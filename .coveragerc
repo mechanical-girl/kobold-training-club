@@ -1,5 +1,5 @@
 [run]
-source = app
+source = ktc
 
 [report]
 omit = */python3.9.1//*
