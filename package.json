@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "test": "nyc --reporter=lcov mocha"
+  },
+  "dependencies": {
+    "chai": "^4.3.4",
+    "codecov": "^3.8.3",
+    "mocha": "^9.0.3",
+    "nyc": "^15.1.0"
+  }
+}
