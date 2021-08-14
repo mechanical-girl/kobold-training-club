@@ -3,7 +3,8 @@ var environmentFetcher;
 
 environmentFetcher = {
     fetchEnvironments: function () {
-        return ["aquatic", "arctic", "cave", "coast", "dungeon", "forest", "grassland", "mountain", "planar", "ruins", "swamp", "underground"]
+        return ['aquatic', 'arctic', 'cave', 'coast', 'desert', 'dungeon', 'forest',
+            'grassland', 'mountain', 'planar', 'ruins', 'swamp', 'underground', 'urban']
     }
 };
 
