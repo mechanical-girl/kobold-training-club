@@ -1,7 +1,7 @@
 language: node_js
   node_js: "16"
   install:
-    - npm install
+    - npm install mocha chai nyc
     - npm install -g codecov
   script:
     - nyc --reporter=lcov mocha
