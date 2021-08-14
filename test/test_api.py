@@ -15,9 +15,17 @@ def test_environments_gives_json_with_proper_mimetype(client):
 
 
 def test_environments_gives_correct_list(client):
-    environments_expected = ['aquatic', 'arctic', 'cave', 'coast', 'desert', 'dungeon', 'forest',
-                                        'grassland', 'mountain', 'planar', 'ruins', 'swamp', 'underground', 'urban']
+    expected = ['aquatic', 'arctic', 'cave', 'coast', 'desert', 'dungeon', 'forest',
+                'grassland', 'mountain', 'planar', 'ruins', 'swamp', 'underground', 'urban']
     response = client.get("/api/environments")
-    environments_received = response.get_json()
+    received = response.get_json()
 
-    assert environments_received == environments_expected
+    assert received == expected
+
+
+def test_size_gives_json_with_proper_mimetype(client):
+    expected = ["Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan"]
+    response = client.get("/api/sizes")
+    received = response.get_json()
+
+    assert received == expected

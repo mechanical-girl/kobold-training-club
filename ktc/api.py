@@ -23,3 +23,7 @@ def get_list_of_environments() -> List[str]:
     environments = list(set_of_environments)
     environments.sort()
     return environments
+
+
+def get_list_of_sizes() -> List[str]:
+    return ["Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan"]
