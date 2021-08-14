@@ -2,4 +2,4 @@
 source = app
 
 [report]
-omit = */travis/*
+omit = */python3.9.1//*
