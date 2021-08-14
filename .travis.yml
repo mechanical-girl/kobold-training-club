@@ -1,10 +1,12 @@
+env:
+  - CODECOV_TOKEN='d2d0d3db-98bd-4add-8ab8-782003116ae9'
 language: python
 python:
   - "3.9"
-
 install:
   - pip install -r requirements.txt
   - python app/convertor.py
 script:
   - nosetests --with-coverage test/*.py
-  - coveralls
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
