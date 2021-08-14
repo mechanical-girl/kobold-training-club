@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify
-from api import get_list_of_environments  # type: ignore
+from ktc.api import get_list_of_environments  # type: ignore
 
 app = Flask(__name__)
 
@@ -11,7 +11,8 @@ def home():
 
 @app.route("/api/environments", methods=["GET"])
 def get_environments():
-    return jsonify(api_get_list_of_environments())
+    return jsonify(get_list_of_environments())
 
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
