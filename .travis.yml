@@ -6,4 +6,4 @@ install:
 script:
   - python app/convertor.py
   - mypy app/*.py
-  - coverage run -m nose
+  - nosetests

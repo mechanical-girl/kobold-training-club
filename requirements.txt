@@ -1,4 +1,11 @@
+click==8.0.1
 Flask==2.0.1
+itsdangerous==2.0.1
+Jinja2==3.0.1
+MarkupSafe==2.0.1
 mypy==0.910
-coverage==5.5
+mypy-extensions==0.4.3
 nose==1.3.7
+toml==0.10.2
+typing-extensions==3.10.0.0
+Werkzeug==2.0.1
