@@ -1,22 +1,9 @@
-jobs:
-  include:
-    language: python
-      python: "3.9"
-      install:
-        - pip install -r requirements.txt
-      before_script:
-        - python app/convertor.py
-      script:
-        - nosetests --with-coverage test/*.py
-      after_success:
-        - bash <(curl -s https://codecov.io/bash)
-
-    language: node_js
-      node_js: 16
-      install:
-        - npm install
-        - npm install -g codecov
-      script:
-        - nyc --reporter=lcov mocha
-      after_success:
-        - codecov
+language: node_js
+  node_js: 16
+  install:
+    - npm install
+    - npm install -g codecov
+  script:
+    - nyc --reporter=lcov mocha
+  after_success:
+    - codecov
