@@ -67,7 +67,7 @@ encounter_xp_multipliers = [1, 1.5, 2, 2.5, 3, 4]
 
 PartyType = List[Tuple[int, int]]
 MonstersType = List[Tuple[str, int]]
-db_location = "../data/monsters.db"
+db_location = "data/monsters.db"
 
 
 # Pass a list of tuples (number of characters, level of characters) to allow for multi-level messages
