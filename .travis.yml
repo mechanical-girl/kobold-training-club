@@ -7,10 +7,10 @@ jobs:
         - "3.9"
       before_script:
         - pip install -r requirements.txt
-        - python app/convertor.py
+        - python ktc/convertor.py
       script:
         - nosetests --with-coverage test/*.py
-        - mypy app/*.py
+        - mypy ktc
       after_success:
         - bash <(curl -s https://codecov.io/bash)
     - language: node_js
