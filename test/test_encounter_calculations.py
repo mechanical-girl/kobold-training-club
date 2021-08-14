@@ -1,5 +1,5 @@
 import unittest
-from app.main import diff_calc, cr_calc, get_encounter_difficulty, get_monster_cr
+from ktc.main import diff_calc, cr_calc, get_encounter_difficulty, get_monster_cr
 
 
 class TestDifficultyCalculator(unittest.TestCase):
