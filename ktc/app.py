@@ -1,5 +1,10 @@
+from ktc.api import get_list_of_challenge_ratings
 from flask import Flask, render_template, jsonify
-from ktc.api import get_list_of_environments, get_list_of_sizes  # type: ignore
+try:
+    import api  # type: ignore
+except ModuleNotFoundError:
+    from ktc import api  # type: ignore
+
 
 app = Flask(__name__)
 
@@ -11,12 +16,17 @@ def home():
 
 @app.route("/api/environments", methods=["GET"])
 def get_environments():
-    return jsonify(get_list_of_environments())
+    return jsonify(api.get_list_of_environments())
 
 
 @app.route("/api/sizes", methods=["GET"])
 def get_sizes():
-    return jsonify(get_list_of_sizes())
+    return jsonify(api.get_list_of_sizes())
+
+
+@app.route("/api/crs", methods=["GET"])
+def get_crs():
+    return jsonify(api.get_list_of_challenge_ratings())
 
 
 if __name__ == "__main__":
