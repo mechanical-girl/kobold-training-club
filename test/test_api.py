@@ -50,3 +50,18 @@ def test_cr_list_gives_correct_list(client):
     received = response.get_json()
 
     assert received == expected
+
+
+def test_source_list_gives_json_with_proper_mimetype(client):
+    response = client.get("/api/sources")
+    assert response.status_code == 200
+    assert response.content_type == 'application/json'
+
+
+def test_source_list_gives_correct_list(client):
+    expected = ['Basic Rules v1',  'Curse of Strahd',  'Fifth Edition Foes',  'Hoard of the Dragon Queen',  'HotDQ supplement',  'Monster Manual',  'Monster Module',  'Monster-A-Day',  "Nerzugal's Extended Bestiary",  'Out of the Abyss',  "Player's Handbook",
+                'Primeval Thule Campaign Setting',  "Primeval Thule Gamemaster's Companion",  'Princes of the Apocalypse',  'Princes of the Apocalypse Online Supplement v1.0',  'Rise of Tiamat',  "Storm King's Thunder",  'Tales from the Yawning Portal',  'Tome of Beasts',  "Volo's Guide to Monsters"]
+    response = client.get("/api/sources")
+    received = response.get_json()
+
+    assert received == expected

@@ -1,3 +1,3 @@
 npm test
-nosetests --with-coverage test/*.py
+coverage run -m pytest test/*.py
 mypy ktc

@@ -29,5 +29,10 @@ def get_crs():
     return jsonify(api.get_list_of_challenge_ratings())
 
 
+@app.route("/api/sources", methods=["GET"])
+def get_sources():
+    return jsonify(api.get_list_of_sources())
+
+
 if __name__ == "__main__":
     app.run(debug=True)
