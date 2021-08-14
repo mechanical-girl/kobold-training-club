@@ -76,9 +76,8 @@ def diff_calc(party: PartyType, enc_xp: int) -> str:
     party_thresholds = [0, 0, 0, 0]
     for tup in party:
         (size, level) = tup
-        tup_thresholds = [threshold*size for threshold in xp_thresholds[level]]
-        for i, threshold in enumerate(tup_thresholds):
-            party_thresholds[i] += threshold
+        for i in range(len(party_thresholds)):
+            party_thresholds[i] += xp_thresholds[level][i]*size
 
     if enc_xp < party_thresholds[0]:
         return "trifling"
