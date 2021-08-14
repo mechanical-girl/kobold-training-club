@@ -9,7 +9,7 @@ jobs:
         - pip install -r requirements.txt
         - python ktc/convertor.py
       script:
-        - nosetests --with-coverage test/*.py
+        - coverage run -m pytest test
         - mypy ktc
       after_success:
         - bash <(curl -s https://codecov.io/bash)
