@@ -7,5 +7,4 @@ install:
   - python app/convertor.py
 script:
   - nosetests --with-coverage test/*.py
-  - mocha --reporter node_modules/mocha-lcov-reporter test/*.js > coverage.info
   - coveralls
