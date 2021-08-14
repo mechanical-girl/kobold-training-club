@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify
-from api import get_list_of_environments
+from api import get_list_of_environments  # type: ignore
 
 app = Flask(__name__)
 
