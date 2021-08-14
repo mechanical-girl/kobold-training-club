@@ -10,6 +10,7 @@ jobs:
         - python app/convertor.py
       script:
         - nosetests --with-coverage test/*.py
+        - mypy app/*.py
       after_success:
         - bash <(curl -s https://codecov.io/bash)
     - language: node_js
