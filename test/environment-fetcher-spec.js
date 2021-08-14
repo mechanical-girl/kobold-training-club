@@ -2,7 +2,7 @@
 
 'use strict';
 var expect = require('chai').expect;
-var EnvironmentFetcher = require('../app/static/environment-fetcher.js');
+var EnvironmentFetcher = require('../app/static/js/environment-fetcher.js');
 
 describe('EnvironmentFetcher', function () {
     it('should exist', function () {
