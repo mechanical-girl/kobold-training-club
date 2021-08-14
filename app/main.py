@@ -1,31 +1,32 @@
 from typing import List, Tuple
 import sqlite3
+import contextlib
 
 xp_per_day_per_character_per_level = [0, 300, 600, 1200, 1700, 3500, 4000, 5000, 6000, 7500,
                                       9000, 10500, 11500, 13500, 15000, 18000, 20000, 25000, 27000, 30000, 40000]
 
-xp_thresholds = [[],
-                 [25, 50, 75, 100],
-                 [50, 100, 150, 200],
-                 [75, 150, 225, 400],
-                 [125, 250, 375, 500],
-                 [250, 500, 750, 1100],
-                 [300, 600, 900, 1400],
-                 [350, 750, 1100, 1700],
-                 [450, 900, 1400, 2100],
-                 [550, 1100, 1600, 2400],
-                 [600, 1200, 1900, 2800],
-                 [800, 1600, 2400, 3600],
-                 [1000, 2000, 3000, 4500],
-                 [1100, 2200, 3400, 5100],
-                 [1250, 2500, 3800, 5700],
-                 [1400, 2800, 4300, 6400],
-                 [1600, 3200, 4800, 7200],
-                 [2000, 3900, 5900, 8800],
-                 [2100, 4200, 6300, 9500],
-                 [2400, 4900, 7300, 10900],
-                 [2800, 5700, 8500, 12700]
-                 ]
+xp_thresholds: List[List[int]] = [[],
+                                  [25, 50, 75, 100],
+                                  [50, 100, 150, 200],
+                                  [75, 150, 225, 400],
+                                  [125, 250, 375, 500],
+                                  [250, 500, 750, 1100],
+                                  [300, 600, 900, 1400],
+                                  [350, 750, 1100, 1700],
+                                  [450, 900, 1400, 2100],
+                                  [550, 1100, 1600, 2400],
+                                  [600, 1200, 1900, 2800],
+                                  [800, 1600, 2400, 3600],
+                                  [1000, 2000, 3000, 4500],
+                                  [1100, 2200, 3400, 5100],
+                                  [1250, 2500, 3800, 5700],
+                                  [1400, 2800, 4300, 6400],
+                                  [1600, 3200, 4800, 7200],
+                                  [2000, 3900, 5900, 8800],
+                                  [2100, 4200, 6300, 9500],
+                                  [2400, 4900, 7300, 10900],
+                                  [2800, 5700, 8500, 12700]
+                                  ]
 
 cr_xp_mapping = {"0":   10,
                  "1/8": 25,
@@ -69,9 +70,10 @@ PartyType = List[Tuple[int, int]]
 MonstersType = List[Tuple[str, int]]
 db_location = "data/monsters.db"
 
-
 # Pass a list of tuples (number of characters, level of characters) to allow for multi-level messages
 # Pass an int of the encounter xp
+
+
 def diff_calc(party: PartyType, enc_xp: int) -> str:
     party_thresholds = [0, 0, 0, 0]
     for tup in party:
@@ -119,12 +121,12 @@ def cr_calc(cr: List[str], quantities: List[int]) -> int:
 
 
 def get_monster_cr(monster: str) -> str:
-    conn = sqlite3.connect(db_location)
-    c = conn.cursor()
+    with contextlib.closing(sqlite3.connect(db_location)) as conn:
+        c = conn.cursor()
 
-    c.execute('''SELECT cr FROM monsters WHERE name = ?''', (monster,))
-    monster_cr = c.fetchone()[0]
-    return monster_cr
+        c.execute('''SELECT cr FROM monsters WHERE name = ?''', (monster,))
+        monster_cr = c.fetchone()[0]
+        return monster_cr
 
 
 def get_encounter_difficulty(party: PartyType, monsters: MonstersType) -> Tuple[int, str]:
@@ -139,3 +141,22 @@ def get_encounter_difficulty(party: PartyType, monsters: MonstersType) -> Tuple[
     diff_level = diff_calc(party, encounter_exp)
 
     return((encounter_exp, diff_level,))
+
+
+def api_get_list_of_environments() -> List[str]:
+    with contextlib.closing(sqlite3.connect(db_location)) as conn:
+        c = conn.cursor()
+
+        c.execute('''SELECT DISTINCT environment FROM monsters''')
+        unique_environments = [item[0] for item in c.fetchall()]
+
+    set_of_environments = set()
+    for environment in unique_environments:
+        if not environment:
+            continue
+        for env in environment.split(','):
+            set_of_environments.add(env.strip())
+
+    environments = list(set_of_environments)
+    environments.sort()
+    return environments
