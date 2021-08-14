@@ -28,7 +28,6 @@ conn.commit()
 
 with open('data/kfc master monster list - Monsters.tsv') as f:
     line = f.readline()
-    print(line)
     while True:
         line = f.readline()
         if not line:
