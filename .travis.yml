@@ -1,9 +1,11 @@
 language: python
 python:
   - "3.9"
+
 install:
   - pip install -r requirements.txt
   - python app/convertor.py
 script:
-  - nosetests --with-coverage
+  - nosetests --with-coverage test/*.py
+  - mocha --reporter node_modules/mocha-lcov-reporter test/*.js > coverage.info
   - coveralls
