@@ -1,4 +1,3 @@
-from ktc.api import get_list_of_challenge_ratings
 from flask import Flask, render_template, jsonify
 try:
     import api  # type: ignore

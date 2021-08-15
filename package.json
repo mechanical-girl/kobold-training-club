@@ -1,12 +1,41 @@
 {
   "scripts": {
-    "test": "nyc --reporter=lcov mocha"
+    "test": "nyc --reporter=lcov jasmine"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "jQuery": "global:jQuery"
   },
   "dependencies": {
-    "chai": "^4.3.4",
     "codecov": "^3.8.3",
-    "mocha": "^9.0.3",
+    "jquery": "^3.6.0",
     "ms": "^2.1.3",
     "nyc": "^15.1.0"
-  }
+  },
+  "name": "kobold-training-club",
+  "description": "[![codecov](https://codecov.io/gh/PouncySilverkitten/kobold-training-club/branch/master/graph/badge.svg?token=YHPHF6CDMG)](https://codecov.io/gh/PouncySilverkitten/kobold-training-club) [![Build Status](https://travis-ci.com/PouncySilverkitten/kobold-training-club.svg?branch=master)](https://travis-ci.com/PouncySilverkitten/kobold-training-club)",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "devDependencies": {
+    "browserify-shim": "^3.8.14",
+    "jasmine": "^3.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pouncysilverkitten/kobold-training-club.git"
+  },
+  "author": "Struan Duncan-Wilson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pouncysilverkitten/kobold-training-club/issues"
+  },
+  "homepage": "https://github.com/pouncysilverkitten/kobold-training-club#readme"
 }
