@@ -65,3 +65,18 @@ def test_source_list_gives_correct_list(client):
     received = response.get_json()
 
     assert received == expected
+
+
+def test_type_list_gives_json_with_proper_mimetype(client):
+    response = client.get("/api/types")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_type_list_gives_correct_list(client):
+    expected = ["Aberration", "Beast", "Celestial", "Construct", "Dragon", "Elemental",
+                "Fey", "Fiend", "Giant", "Humanoid", "Monstrosity", "Ooze", "Plant", "Undead"]
+    response = client.get("/api/types")
+    received = response.get_json()
+
+    assert received == expected

@@ -57,3 +57,16 @@ def test_source_list_returns_unique_list_of_sources():
                 'Primeval Thule Campaign Setting',  "Primeval Thule Gamemaster's Companion",  'Princes of the Apocalypse',  'Princes of the Apocalypse Online Supplement v1.0',  'Rise of Tiamat',  "Storm King's Thunder",  'Tales from the Yawning Portal',  'Tome of Beasts',  "Volo's Guide to Monsters"]
     actual = api.get_list_of_sources()
     assert expected == actual
+
+
+def test_alignment_list_returns_list():
+    expected = type(list())
+    actual = type(api.get_list_of_alignments())
+    assert expected == actual
+
+
+def test_alignment_list_returns_unique_list_of_alignments():
+    expected = ['any', 'any chaotic', 'any evil', 'any good', 'any lawful', 'chaotic evil', 'chaotic good', 'chaotic neutral', 'lawful evil',
+                'lawful good', 'lawful good', 'lawful neutral', 'neutral', 'neutral evil', 'neutral good', 'neutral good ', 'non-good', 'non-lawful', 'unaligned']
+    actual = api.get_list_of_alignments()
+    assert expected == actual
