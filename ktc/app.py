@@ -33,5 +33,10 @@ def get_sources():
     return jsonify(api.get_list_of_sources())
 
 
+@app.route("/api/types", methods=["GET"])
+def get_types():
+    return jsonify(api.get_list_of_monster_types())
+
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -81,6 +81,18 @@ def get_list_of_challenge_ratings() -> List[str]:
     return unique_crs
 
 
+def get_list_of_alignments() -> List[str]:
+    with contextlib.closing(sqlite3.connect(db_location)) as conn:
+        c = conn.cursor()
+
+        c.execute('''SELECT DISTINCT alignment FROM monsters''')
+        unique_alignments = [item[0].lower()
+                             for item in c.fetchall() if not " or " in item[0]]
+
+    unique_alignments.sort()
+    return unique_alignments
+
+
 def get_list_of_sources() -> List[str]:
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
