@@ -80,3 +80,18 @@ def test_type_list_gives_correct_list(client):
     received = response.get_json()
 
     assert received == expected
+
+
+def test_alignment_list_gives_json_with_proper_mimetype(client):
+    response = client.get("/api/alignments")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_alignment_list_gives_correct_list(client):
+    expected = ['any', 'any chaotic', 'any evil', 'any good', 'any lawful', 'chaotic evil', 'chaotic good', 'chaotic neutral', 'lawful evil',
+                'lawful good', 'lawful good', 'lawful neutral', 'neutral', 'neutral evil', 'neutral good', 'neutral good ', 'non-good', 'non-lawful', 'unaligned']
+    response = client.get("/api/alignments")
+    received = response.get_json()
+
+    assert received == expected

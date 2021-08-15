@@ -38,5 +38,10 @@ def get_types():
     return jsonify(api.get_list_of_monster_types())
 
 
+@app.route("/api/alignments", methods=["GET"])
+def get_alignments():
+    return jsonify(api.get_list_of_alignments())
+
+
 if __name__ == "__main__":
     app.run(debug=True)
