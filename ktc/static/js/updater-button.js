@@ -10,7 +10,8 @@ var updaterButtonClicked = function (clicked_button) {
                 selected_elements.push(this_box.id);
             }
         }
-        return selected_elements
+        console.log(selected_elements)
+        return selected_elements;
     }
 }
 
