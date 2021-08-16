@@ -8,7 +8,7 @@ var listElements = function (data, prefix = "") {
     }
     listText = "";
     for (let i = 0; i < data.length; i++) {
-        listText += ("<li id='" + prefix + data[i] + "'><label><input type='checkbox' class='monitor' id=" + prefix + data[i] + ">" + data[i] + "</label></li>");
+        listText += ("<li><label><input type='checkbox' id='" + prefix + data[i] + "'>" + data[i] + "</label></li>");
     };
     return listText;
 };
@@ -21,12 +21,16 @@ var updaterButtonClicked = require('./updater-button.js')
 //https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 
-$($.getJSON("/api/environments", function (data) {
-
-    var parent = $("#environments_selector");
-    parent.append(listElements(data, "environment"));
-
-}));
+$(function () {
+    selectors = ["environments", "sizes", "types", "alignments", "sources"]
+    for (let i = 0; i < selectors.length; i++) {
+        let selector = selectors[i]
+        $.getJSON("/api/" + selector, function (data) {
+            var parent = $("#" + selector + "_selector");
+            parent.append(listElements(data, selector));
+        })
+    }
+})
 
 $(function () {
     $(".updater_button").on("click", function () {
@@ -40,13 +44,15 @@ $(function () {
 var updaterButtonClicked = function (clicked_button) {
     if (clicked_button != undefined) {
         parent_list = $(clicked_button).prev()
-        console.log(parent_list.attr("id"))
+        var selected_elements = []
         for (var i = 0; i < parent_list.children().length; i++) {
             var this_box = parent_list.children()[i].children[0].children[0];
             if ($(this_box).prop("checked")) {
-                console.log(this_box.id)
+                selected_elements.push(this_box.id);
             }
         }
+        console.log(selected_elements)
+        return selected_elements;
     }
 }
 
