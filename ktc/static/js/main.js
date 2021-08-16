@@ -19,3 +19,15 @@ $(function () {
         updaterButtonClicked(this);
     })
 });
+
+// Relabel expand and collapse buttons
+$(function () {
+    $('.expand-collapse').on("click", function () {
+        if ($(this).hasClass('glyphicon-chevron-down')) {
+            $(this).html('<i class="bi bi-chevron-up"></i> Hide');
+        }
+        else {
+            $(this).html('<i class="bi bi-chevron-down"></i> Show');
+        }
+    });
+})

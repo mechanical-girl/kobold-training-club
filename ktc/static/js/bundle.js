@@ -37,6 +37,18 @@ $(function () {
         updaterButtonClicked(this);
     })
 });
+
+// Relabel expand and collapse buttons
+$(function () {
+    $('.expand-collapse').on("click", function () {
+        if ($(this).hasClass('glyphicon-chevron-down')) {
+            $(this).html('<i class="bi bi-chevron-up"></i> Hide');
+        }
+        else {
+            $(this).html('<i class="bi bi-chevron-down"></i> Show');
+        }
+    });
+})
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./element_lister.js":1,"./updater-button.js":3}],3:[function(require,module,exports){
 // updater-button.js
