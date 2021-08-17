@@ -135,7 +135,7 @@ def get_list_of_monsters(parameters: Dict) -> List[Dict]:
                          "size": monster[2].strip(),
                          "type": monster[3].strip(),
                          "alignment": monster[4].strip(),
-                         "source": monster[5].strip()
+                         "sources": monster[5].strip()
                          })
 
     return monsters

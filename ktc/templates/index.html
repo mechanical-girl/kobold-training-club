@@ -14,74 +14,116 @@
 </head>
 
 <body>
-    <div class="container">
-        <h3>Choose your monsters here</h3>
+    <div class="container" style="font-size: 10pt">
         <div class="row">
-            <div class="col">
-                <h4>Environments</h4>
-                <button class="btn btn-primary expand-collapse" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#environmentsCollapser" aria-expanded="true" aria-controls="collapseExample">
-                    <i class="bi bi-chevron-up"></i> Hide
-                </button>
-
-                <div class="collapse show" id="environmentsCollapser">
-                    <ul id="environments_selector">
-                    </ul>
-                    <button class="updater_button">Update</button>
-                </div>
-            </div>
-
-            <div class="col-2">
-                <h4>Sizes</h4>
-                <button class="btn btn-primary expand-collapse" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#sizesCollapser" aria-expanded="true" aria-controls="collapseExample">
-                    <i class="bi bi-chevron-up"></i> Hide
-                </button>
-                <div class="collapse show" id="sizesCollapser">
-                    <ul id="sizes_selector">
-                    </ul>
-                    <button class="updater_button">Update</button>
-                </div>
-            </div>
             <div class="col-4">
-                <h4>Sources</h4>
-                <button class="btn btn-primary expand-collapse" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#sourcesCollapser" aria-expanded="true" aria-controls="collapseExample">
-                    <i class="bi bi-chevron-up"></i> Hide
-                </button>
-                <div class="collapse show" id="sourcesCollapser">
-                    <ul id="sources_selector">
-                    </ul>
-                    <button class="updater_button">Update</button>
+                <h3>Choose your monsters here</h3>
+                <div class="accordion" id="accordionSelector">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="environmentsHeader">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#vollapseEnvironments" aria-expanded="true"
+                                aria-controls="vollapseEnvironments">
+                                Environments
+                            </button>
+                        </h2>
+                        <div id="vollapseEnvironments" class="accordion-collapse collapse show"
+                            aria-labelledby="environmentsHeader" data-bs-parent="#accordionSelector">
+                            <div class="accordion-body">
+                                <ul id="environments_selector">
+                                </ul>
+                                <button class="updater_button">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="sizesHeader">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseSizes" aria-expanded="false" aria-controls="collapseSizes">
+                                Sizes
+                            </button>
+                        </h2>
+                        <div id="collapseSizes" class="accordion-collapse collapse" aria-labelledby="sizesHeader"
+                            data-bs-parent="#accordionSelector">
+                            <div class="accordion-body">
+                                <ul id="sizes_selector">
+                                </ul>
+                                <button class="updater_button">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingSources">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseSources" aria-expanded="false" aria-controls="collapseSources">
+                                Sources
+                            </button>
+                        </h2>
+                        <div id="collapseSources" class="accordion-collapse collapse" aria-labelledby="headingSources"
+                            data-bs-parent="#accordionSelector">
+                            <div class="accordion-body">
+                                <ul id="sources_selector">
+                                </ul>
+                                <button class="updater_button">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTypes">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTypes" aria-expanded="false" aria-controls="collapseTypes">
+                                Types
+                            </button>
+                        </h2>
+                        <div id="collapseTypes" class="accordion-collapse collapse" aria-labelledby="headingTypes"
+                            data-bs-parent="#accordionSelector">
+                            <div class="accordion-body">
+                                <ul id="types_selector">
+                                </ul>
+                                <button class="updater_button">Update</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingAlignments">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseAlignments" aria-expanded="false"
+                                aria-controls="collapseAlignments">
+                                Alignments
+                            </button>
+                        </h2>
+                        <div id="collapseAlignments" class="accordion-collapse collapse"
+                            aria-labelledby="headingAlignments" data-bs-parent="#accordionSelector">
+                            <div class="accordion-body">
+                                <ul id="alignments_selector">
+                                </ul>
+                                <button class="updater_button">Update</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-2">
-                <h4>Types</h4>
-                <button class="btn btn-primary expand-collapse" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#typesCollapser" aria-expanded="true" aria-controls="collapseExample">
-                    <i class="bi bi-chevron-up"></i> Hide
-                </button>
-                <div class="collapse show" id="typesCollapser">
-                    <ul id="types_selector">
-                    </ul>
-                    <button class="updater_button">Update</button>
-                </div>
+            <div class="col-8">
+                <table class="table" id="monsterTable">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">CR</th>
+                            <th scope="col">Size</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Alignment</th>
+                            <th scope="col">Source(s)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
             </div>
-            <div class="col-2">
-                <h4>Alignments</h4>
-                <button class="btn btn-primary expand-collapse" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#alignmentsCollapser" aria-expanded="true" aria-controls="collapseExample">
-                    <i class="bi bi-chevron-up"></i> Hide
-                </button>
-                <div class="collapse show" id="alignmentsCollapser">
-                    <ul id="alignments_selector">
-                    </ul>
-                    <button class="updater_button">Update</button>
-                </div>
-            </div>
+            <script src="static/js/bundle.js"></script>
         </div>
     </div>
-    <script src="static/js/bundle.js"></script>
 </body>
 
 </html>

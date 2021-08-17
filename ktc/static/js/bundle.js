@@ -18,7 +18,8 @@ module.exports = listElements
 (function (global){(function (){
 var listElements = require('./element_lister.js')
 var updaterButtonClicked = require('./updater-button.js')
-//https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
+var monsterTable = require("./monster-table.js")
+// https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 
 $(function () {
@@ -28,8 +29,10 @@ $(function () {
         $.getJSON("/api/" + selector, function (data) {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
-        })
-    }
+        });
+    };
+
+    let monsterTableString = monsterTable.monsterTableFinder(monsterTable.monsterTableUpdater);
 })
 
 $(function () {
@@ -50,7 +53,37 @@ $(function () {
     });
 })
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./element_lister.js":1,"./updater-button.js":3}],3:[function(require,module,exports){
+},{"./element_lister.js":1,"./monster-table.js":3,"./updater-button.js":4}],3:[function(require,module,exports){
+// monster-table.js
+
+var monsterTableFinder = function (callback, parameters = []) {
+    $.getJSON("/api/monsters", { "params": parameters }, callback);
+}
+
+var monsterTableFormatter = function (monsters) {
+    tableString = "";
+    for (var i = 0; i < monsters.length; i++) {
+        tableString = tableString + '<tr><th scope="row">';
+        tableString = tableString + monsters[i]['name'] + '</th><td>';
+        tableString = tableString + monsters[i]['cr'] + '</td><td>';
+        tableString = tableString + monsters[i]['size'] + '</td><td>';
+        tableString = tableString + monsters[i]['type'] + '</td><td>';
+        tableString = tableString + monsters[i]['alignment'] + '</td><td>';
+        tableString = tableString + monsters[i]['sources'] + '</td></tr>\n';
+    }
+    console.log(tableString);
+    return tableString;
+
+};
+
+var monsterTableUpdater = function (monsters) {
+    var tableText = monsterTableFormatter(monsters);
+    $('#monsterTable tbody').empty();
+    $('#monsterTable tbody').append(tableText);
+}
+
+module.exports = { monsterTableFinder: monsterTableFinder, monsterTableFormatter: monsterTableFormatter, monsterTableUpdater: monsterTableUpdater };
+},{}],4:[function(require,module,exports){
 // updater-button.js
 
 var updaterButtonClicked = function (clicked_button) {

@@ -1,6 +1,7 @@
 var listElements = require('./element_lister.js')
 var updaterButtonClicked = require('./updater-button.js')
-//https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
+var monsterTable = require("./monster-table.js")
+// https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = require('jQuery');
 
 $(function () {
@@ -10,8 +11,10 @@ $(function () {
         $.getJSON("/api/" + selector, function (data) {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
-        })
-    }
+        });
+    };
+
+    let monsterTableString = monsterTable.monsterTableFinder(monsterTable.monsterTableUpdater);
 })
 
 $(function () {
