@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 try:
     import api  # type: ignore
 except ModuleNotFoundError:
@@ -41,6 +41,12 @@ def get_types():
 @app.route("/api/alignments", methods=["GET"])
 def get_alignments():
     return jsonify(api.get_list_of_alignments())
+
+
+@app.route("/api/monsters", methods=["GET"])
+def get_monsters():
+    monster_parameters = request.args.get('params')
+    return jsonify(api.get_list_of_monsters(monster_parameters))
 
 
 if __name__ == "__main__":

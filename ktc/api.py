@@ -1,6 +1,6 @@
 import sqlite3
 import contextlib
-from typing import List
+from typing import Dict, List
 from fractions import Fraction
 
 
@@ -109,3 +109,33 @@ def get_list_of_sources() -> List[str]:
     sources = list(set_of_sources)
     sources.sort()
     return sources
+
+
+def get_list_of_monsters(parameters: Dict) -> List[Dict]:
+    """Query the database for monsters matching the parameters passed and return a list
+
+    Args:
+        parameters (Dict): a dict of parameters, consisting of column names: [acceptable values]
+
+    Returns:
+        List[Tuple]: a list of dicts, each dict describing a single monster
+    """
+
+    with contextlib.closing(sqlite3.connect(db_location)) as conn:
+        c = conn.cursor()
+
+        c.execute(
+            '''SELECT name, cr, size, type, alignment, source FROM monsters ORDER BY name asc LIMIT 20''')
+        monster_list = c.fetchall()
+
+    monsters = []
+    for monster in monster_list:
+        monsters.append({"name": monster[0].strip(),
+                         "cr": monster[1].strip(),
+                         "size": monster[2].strip(),
+                         "type": monster[3].strip(),
+                         "alignment": monster[4].strip(),
+                         "source": monster[5].strip()
+                         })
+
+    return monsters

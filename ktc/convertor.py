@@ -34,6 +34,9 @@ with open('data/kfc master monster list - Monsters.tsv') as f:
             break
 
         values = line.split("\t")
+        for value in values:
+            value.replace("'           'v1.0", " v1.0")
+            value.strip()
         c.execute('''INSERT INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                   (*values,))
 
