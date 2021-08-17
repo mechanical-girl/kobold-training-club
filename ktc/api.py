@@ -3,8 +3,11 @@ import contextlib
 from typing import Dict, List
 from fractions import Fraction
 
+import os
 
-db_location = "data/monsters.db"
+
+path_to_database = os.path.join(os.path.dirname("../data", "monsters.db"))
+db_location = path_to_database
 
 
 def sort_sizes(size_list: List[str]) -> List[str]:
