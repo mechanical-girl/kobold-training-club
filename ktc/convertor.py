@@ -1,8 +1,10 @@
 import sqlite3
 
 
-path_to_database = os.path.join(os.path.dirname("../data"), "monsters.db")
+path_to_database = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), os.pardir, "data/monsters.db"))
 db_location = path_to_database
+
 
 conn = sqlite3.connect(db_location)
 c = conn.cursor()
