@@ -43,7 +43,7 @@ global.$ = require('jquery')(window);
 describe("#getUpdatedValues", function () {
     it('should return a list of the ids of checked boxes, given the id of the ul.', function () {
         let expected = ["third_input"]
-        let actual = updaterButton.GetUpdatedValues("checkList")
+        let actual = updaterButton.GetUpdatedValues("checkList");
         expect(actual).toEqual(expected);
     })
 })

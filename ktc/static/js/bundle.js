@@ -42,7 +42,7 @@ $(function () {
         var listUpdated = updaterButton.AssociatedId(this);
         listUpdatedName = listUpdated.split("_")[0];
         monsterParameters[listUpdatedName] = updaterButton.GetUpdatedValues(listUpdated);
-        console.log(monsterParameters);
+        monsterTable.update(monsterParameters);
     })
 });
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
@@ -50,7 +50,7 @@ $(function () {
 // monster-table.js
 
 var monsterTableFinder = function (callback, parameters) {
-    $.getJSON("/api/monsters", { "params": parameters }, callback);
+    $.post("/api/monsters", { params: JSON.stringify(parameters) }, callback);
 }
 
 var monsterTableFormatter = function (monsters) {
@@ -78,7 +78,7 @@ var update = function (params = {}) {
     monsterTableFinder(monsterTableUpdater, params);
 }
 
-module.exports = { update: update };
+module.exports = { update: update, monsterTableFormatter: monsterTableFormatter, monsterTableUpdater: monsterTableUpdater };
 },{}],4:[function(require,module,exports){
 // updater-button.js
 

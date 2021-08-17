@@ -121,11 +121,94 @@ def get_list_of_monsters(parameters: Dict) -> List[Dict]:
         List[Tuple]: a list of dicts, each dict describing a single monster
     """
 
+    if not parameters:
+        parameters = {}
+
+    try:
+        environment_constraints = [param.split("_")[1] for param
+                                   in parameters["environments"]]
+    except KeyError:
+        environment_constraints = []
+
+    try:
+        size_constraints = [param.split("_")[1] for param
+                            in parameters["sizes"]]
+    except KeyError:
+        size_constraints = []
+
+    try:
+        source_constraints = [param.split("_")[1] for param
+                              in parameters["sources"]]
+    except KeyError:
+        source_constraints = []
+
+    try:
+        type_constraints = [param.split("_")[1] for param
+                            in parameters["types"]]
+    except KeyError:
+        type_constraints = []
+
+    try:
+        alignment_constraints = [param.split("_")[1] for param
+                                 in parameters["alignments"]]
+    except KeyError:
+        alignment_constraints = []
+
+    # Oh, this is clumsy, I hate this
+    where_requirements = ""
+    query_arguments = []
+    query_from = "monsters"
+
+    # SO
+    # If we have size constraints, we construct a string of placeholders,
+    # then put that into a IN subquery
+    # and then append the constraints to the query_arguments list
+    if environment_constraints != []:
+        environment_query_placeholders = f"({', '.join(['?']*len(environment_constraints))})"
+        where_requirements += f"environment IN {environment_query_placeholders} AND "
+        query_arguments += environment_constraints
+
+    if size_constraints != []:
+        size_query_placeholders = f"({', '.join(['?']*len(size_constraints))})"
+        where_requirements += f"size IN {size_query_placeholders} AND "
+        query_arguments += size_constraints
+
+    if source_constraints != []:
+        query_from = "(SELECT * FROM monsters WHERE "
+        for i in range(len(source_constraints)):
+            query_from += "source LIKE ? OR "
+            source_constraints[i] = f"%{source_constraints[i]}%"
+        query_from = query_from[:-4]
+        query_from += ")"
+        query_arguments = source_constraints + query_arguments
+
+    if type_constraints != []:
+        type_query_placeholders = f"({', '.join(['?']*len(type_constraints))})"
+        where_requirements += f"type IN {type_query_placeholders} AND "
+        query_arguments += type_constraints
+
+    if alignment_constraints != []:
+        alignment_query_placeholders = f"({', '.join(['?']*len(alignment_constraints))})"
+        where_requirements += f"alignment IN {alignment_query_placeholders} AND "
+        query_arguments += alignment_constraints
+
+    # If there are requirements, we add a WHERE to the start
+    if where_requirements != "":
+        where_requirements = ("WHERE ") + where_requirements
+    # Take of the trailing " and "
+    if where_requirements.endswith(" AND "):
+        where_requirements = where_requirements[:-5]
+
+    query_string = f'''SELECT name, cr, size, type, alignment, source FROM {query_from} {where_requirements} ORDER BY name asc LIMIT 20'''
+
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
+        conn.set_trace_callback(print)
 
-        c.execute(
-            '''SELECT name, cr, size, type, alignment, source FROM monsters ORDER BY name asc LIMIT 20''')
+        if query_arguments:
+            c.execute(query_string, (*query_arguments,))
+        else:
+            c.execute(query_string)
         monster_list = c.fetchall()
 
     monsters = []

@@ -1,7 +1,7 @@
 // monster-table.js
 
 var monsterTableFinder = function (callback, parameters) {
-    $.getJSON("/api/monsters", { "params": parameters }, callback);
+    $.post("/api/monsters", { params: JSON.stringify(parameters) }, callback);
 }
 
 var monsterTableFormatter = function (monsters) {

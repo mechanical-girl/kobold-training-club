@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request
+import json
 try:
     import api  # type: ignore
 except ModuleNotFoundError:
@@ -43,9 +44,17 @@ def get_alignments():
     return jsonify(api.get_list_of_alignments())
 
 
-@app.route("/api/monsters", methods=["GET"])
+@app.route("/api/monsters", methods=["GET", "POST"])
 def get_monsters():
-    monster_parameters = request.args.get('params')
+    print(request.form)
+    try:
+        monster_parameters_string = request.values['params']
+        print(monster_parameters_string)
+        monster_parameters = json.loads(
+            monster_parameters_string.replace("'", '"'))
+    except:
+        monster_parameters = {}
+    print(monster_parameters)
     return jsonify(api.get_list_of_monsters(monster_parameters))
 
 
