@@ -1,6 +1,6 @@
 // monster-table.js
 
-var monsterTableFinder = function (callback, parameters = []) {
+var monsterTableFinder = function (callback, parameters) {
     $.getJSON("/api/monsters", { "params": parameters }, callback);
 }
 
@@ -15,7 +15,6 @@ var monsterTableFormatter = function (monsters) {
         tableString = tableString + monsters[i]['alignment'] + '</td><td>';
         tableString = tableString + monsters[i]['sources'] + '</td></tr>\n';
     }
-    console.log(tableString);
     return tableString;
 
 };
@@ -26,4 +25,8 @@ var monsterTableUpdater = function (monsters) {
     $('#monsterTable tbody').append(tableText);
 }
 
-module.exports = { monsterTableFinder: monsterTableFinder, monsterTableFormatter: monsterTableFormatter, monsterTableUpdater: monsterTableUpdater };
+var update = function (params = {}) {
+    monsterTableFinder(monsterTableUpdater, params);
+}
+
+module.exports = { update: update, monsterTableFormatter: monsterTableFormatter, monsterTableUpdater: monsterTableUpdater };

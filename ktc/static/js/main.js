@@ -1,8 +1,10 @@
 var listElements = require('./element_lister.js')
-var updaterButtonClicked = require('./updater-button.js')
+var updaterButton = require('./updater-button.js')
 var monsterTable = require("./monster-table.js")
 // https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = require('jQuery');
+
+var monsterParameters = {};
 
 $(function () {
     selectors = ["environments", "sizes", "types", "alignments", "sources"]
@@ -14,23 +16,14 @@ $(function () {
         });
     };
 
-    let monsterTableString = monsterTable.monsterTableFinder(monsterTable.monsterTableUpdater);
+    monsterTable.update();
 })
 
 $(function () {
     $(".updater_button").on("click", function () {
-        updaterButtonClicked(this);
+        var listUpdated = updaterButton.AssociatedId(this);
+        listUpdatedName = listUpdated.split("_")[0];
+        monsterParameters[listUpdatedName] = updaterButton.GetUpdatedValues(listUpdated);
+        monsterTable.update(monsterParameters);
     })
 });
-
-// Relabel expand and collapse buttons
-$(function () {
-    $('.expand-collapse').on("click", function () {
-        if ($(this).hasClass('glyphicon-chevron-down')) {
-            $(this).html('<i class="bi bi-chevron-up"></i> Hide');
-        }
-        else {
-            $(this).html('<i class="bi bi-chevron-down"></i> Show');
-        }
-    });
-})

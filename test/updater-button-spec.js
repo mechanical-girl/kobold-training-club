@@ -14,7 +14,7 @@ var dom = new JSDOM('\
     <head>\
     </head>\
     <body>\
-        <ul>\
+        <ul id="checkList">\
             <li>\
                 <label>\
                     <input type="checkbox" id="first_input">\
@@ -40,10 +40,10 @@ var document = dom.window.document;
 var window = document.defaultView;
 global.$ = require('jquery')(window);
 
-describe("#updaterButton", function () {
-    it('should return a list of the ids of checked boxes, given the id of the next element to the ul.', function () {
+describe("#getUpdatedValues", function () {
+    it('should return a list of the ids of checked boxes, given the id of the ul.', function () {
         let expected = ["third_input"]
-        let actual = updaterButton(document.getElementById("test_span"))
+        let actual = updaterButton.GetUpdatedValues("checkList")
         expect(actual).toEqual(expected);
     })
 })

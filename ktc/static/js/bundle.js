@@ -17,10 +17,12 @@ module.exports = listElements
 },{}],2:[function(require,module,exports){
 (function (global){(function (){
 var listElements = require('./element_lister.js')
-var updaterButtonClicked = require('./updater-button.js')
+var updaterButton = require('./updater-button.js')
 var monsterTable = require("./monster-table.js")
 // https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
+
+var monsterParameters = {};
 
 $(function () {
     selectors = ["environments", "sizes", "types", "alignments", "sources"]
@@ -32,31 +34,22 @@ $(function () {
         });
     };
 
-    let monsterTableString = monsterTable.monsterTableFinder(monsterTable.monsterTableUpdater);
+    monsterTable.update();
 })
 
 $(function () {
     $(".updater_button").on("click", function () {
-        updaterButtonClicked(this);
+        var listUpdated = updaterButton.AssociatedId(this);
+        listUpdatedName = listUpdated.split("_")[0];
+        monsterParameters[listUpdatedName] = updaterButton.GetUpdatedValues(listUpdated);
+        console.log(monsterParameters);
     })
 });
-
-// Relabel expand and collapse buttons
-$(function () {
-    $('.expand-collapse').on("click", function () {
-        if ($(this).hasClass('glyphicon-chevron-down')) {
-            $(this).html('<i class="bi bi-chevron-up"></i> Hide');
-        }
-        else {
-            $(this).html('<i class="bi bi-chevron-down"></i> Show');
-        }
-    });
-})
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./element_lister.js":1,"./monster-table.js":3,"./updater-button.js":4}],3:[function(require,module,exports){
 // monster-table.js
 
-var monsterTableFinder = function (callback, parameters = []) {
+var monsterTableFinder = function (callback, parameters) {
     $.getJSON("/api/monsters", { "params": parameters }, callback);
 }
 
@@ -71,7 +64,6 @@ var monsterTableFormatter = function (monsters) {
         tableString = tableString + monsters[i]['alignment'] + '</td><td>';
         tableString = tableString + monsters[i]['sources'] + '</td></tr>\n';
     }
-    console.log(tableString);
     return tableString;
 
 };
@@ -82,13 +74,24 @@ var monsterTableUpdater = function (monsters) {
     $('#monsterTable tbody').append(tableText);
 }
 
-module.exports = { monsterTableFinder: monsterTableFinder, monsterTableFormatter: monsterTableFormatter, monsterTableUpdater: monsterTableUpdater };
+var update = function (params = {}) {
+    monsterTableFinder(monsterTableUpdater, params);
+}
+
+module.exports = { update: update };
 },{}],4:[function(require,module,exports){
 // updater-button.js
 
-var updaterButtonClicked = function (clicked_button) {
+var AssociatedId = function (clicked_button) {
     if (clicked_button != undefined) {
-        parent_list = $(clicked_button).prev()
+        parent_list = $(clicked_button).prev();
+        return parent_list.attr('id');
+    }
+}
+
+var GetUpdatedValues = function (updatedList) {
+    if (updatedList != undefined) {
+        parent_list = $("#" + updatedList);
         var selected_elements = []
         for (var i = 0; i < parent_list.children().length; i++) {
             var this_box = parent_list.children()[i].children[0].children[0];
@@ -96,10 +99,10 @@ var updaterButtonClicked = function (clicked_button) {
                 selected_elements.push(this_box.id);
             }
         }
-        console.log(selected_elements)
+        console.log(selected_elements);
         return selected_elements;
     }
 }
 
-module.exports = updaterButtonClicked
+module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId }
 },{}]},{},[2]);

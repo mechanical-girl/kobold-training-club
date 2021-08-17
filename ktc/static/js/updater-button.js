@@ -1,8 +1,15 @@
 // updater-button.js
 
-var updaterButtonClicked = function (clicked_button) {
+var AssociatedId = function (clicked_button) {
     if (clicked_button != undefined) {
-        parent_list = $(clicked_button).prev()
+        parent_list = $(clicked_button).prev();
+        return parent_list.attr('id');
+    }
+}
+
+var GetUpdatedValues = function (updatedList) {
+    if (updatedList != undefined) {
+        parent_list = $("#" + updatedList);
         var selected_elements = []
         for (var i = 0; i < parent_list.children().length; i++) {
             var this_box = parent_list.children()[i].children[0].children[0];
@@ -10,9 +17,9 @@ var updaterButtonClicked = function (clicked_button) {
                 selected_elements.push(this_box.id);
             }
         }
-        console.log(selected_elements)
+        console.log(selected_elements);
         return selected_elements;
     }
 }
 
-module.exports = updaterButtonClicked
+module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId }
