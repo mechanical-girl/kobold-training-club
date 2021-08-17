@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 
 path_to_database = os.path.abspath(
