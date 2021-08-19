@@ -23,6 +23,13 @@ var monsterTable = require("./monster-table.js")
 var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 
 var monsterParameters = {};
+var monsterDataTable;
+
+var getMonsterParameters = function () {
+    return {
+        params: JSON.stringify(monsterParameters)
+    };
+}
 
 $(function () {
     selectors = ["environments", "sizes", "types", "alignments", "sources"]
@@ -34,7 +41,14 @@ $(function () {
         });
     };
 
-    monsterTable.update();
+    monsterDataTable = $('#monsterTable').DataTable({
+        "ajax": {
+            "url": '/api/monsters',
+            "type": 'POST',
+            "data": getMonsterParameters
+        }
+    })
+    //monsterTable.update();
 })
 
 $(function () {
@@ -42,7 +56,8 @@ $(function () {
         var listUpdated = updaterButton.AssociatedId(this);
         listUpdatedName = listUpdated.split("_")[0];
         monsterParameters[listUpdatedName] = updaterButton.GetUpdatedValues(listUpdated);
-        monsterTable.update(monsterParameters);
+        //monsterTable.update(monsterParameters);
+        monsterDataTable.ajax.reload()
     })
 });
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})

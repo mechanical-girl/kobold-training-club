@@ -204,7 +204,7 @@ def get_list_of_monsters(parameters: Dict) -> List[Dict]:
     if where_requirements.endswith(" AND "):
         where_requirements = where_requirements[:-5]
 
-    query_string = f'''SELECT name, cr, size, type, alignment, source FROM {query_from} {where_requirements} ORDER BY name asc LIMIT 20'''
+    query_string = f'''SELECT name, cr, size, type, alignment, source FROM {query_from} {where_requirements} ORDER BY name'''
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
@@ -216,14 +216,9 @@ def get_list_of_monsters(parameters: Dict) -> List[Dict]:
             c.execute(query_string)
         monster_list = c.fetchall()
 
-    monsters = []
+    monsters = {"data": []}
     for monster in monster_list:
-        monsters.append({"name": monster[0].strip(),
-                         "cr": monster[1].strip(),
-                         "size": monster[2].strip(),
-                         "type": monster[3].strip(),
-                         "alignment": monster[4].strip(),
-                         "sources": monster[5].strip()
-                         })
+        monsters['data'].append([monster[0].strip(), monster[1].strip(), monster[2].strip(
+        ), monster[3].strip(),  monster[4].strip(), monster[5].strip()])
 
     return monsters
