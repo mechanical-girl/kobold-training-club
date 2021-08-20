@@ -159,10 +159,18 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     except KeyError:
         alignment_constraints = []
 
+    try:
+        challenge_rating_minimum = parameters["minimumChallengeRating"]
+        challenge_rating_maximum = parameters["maximumChallengeRating"]
+    except KeyError:
+        challenge_rating_minimum = None
+
     # Oh, this is clumsy, I hate this
     where_requirements = ""
     query_arguments = []
     query_from = "monsters"
+    possible_challenge_ratings = ['0', '1/8', '1/4', '1/2', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+                                  '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '30']
 
     # SO
     # If we have size constraints, we construct a string of placeholders,
@@ -179,7 +187,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         query_arguments += size_constraints
 
     if source_constraints != []:
-        query_from = "(SELECT * FROM monsters WHERE "
+        query_from = f"(SELECT * FROM {query_from} WHERE "
         for i in range(len(source_constraints)):
             query_from += "source LIKE ? OR "
             source_constraints[i] = f"%{source_constraints[i]}%"
@@ -196,6 +204,15 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         alignment_query_placeholders = f"({', '.join(['?']*len(alignment_constraints))})"
         where_requirements += f"alignment IN {alignment_query_placeholders} AND "
         query_arguments += alignment_constraints
+
+    if challenge_rating_minimum:
+        mindex = possible_challenge_ratings.index(
+            challenge_rating_minimum)  # or min_index, if you will
+        maxdex = possible_challenge_ratings.index(challenge_rating_maximum)
+        if mindex < maxdex:
+            challenge_rating_placeholders = f"({', '.join(['?']*(len(range(mindex, maxdex))))})"
+            where_requirements += f"cr IN {challenge_rating_placeholders} AND "
+            query_arguments += possible_challenge_ratings[mindex:maxdex]
 
     # If there are requirements, we add a WHERE to the start
     if where_requirements != "":

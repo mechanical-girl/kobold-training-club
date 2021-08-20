@@ -91,6 +91,21 @@ def test_alignment_list_gives_correct_list(client):
     assert expected == received
 
 
+def test_cr_list_gives_json_with_proper_mimetype(client):
+    response = client.get("/api/crs")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_cr_list_gives_correct_list(client):
+    expected = ['0', '1/8', '1/4', '1/2', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+                '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '30']
+    response = client.get("/api/crs")
+    received = response.get_json()
+    print(received)
+    assert expected == received
+
+
 def test_monster_list_gives_json_with_proper_mimetype(client):
     response = client.get("/api/monsters")
     assert response.status_code == 200

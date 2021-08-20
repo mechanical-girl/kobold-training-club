@@ -40,6 +40,16 @@ $(function () {
         });
     };
 
+    $.getJSON("/api/crs", function (data) {
+        var min = $("#challengeRatingMinimum");
+        var max = $("#challengeRatingMaximum")
+        for (let i = 0; i < data.length; i++) {
+            var option = "<option value='" + data[i] + "'>" + data[i] + "</option>"
+            min.append(option);
+            max.append(option);
+        }
+    })
+
     monsterDataTable = $('#monsterTable').DataTable({
         "ajax": {
             "url": '/api/monsters',
@@ -53,8 +63,14 @@ $(function () {
 $(function () {
     $(".updater_button").on("click", function () {
         var listUpdated = updaterButton.AssociatedId(this);
-        listUpdatedName = listUpdated.split("_")[0];
-        monsterParameters[listUpdatedName] = updaterButton.GetUpdatedValues(listUpdated);
+        if (listUpdated == "maxCr") {
+            var values = updaterButton.getUpdatedChallengeRatings();
+            monsterParameters["minimumChallengeRating"] = values[0]
+            monsterParameters["maximumChallengeRating"] = values[1]
+        } else {
+            listUpdatedName = listUpdated.split("_")[0];
+            monsterParameters[listUpdatedName] = updaterButton.GetUpdatedValues(listUpdated);
+        }
         monsterDataTable.ajax.reload();
         monsterDataTable.columns.adjust().draw();
     })
@@ -85,5 +101,32 @@ var GetUpdatedValues = function (updatedList) {
     }
 }
 
-module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId }
+var getUpdatedChallengeRatings = function () {
+    var minValue = $("#minCr option:selected").attr("value");
+    var maxValue = $("#maxCr option:selected").attr("value");
+    if (minValue.includes('/')) {
+        var y = minValue.split('/');
+        var minValueComp = y[0] / y[1];
+    } else {
+        var minValueComp = minValue
+    }
+    if (maxValue.includes('/')) {
+        var y = maxValue.split('/');
+        var maxValueComp = y[0] / y[1];
+    } else {
+        var maxValueComp = maxValue
+    }
+    if (maxValue < minValueComp) {
+        $("#challengeRatingSelectorDiv").prepend('<div class="alert alert-danger" role="alert">Please ensure your minimum challenge rating is less than or equal to your maximum challenge rating.</div>')
+    } else {
+        var alerts = $("#challengeRatingSelectorDiv .alert")
+        for (var i = 0; i < alerts.length; i++) {
+            alerts[i].remove();
+        }
+    }
+
+    return [minValue, maxValue];
+}
+
+module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings }
 },{}]},{},[2]);
