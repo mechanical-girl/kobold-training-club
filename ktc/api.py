@@ -1,6 +1,6 @@
 import sqlite3
 import contextlib
-from typing import Dict, List
+from typing import Dict, List, Any
 from fractions import Fraction
 
 import os
@@ -116,14 +116,14 @@ def get_list_of_sources() -> List[str]:
     return sources
 
 
-def get_list_of_monsters(parameters: Dict) -> List[Dict]:
+def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     """Query the database for monsters matching the parameters passed and return a list
 
     Args:
         parameters (Dict): a dict of parameters, consisting of column names: [acceptable values]
 
     Returns:
-        List[Tuple]: a list of dicts, each dict describing a single monster
+        Dict[str, List[List[Any]]]
     """
 
     if not parameters:
@@ -216,9 +216,10 @@ def get_list_of_monsters(parameters: Dict) -> List[Dict]:
             c.execute(query_string)
         monster_list = c.fetchall()
 
-    monsters = {"data": []}
+    monster_data = []
     for monster in monster_list:
-        monsters['data'].append([monster[0].strip(), monster[1].strip(), monster[2].strip(
-        ), monster[3].strip(),  monster[4].strip(), monster[5].strip()])
+        monster_data.append([monster[0].strip(), monster[1].strip(),
+                             monster[2].strip(), monster[3].strip(),
+                             monster[4].strip(), monster[5].strip()])
 
-    return monsters
+    return {"data": monster_data}

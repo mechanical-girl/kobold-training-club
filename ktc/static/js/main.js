@@ -28,11 +28,16 @@ $(function () {
             "type": 'POST',
             "data": getMonsterParameters
         }
-    })
+    });
+    monsterDataTable.columns.adjust().draw();
 })
 
 $(function () {
     $(".updater_button").on("click", function () {
-        monsterDataTable.ajax.reload()
+        var listUpdated = updaterButton.AssociatedId(this);
+        listUpdatedName = listUpdated.split("_")[0];
+        monsterParameters[listUpdatedName] = updaterButton.GetUpdatedValues(listUpdated);
+        monsterDataTable.ajax.reload();
+        monsterDataTable.columns.adjust().draw();
     })
 });
