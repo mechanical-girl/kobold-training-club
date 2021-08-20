@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "nyc --reporter=lcov jasmine"
+    "test": "nyc jasmine"
   },
   "browserify": {
     "transform": [
