@@ -11,7 +11,7 @@ jobs:
         - npm test
       after_success:
         - nyc report --reporter=text-lcov > coverage.lcov
-        - codecov -cF javascript
+        - codecov -F javascript -f coverage.lcov
     - language: python
       python:
         - "3.9"
@@ -22,4 +22,4 @@ jobs:
         - coverage run -m pytest test
         - mypy ktc
       after_success:
-        - codecov -cF python
+        - codecov -F python
