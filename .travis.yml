@@ -27,4 +27,4 @@ jobs:
         - coverage xml
         - mypy ktc
       after_success:
-        - codecov -F python -f coverage.xml
+        - ./codecov -F python -f coverage.xml
