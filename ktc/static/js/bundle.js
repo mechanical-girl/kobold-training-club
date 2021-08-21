@@ -20,6 +20,7 @@ var listElements = require('./element_lister.js')
 var updaterButton = require('./updater-button.js')
 // https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
+const partyManager = require('./party-manager.js');
 
 var monsterParameters = {};
 var monsterDataTable;
@@ -31,6 +32,7 @@ var getMonsterParameters = function () {
 }
 
 $(function () {
+    // Populate the first five accordions
     selectors = ["environments", "sizes", "types", "alignments", "sources"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i]
@@ -40,6 +42,7 @@ $(function () {
         });
     };
 
+    // Populate the last accordion
     $.getJSON("/api/crs", function (data) {
         var min = $("#challengeRatingMinimum");
         var max = $("#challengeRatingMaximum")
@@ -50,6 +53,7 @@ $(function () {
         }
     })
 
+    // Populate the last monster table
     monsterDataTable = $('#monsterTable').DataTable({
         "ajax": {
             "url": '/api/monsters',
@@ -58,6 +62,9 @@ $(function () {
         }
     });
     monsterDataTable.columns.adjust().draw();
+
+    // Populate the character selectors
+    partyManager.createCharLevelCombo();
 })
 
 $(function () {
@@ -75,8 +82,22 @@ $(function () {
         monsterDataTable.columns.adjust().draw();
     })
 });
+
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./element_lister.js":1,"./updater-button.js":3}],3:[function(require,module,exports){
+},{"./element_lister.js":1,"./party-manager.js":3,"./updater-button.js":4}],3:[function(require,module,exports){
+//party-manager.js
+
+var createCharLevelCombo = function () {
+    var characterListDiv = $("#characterList");
+    var options = '<option value="1">1</option><option value="2">2</option><option value="3">3</option>';
+    characterListDiv.append('<select>' + options + '</select>');
+
+    var levelListDiv = $("#levelList");
+    levelListDiv.append('<select>' + options + '</select>');
+}
+
+module.exports = { createCharLevelCombo: createCharLevelCombo }
+},{}],4:[function(require,module,exports){
 // updater-button.js
 
 var AssociatedId = function (clicked_button) {
