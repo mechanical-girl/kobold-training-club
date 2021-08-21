@@ -1,17 +1,20 @@
+# -*- coding: utf-8 -*-
 import sqlite3
 import os
 
 
 path_to_database = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), os.pardir, "data/monsters.db"))
+    os.path.join(os.path.dirname(__file__), os.pardir, "data/monsters.db")
+)
 db_location = path_to_database
 
 
 conn = sqlite3.connect(db_location)
 c = conn.cursor()
 
-c.execute('''DROP TABLE IF EXISTS monsters''')
-c.execute('''CREATE TABLE monsters(
+c.execute("""DROP TABLE IF EXISTS monsters""")
+c.execute(
+    """CREATE TABLE monsters(
                 guid test,
                 fid text,
                 name text,
@@ -28,12 +31,13 @@ c.execute('''CREATE TABLE monsters(
                 lair int,
                 legendary int,
                 named int,
-                source text)''')
+                source text)"""
+)
 
 conn.commit()
 
 
-with open('data/kfc master monster list - Monsters.tsv') as f:
+with open("data/kfc master monster list - Monsters.tsv") as f:
     line = f.readline()
     while True:
         line = f.readline()
@@ -46,7 +50,9 @@ with open('data/kfc master monster list - Monsters.tsv') as f:
             values[i] = values[i].replace("'           '", "")
             values[i] = values[i].strip()
 
-        c.execute('''INSERT INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                  (*values,))
+        c.execute(
+            """INSERT INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (*values,),
+        )
 
     conn.commit()

@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, render_template, jsonify, request
 import json
+
 try:
     import api  # type: ignore
 except ModuleNotFoundError:
@@ -9,7 +11,7 @@ except ModuleNotFoundError:
 app = Flask(__name__)
 
 
-@app.route("/", methods=['GET', 'POST', 'PUT'])
+@app.route("/", methods=["GET", "POST", "PUT"])
 def home():
     return render_template("index.html")
 
@@ -48,10 +50,9 @@ def get_alignments():
 def get_monsters():
     print(request.form)
     try:
-        monster_parameters_string = request.values['params']
+        monster_parameters_string = request.values["params"]
         print(monster_parameters_string)
-        monster_parameters = json.loads(
-            monster_parameters_string.replace("'", '"'))
+        monster_parameters = json.loads(monster_parameters_string.replace("'", '"'))
     except:
         monster_parameters = {}
     print(monster_parameters)

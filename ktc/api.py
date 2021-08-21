@@ -265,7 +265,6 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         where_requirements = where_requirements[:-5]
 
     query_string = f"""SELECT name, cr, size, type, alignment, source FROM {query_from} {where_requirements} ORDER BY name"""
-    print(query_string)
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
