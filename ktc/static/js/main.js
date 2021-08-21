@@ -41,7 +41,30 @@ $(function () {
             "url": '/api/monsters',
             "type": 'POST',
             "data": getMonsterParameters
-        }
+        },
+        "columns": [
+            { data: 0 },
+            {
+                data: 1,
+                render: function (data, type, row) {
+                    if (type === 'sort') {
+                        var y = data.split('/');
+                        if (y.length > 1) {
+                            return (y[0] / y[1]);
+                        }
+                        else {
+                            return (y[0]);
+                        }
+                    } else {
+                        return data
+                    }
+                }
+            },
+            { data: 2 },
+            { data: 3 },
+            { data: 4 },
+            { data: 5 }
+        ]
     });
     monsterDataTable.columns.adjust().draw();
 
