@@ -2,6 +2,7 @@ var listElements = require('./element_lister.js')
 var updaterButton = require('./updater-button.js')
 // https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = require('jQuery');
+const partyManager = require('./party-manager.js');
 
 var monsterParameters = {};
 var monsterDataTable;
@@ -13,6 +14,7 @@ var getMonsterParameters = function () {
 }
 
 $(function () {
+    // Populate the first five accordions
     selectors = ["environments", "sizes", "types", "alignments", "sources"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i]
@@ -22,6 +24,7 @@ $(function () {
         });
     };
 
+    // Populate the last accordion
     $.getJSON("/api/crs", function (data) {
         var min = $("#challengeRatingMinimum");
         var max = $("#challengeRatingMaximum")
@@ -32,6 +35,7 @@ $(function () {
         }
     })
 
+    // Populate the monster table
     monsterDataTable = $('#monsterTable').DataTable({
         "ajax": {
             "url": '/api/monsters',
@@ -40,9 +44,15 @@ $(function () {
         }
     });
     monsterDataTable.columns.adjust().draw();
-})
 
-$(function () {
+    // Populate the character selectors
+    partyManager.createCharLevelCombo();
+
+    $(document).on("click", ".party-update", function () {
+        partyManager.handleClick(this)
+    });
+
+    // Handle sort updates
     $(".updater_button").on("click", function () {
         var listUpdated = updaterButton.AssociatedId(this);
         if (listUpdated == "maxCr") {

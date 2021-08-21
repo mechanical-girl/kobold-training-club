@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from ktc.main import diff_calc, cr_calc, get_encounter_difficulty, get_monster_cr
 
 
@@ -48,23 +49,19 @@ class TestGetEncounterDifficulty:
     def test_encounter_difficulty_single_level_single_monster(self):
         party = [(4, 3)]
         monsters = [("Air Elemental", 1)]
-        assert get_encounter_difficulty(
-            party, monsters) == (1800, "deadly")
+        assert get_encounter_difficulty(party, monsters) == (1800, "deadly")
 
     def test_encounter_difficulty_multiple_levels_single_monster(self):
         party = [(4, 3), (1, 4)]
         monsters = [("Air Elemental", 1)]
-        assert get_encounter_difficulty(
-            party, monsters) == (1800, "hard")
+        assert get_encounter_difficulty(party, monsters) == (1800, "hard")
 
     def test_encounter_difficulty_multiple_levels_multiple_monsters_single_cr(self):
         party = [(4, 5), (1, 6)]
         monsters = [("Air Elemental", 2)]
-        assert get_encounter_difficulty(
-            party, monsters) == (5400, "hard")
+        assert get_encounter_difficulty(party, monsters) == (5400, "hard")
 
     def test_encounter_difficulty_multiple_levels_multiple_monsters_multiple_cr(self):
         party = [(4, 5), (1, 6)]
         monsters = [("Air Elemental", 2), ("Allosaurus", 1)]
-        assert get_encounter_difficulty(
-            party, monsters) == (8100, "deadly")
+        assert get_encounter_difficulty(party, monsters) == (8100, "deadly")

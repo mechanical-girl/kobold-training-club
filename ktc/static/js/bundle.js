@@ -14,12 +14,14 @@ var listElements = function (data, prefix = "") {
 };
 
 module.exports = listElements
+
 },{}],2:[function(require,module,exports){
 (function (global){(function (){
 var listElements = require('./element_lister.js')
 var updaterButton = require('./updater-button.js')
 // https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
+const partyManager = require('./party-manager.js');
 
 var monsterParameters = {};
 var monsterDataTable;
@@ -31,6 +33,7 @@ var getMonsterParameters = function () {
 }
 
 $(function () {
+    // Populate the first five accordions
     selectors = ["environments", "sizes", "types", "alignments", "sources"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i]
@@ -40,6 +43,7 @@ $(function () {
         });
     };
 
+    // Populate the last accordion
     $.getJSON("/api/crs", function (data) {
         var min = $("#challengeRatingMinimum");
         var max = $("#challengeRatingMaximum")
@@ -50,6 +54,7 @@ $(function () {
         }
     })
 
+    // Populate the monster table
     monsterDataTable = $('#monsterTable').DataTable({
         "ajax": {
             "url": '/api/monsters',
@@ -58,9 +63,15 @@ $(function () {
         }
     });
     monsterDataTable.columns.adjust().draw();
-})
 
-$(function () {
+    // Populate the character selectors
+    partyManager.createCharLevelCombo();
+
+    $(document).on("click", ".party-update", function () {
+        partyManager.handleClick(this)
+    });
+
+    // Handle sort updates
     $(".updater_button").on("click", function () {
         var listUpdated = updaterButton.AssociatedId(this);
         if (listUpdated == "maxCr") {
@@ -75,8 +86,43 @@ $(function () {
         monsterDataTable.columns.adjust().draw();
     })
 });
+
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./element_lister.js":1,"./updater-button.js":3}],3:[function(require,module,exports){
+},{"./element_lister.js":1,"./party-manager.js":3,"./updater-button.js":4}],3:[function(require,module,exports){
+//party-manager.js
+
+var createCharLevelCombo = function () {
+    var characterListDiv = $("#characterList");
+    var optionID = $("#characterList div").length
+
+    var options = "";
+    for (var i = 1; i <= 20; i++) {
+        options += '<option value="' + i + '">' + i + '</option>'
+    }
+    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 25px;"></i><select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 25px;"></i></div>';
+    characterListDiv.append(level_holder);
+}
+
+var handleClick = function (clicked_button) {
+    if (clicked_button == window.document || clicked_button == undefined) { return }
+
+    var button_classes = clicked_button.className.split(/\s+/);
+
+    if (button_classes.indexOf("party-update") == -1) {
+        return
+    }
+
+    if (button_classes.indexOf("bi-plus-square-fill") != -1) {
+        createCharLevelCombo();
+    } else if (button_classes.indexOf("bi-dash-square-fill") != -1 && $("#characterList div").length > 1) {
+        $(clicked_button).parent().remove();
+    }
+
+}
+
+module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick }
+
+},{}],4:[function(require,module,exports){
 // updater-button.js
 
 var AssociatedId = function (clicked_button) {
@@ -129,4 +175,5 @@ var getUpdatedChallengeRatings = function () {
 }
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings }
+
 },{}]},{},[2]);
