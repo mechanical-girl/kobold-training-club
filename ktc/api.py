@@ -211,10 +211,12 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     # then put that into a IN subquery
     # and then append the constraints to the query_arguments list
     if environment_constraints != []:
-        environment_query_placeholders = (
-            f"({', '.join(['?']*len(environment_constraints))})"
-        )
-        where_requirements += f"environment IN {environment_query_placeholders} AND "
+        query_from = f"(SELECT * FROM {query_from} WHERE "
+        for i in range(len(environment_constraints)):
+            query_from += "environment LIKE ? OR "
+            environment_constraints[i] = f"%{environment_constraints[i]}%"
+        query_from = query_from[:-4]
+        query_from += ")"
         query_arguments += environment_constraints
 
     if size_constraints != []:

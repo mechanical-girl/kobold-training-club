@@ -7,19 +7,25 @@ jobs:
         - 16
       before_script:
         - npm install
+        - curl -Os https://uploader.codecov.io/latest/linux/codecov
+        - chmod +x codecov
       script:
         - npm test
       after_success:
         - nyc report --reporter=text-lcov > coverage.lcov
-        - codecov -cF javascript -f coverage.lcov
+        - codecov -F javascript -f coverage.lcov
     - language: python
       python:
         - "3.9"
       before_script:
         - pip install -r requirements.txt
+        - curl -Os https://uploader.codecov.io/latest/linux/codecov
+        - chmod +x codecov
         - python ktc/convertor.py
       script:
         - coverage run -m pytest test
+        - coverage xml
         - mypy ktc
       after_success:
-        - codecov -cF python -f .coverage
+        - codecov -F python -f coverage.xml
+
