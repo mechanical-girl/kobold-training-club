@@ -7,6 +7,8 @@ jobs:
         - 16
       before_script:
         - npm install
+        - curl -Os https://uploader.codecov.io/latest/linux/codecov
+        - chmod +x codecov
       script:
         - npm test
       after_success:
@@ -17,6 +19,8 @@ jobs:
         - "3.9"
       before_script:
         - pip install -r requirements.txt
+        - curl -Os https://uploader.codecov.io/latest/linux/codecov
+        - chmod +x codecov
         - python ktc/convertor.py
       script:
         - coverage run -m pytest test
