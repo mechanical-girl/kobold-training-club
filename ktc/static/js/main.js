@@ -35,7 +35,7 @@ $(function () {
         }
     })
 
-    // Populate the last monster table
+    // Populate the monster table
     monsterDataTable = $('#monsterTable').DataTable({
         "ajax": {
             "url": '/api/monsters',
@@ -47,9 +47,12 @@ $(function () {
 
     // Populate the character selectors
     partyManager.createCharLevelCombo();
-})
 
-$(function () {
+    $(document).on("click", ".party-update", function () {
+        partyManager.handleClick(this)
+    });
+
+    // Handle sort updates
     $(".updater_button").on("click", function () {
         var listUpdated = updaterButton.AssociatedId(this);
         if (listUpdated == "maxCr") {

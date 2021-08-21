@@ -14,6 +14,7 @@ var listElements = function (data, prefix = "") {
 };
 
 module.exports = listElements
+
 },{}],2:[function(require,module,exports){
 (function (global){(function (){
 var listElements = require('./element_lister.js')
@@ -53,7 +54,7 @@ $(function () {
         }
     })
 
-    // Populate the last monster table
+    // Populate the monster table
     monsterDataTable = $('#monsterTable').DataTable({
         "ajax": {
             "url": '/api/monsters',
@@ -65,9 +66,12 @@ $(function () {
 
     // Populate the character selectors
     partyManager.createCharLevelCombo();
-})
 
-$(function () {
+    $(document).on("click", ".party-update", function () {
+        partyManager.handleClick(this)
+    });
+
+    // Handle sort updates
     $(".updater_button").on("click", function () {
         var listUpdated = updaterButton.AssociatedId(this);
         if (listUpdated == "maxCr") {
@@ -89,14 +93,35 @@ $(function () {
 
 var createCharLevelCombo = function () {
     var characterListDiv = $("#characterList");
-    var options = '<option value="1">1</option><option value="2">2</option><option value="3">3</option>';
-    characterListDiv.append('<select>' + options + '</select>');
+    var optionID = $("#characterList div").length
 
-    var levelListDiv = $("#levelList");
-    levelListDiv.append('<select>' + options + '</select>');
+    var options = "";
+    for (var i = 1; i <= 20; i++) {
+        options += '<option value="' + i + '">' + i + '</option>'
+    }
+    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 25px;"></i><select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 25px;"></i></div>';
+    characterListDiv.append(level_holder);
 }
 
-module.exports = { createCharLevelCombo: createCharLevelCombo }
+var handleClick = function (clicked_button) {
+    if (clicked_button == window.document || clicked_button == undefined) { return }
+
+    var button_classes = clicked_button.className.split(/\s+/);
+
+    if (button_classes.indexOf("party-update") == -1) {
+        return
+    }
+
+    if (button_classes.indexOf("bi-plus-square-fill") != -1) {
+        createCharLevelCombo();
+    } else if (button_classes.indexOf("bi-dash-square-fill") != -1 && $("#characterList div").length > 1) {
+        $(clicked_button).parent().remove();
+    }
+
+}
+
+module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick }
+
 },{}],4:[function(require,module,exports){
 // updater-button.js
 
@@ -150,4 +175,5 @@ var getUpdatedChallengeRatings = function () {
 }
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings }
+
 },{}]},{},[2]);
