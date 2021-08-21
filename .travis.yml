@@ -20,6 +20,7 @@ jobs:
         - python ktc/convertor.py
       script:
         - coverage run -m pytest test
+        - coverage xml
         - mypy ktc
       after_success:
-        - codecov -cF python -f .coverage
+        - codecov -cF python -f coverage.xml
