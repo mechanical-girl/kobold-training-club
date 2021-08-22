@@ -71,5 +71,10 @@ def get_encounter_xp():
     return jsonify(api.get_encounter_xp(monsters))
 
 
+@app.route("/about.html", methods=["GET", "POST", "PUT"])
+def about_page():
+    return render_template("about.html")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
