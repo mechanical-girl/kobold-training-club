@@ -3,4 +3,4 @@
 /* global describe, it, expect */
 
 'use strict';
-var encounterManager = require('../ktc/static/js/encounter_manager.js');
+var encounterManager = require('../ktc/static/js/encounter-manager.js');
