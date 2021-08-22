@@ -4,6 +4,8 @@ import contextlib
 from typing import Dict, List, Any
 from fractions import Fraction
 
+import ktc.main as main
+
 import os
 
 
@@ -290,3 +292,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         )
 
     return {"data": monster_data}
+
+
+def get_party_thresholds(party):
+    return main.party_thresholds_calc(party)

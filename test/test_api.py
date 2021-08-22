@@ -503,3 +503,18 @@ def test_monster_list_returns_good_source_constraint_list(client):
 
     for monster in received:
         assert "Monster Manual" in monster[5]
+
+
+def test_exp_calc_gives_json_with_proper_mimetype(client):
+    response = client.get("/api/expthresholds?params=" + str([[1, 1]]))
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_exp_calc_returns_good_data(client):
+    party = [[4, 5], [1, 2]]
+    expected = [1050, 2100, 3150, 4600, 14600]
+    response = client.get("/api/expthresholds?params=" + str(party))
+    received = response.get_json()
+
+    assert expected == received

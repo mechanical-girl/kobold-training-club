@@ -8,7 +8,7 @@ var createCharLevelCombo = function () {
     for (var i = 1; i <= 20; i++) {
         options += '<option value="' + i + '">' + i + '</option>'
     }
-    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 25px;"></i><select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 25px;"></i></div>';
+    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 25px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 25px;"></i></div>';
     characterListDiv.append(level_holder);
 }
 
@@ -27,6 +27,26 @@ var handleClick = function (clicked_button) {
         $(clicked_button).parent().remove();
     }
 
-}
+    var party = [];
+    var comboSelectorDivs = $("div .charLevelComboSelector");
+    for (var i = 0; i <= comboSelectorDivs.length; i++) {
+        let selectors = $(comboSelectorDivs[i]).children("select")
+        if (selectors.length > 0) {
+            party[party.length] = new Array($(selectors[0]).val(), $(selectors[1]).val())
+        }
+    }
+    console.log(party);
+
+    $.ajax({
+        type: "POST",
+        url: "/api/expthresholds",
+        contentType: "application/json",
+        data: JSON.stringify(party),
+        success: function (result) {
+            console.log(result);
+        }
+
+    })
+};
 
 module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick }
