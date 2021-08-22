@@ -48,15 +48,20 @@ def get_alignments():
 
 @app.route("/api/monsters", methods=["GET", "POST"])
 def get_monsters():
-    print(request.form)
     try:
         monster_parameters_string = request.values["params"]
         print(monster_parameters_string)
-        monster_parameters = json.loads(monster_parameters_string.replace("'", '"'))
+        monster_parameters = json.loads(
+            monster_parameters_string.replace("'", '"'))
     except:
         monster_parameters = {}
-    print(monster_parameters)
     return jsonify(api.get_list_of_monsters(monster_parameters))
+
+
+@app.route("/api/expthresholds", methods=["GET", "POST"])
+def get_exp_thresholds():
+    party = json.loads(request.values["party"])
+    return jsonify(api.get_party_thresholds(party))
 
 
 if __name__ == "__main__":

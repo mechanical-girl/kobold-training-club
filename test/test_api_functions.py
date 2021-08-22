@@ -477,3 +477,11 @@ def test_monster_list_returns_good_source_constraint_list():
     actual = api.get_list_of_monsters(parameters)["data"]
     for monster in actual:
         assert "Monster Manual" in monster[5]
+
+
+def test_xp_calculator_returns_good_data():
+    party = [[4, 5], [1, 2]]
+    expected = [1050, 2100, 3150, 4600, 14600]
+    actual = api.get_party_thresholds(party)
+
+    assert expected == actual

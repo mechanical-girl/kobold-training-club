@@ -3,6 +3,7 @@ var updaterButton = require('./updater-button.js')
 // https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = require('jQuery');
 const partyManager = require('./party-manager.js');
+const encounterManager = require('./encounter-manager.js')
 
 var monsterParameters = {};
 var monsterDataTable;
@@ -88,5 +89,14 @@ $(function () {
         }
         monsterDataTable.ajax.reload();
         monsterDataTable.columns.adjust().draw();
+    })
+
+    // Handle monster adds
+    $(document).on("click", "#monsterTable > tbody > tr", function () {
+        encounterManager.addMonster();
+    })
+
+    $(document).on("change", "select", function () {
+        partyManager.updateThresholds();
     })
 });

@@ -54,12 +54,12 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="environmentsHeader">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#vollapseEnvironments" aria-expanded="true"
-                                aria-controls="vollapseEnvironments">
+                                data-bs-target="#collapseEnvironments" aria-expanded="true"
+                                aria-controls="collapseEnvironments">
                                 Environments
                             </button>
                         </h2>
-                        <div id="vollapseEnvironments" class="accordion-collapse collapse show"
+                        <div id="collapseEnvironments" class="accordion-collapse collapse show"
                             aria-labelledby="environmentsHeader" data-bs-parent="#accordionSelector">
                             <div class="accordion-body">
                                 <ul id="environments_selector">
@@ -159,14 +159,20 @@
             </div>
             <div class="col-8">
                 <div class="row" style="margin-bottom: 25px;">
-                    <div class="col-6">
-                        <h4>Your Party</h4>
-                        <div class="row" id="characterList">
-
+                    <div class="col-7">
+                        <div class="row">
+                            <h4>Your Party</h4>
+                            <div class="col-8" id="characterList">
+                            </div>
+                            <div class="col-4 float-end" id="encounterThresholds">
+                            </div>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-5">
                         <h4>Your Encounter</h4>
+                        <div class="row" id="monsterList">
+
+                        </div>
                     </div>
 
                 </div>

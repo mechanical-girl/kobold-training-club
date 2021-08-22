@@ -99,11 +99,7 @@ db_location = "data/monsters.db"
 
 
 def diff_calc(party: PartyType, enc_xp: int) -> str:
-    party_thresholds = [0, 0, 0, 0]
-    for tup in party:
-        (size, level) = tup
-        for i in range(len(party_thresholds)):
-            party_thresholds[i] += xp_thresholds[level][i] * size
+    party_thresholds = party_thresholds_calc(party)
 
     if enc_xp < party_thresholds[0]:
         return "trifling"
@@ -115,6 +111,17 @@ def diff_calc(party: PartyType, enc_xp: int) -> str:
         return "hard"
     else:
         return "deadly"
+
+
+def party_thresholds_calc(party: PartyType) -> List[int]:
+    party_thresholds = [0, 0, 0, 0, 0]
+    for tup in party:
+        (size, level) = tup
+        for i in range(len(party_thresholds) - 1):
+            party_thresholds[i] += xp_thresholds[level][i] * size
+        party_thresholds[4] += xp_per_day_per_character_per_level[level] * size
+
+    return party_thresholds
 
 
 # Pass a list of CRs and a list of quantities of monsters

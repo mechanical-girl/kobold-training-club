@@ -16,12 +16,23 @@ var listElements = function (data, prefix = "") {
 module.exports = listElements
 
 },{}],2:[function(require,module,exports){
+// encounter-manager.js
+
+var addMonster = function () {
+    var monsterListDiv = $("#monsterList");
+    var monsterName = $(this).children("td:first-child").text()
+    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 25px;"></i><select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 25px;"></i></div>';
+    characterListDiv.append(level_holder);
+
+}
+},{}],3:[function(require,module,exports){
 (function (global){(function (){
 var listElements = require('./element_lister.js')
 var updaterButton = require('./updater-button.js')
 // https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 const partyManager = require('./party-manager.js');
+const encounterManager = require('./encounter-manager.js')
 
 var monsterParameters = {};
 var monsterDataTable;
@@ -60,7 +71,30 @@ $(function () {
             "url": '/api/monsters',
             "type": 'POST',
             "data": getMonsterParameters
-        }
+        },
+        "columns": [
+            { data: 0 },
+            {
+                data: 1,
+                render: function (data, type, row) {
+                    if (type === 'sort') {
+                        var y = data.split('/');
+                        if (y.length > 1) {
+                            return (y[0] / y[1]);
+                        }
+                        else {
+                            return (y[0]);
+                        }
+                    } else {
+                        return data
+                    }
+                }
+            },
+            { data: 2 },
+            { data: 3 },
+            { data: 4 },
+            { data: 5 }
+        ]
     });
     monsterDataTable.columns.adjust().draw();
 
@@ -85,10 +119,19 @@ $(function () {
         monsterDataTable.ajax.reload();
         monsterDataTable.columns.adjust().draw();
     })
+
+    // Handle monster adds
+    $(document).on("click", "#monsterTable > tbody > tr", function () {
+        encounterManager.addMonster();
+    })
+
+    $(document).on("change", "select", function () {
+        partyManager.updateThresholds();
+    })
 });
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./element_lister.js":1,"./party-manager.js":3,"./updater-button.js":4}],3:[function(require,module,exports){
+},{"./element_lister.js":1,"./encounter-manager.js":2,"./party-manager.js":4,"./updater-button.js":5}],4:[function(require,module,exports){
 //party-manager.js
 
 var createCharLevelCombo = function () {
@@ -99,7 +142,7 @@ var createCharLevelCombo = function () {
     for (var i = 1; i <= 20; i++) {
         options += '<option value="' + i + '">' + i + '</option>'
     }
-    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 25px;"></i><select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 25px;"></i></div>';
+    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
     characterListDiv.append(level_holder);
 }
 
@@ -118,11 +161,39 @@ var handleClick = function (clicked_button) {
         $(clicked_button).parent().remove();
     }
 
+
+};
+
+var updateThresholds = function () {
+    var party = [];
+    var comboSelectorDivs = $("div .charLevelComboSelector");
+    for (var i = 0; i <= comboSelectorDivs.length; i++) {
+        let selectors = $(comboSelectorDivs[i]).children("select")
+        if (selectors.length > 0) {
+            party[party.length] = new Array(parseInt($(selectors[0]).val()), parseInt($(selectors[1]).val()))
+        }
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "/api/expthresholds",
+        data: { party: JSON.stringify(party) },
+        success: function (result) {
+            var displayDiv = $("div #encounterThresholds");
+            displayDiv.empty();
+            displayDiv.append('<div class="row float-end"><div class="col">Easy: ' + result[0].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col">Medium: ' + result[1].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col">Hard: ' + result[2].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col">Deadly: ' + result[3].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col">Daily: ' + result[4].toLocaleString("en-GB") + 'exp</div></div>');
+        }
+
+    })
 }
 
-module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick }
+module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 // updater-button.js
 
 var AssociatedId = function (clicked_button) {
@@ -176,4 +247,4 @@ var getUpdatedChallengeRatings = function () {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings }
 
-},{}]},{},[2]);
+},{}]},{},[3]);
