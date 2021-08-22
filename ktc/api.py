@@ -303,3 +303,16 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
 def get_party_thresholds(party):
     return main.party_thresholds_calc(party)
+
+
+def get_encounter_xp(monsters):
+    crs = []
+    quantities = []
+    for monster_pair in monsters:
+        (name, number) = monster_pair
+        monster_cr = main.get_monster_cr(name)
+        crs.append(monster_cr)
+        quantities.append(int(number))
+
+    adj_xp_total = main.cr_calc(crs, quantities)
+    return(adj_xp_total)

@@ -519,3 +519,13 @@ def test_exp_calc_returns_good_data(client):
     received = response.get_json()
 
     assert expected == received
+
+
+def test_encounter_xp_returns_good_data(client):
+    monsters = [["Aarakocra", '4']]
+    expected = 400
+    response = client.get(
+        "/api/encounterxp?monsters=" + json.dumps(monsters))
+    received = response.get_json()
+
+    assert expected == received
