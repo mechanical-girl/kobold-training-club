@@ -93,7 +93,7 @@ $(function () {
 
     // Handle monster adds
     $(document).on("click", "#monsterTable > tbody > tr", function () {
-        encounterManager.addMonster();
+        encounterManager.addMonster(this);
     })
 
     $(document).on("change", "select", function () {
