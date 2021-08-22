@@ -64,5 +64,17 @@ def get_exp_thresholds():
     return jsonify(api.get_party_thresholds(party))
 
 
+@app.route("/api/encounterxp", methods=["GET", "POST"])
+def get_encounter_xp():
+    monsters = json.loads(request.values["monsters"])
+    print(api.get_encounter_xp(monsters))
+    return jsonify(api.get_encounter_xp(monsters))
+
+
+@app.route("/about.html", methods=["GET", "POST", "PUT"])
+def about_page():
+    return render_template("about.html")
+
+
 if __name__ == "__main__":
     app.run(debug=True)

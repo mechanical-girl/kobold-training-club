@@ -258,7 +258,8 @@ def test_monster_list_returns_full_list_if_no_parameters_passed():
             "chaotic evil",
             "Fifth Edition Foes: 5",
         ],
-        ["Abjurer", "9", "Medium", "Humanoid", "any", "Volo's Guide to Monsters: 209"],
+        ["Abjurer", "9", "Medium", "Humanoid",
+            "any", "Volo's Guide to Monsters: 209"],
         [
             "Aboleth",
             "10",
@@ -484,4 +485,11 @@ def test_xp_calculator_returns_good_data():
     expected = [1050, 2100, 3150, 4600, 14600]
     actual = api.get_party_thresholds(party)
 
+    assert expected == actual
+
+
+def test_get_encounter_xp():
+    monsters = [['Aarakocra', 4]]
+    expected = 400
+    actual = api.get_encounter_xp(monsters)
     assert expected == actual

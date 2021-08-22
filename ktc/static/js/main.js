@@ -96,6 +96,10 @@ $(function () {
         encounterManager.addMonster(this);
     })
 
+    $(document).on("click", ".encounter-update", function () {
+        encounterManager.updateMonsterCount(this);
+    })
+
     $(document).on("change", "select", function () {
         partyManager.updateThresholds();
     })
