@@ -95,4 +95,8 @@ $(function () {
     $(document).on("click", "#monsterTable > tbody > tr", function () {
         encounterManager.addMonster();
     })
+
+    $(document).on("change", "select", function () {
+        partyManager.updateThresholds();
+    })
 });

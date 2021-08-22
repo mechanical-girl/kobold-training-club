@@ -4,7 +4,11 @@ import contextlib
 from typing import Dict, List, Any
 from fractions import Fraction
 
-import ktc.main as main
+
+try:
+    import main  # type: ignore
+except ModuleNotFoundError:
+    import ktc.main  # type: ignore
 
 import os
 
@@ -142,17 +146,20 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         environment_constraints = []
 
     try:
-        size_constraints = [param.split("_")[1] for param in parameters["sizes"]]
+        size_constraints = [param.split("_")[1]
+                            for param in parameters["sizes"]]
     except KeyError:
         size_constraints = []
 
     try:
-        source_constraints = [param.split("_")[1] for param in parameters["sources"]]
+        source_constraints = [param.split("_")[1]
+                              for param in parameters["sources"]]
     except KeyError:
         source_constraints = []
 
     try:
-        type_constraints = [param.split("_")[1] for param in parameters["types"]]
+        type_constraints = [param.split("_")[1]
+                            for param in parameters["types"]]
     except KeyError:
         type_constraints = []
 

@@ -124,6 +124,10 @@ $(function () {
     $(document).on("click", "#monsterTable > tbody > tr", function () {
         encounterManager.addMonster();
     })
+
+    $(document).on("change", "select", function () {
+        partyManager.updateThresholds();
+    })
 });
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
@@ -138,7 +142,7 @@ var createCharLevelCombo = function () {
     for (var i = 1; i <= 20; i++) {
         options += '<option value="' + i + '">' + i + '</option>'
     }
-    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 25px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 25px;"></i></div>';
+    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
     characterListDiv.append(level_holder);
 }
 
@@ -157,29 +161,37 @@ var handleClick = function (clicked_button) {
         $(clicked_button).parent().remove();
     }
 
+
+};
+
+var updateThresholds = function () {
     var party = [];
     var comboSelectorDivs = $("div .charLevelComboSelector");
     for (var i = 0; i <= comboSelectorDivs.length; i++) {
         let selectors = $(comboSelectorDivs[i]).children("select")
         if (selectors.length > 0) {
-            party[party.length] = new Array($(selectors[0]).val(), $(selectors[1]).val())
+            party[party.length] = new Array(parseInt($(selectors[0]).val()), parseInt($(selectors[1]).val()))
         }
     }
-    console.log(party);
 
     $.ajax({
         type: "POST",
         url: "/api/expthresholds",
-        contentType: "application/json",
-        data: JSON.stringify(party),
+        data: { party: JSON.stringify(party) },
         success: function (result) {
-            console.log(result);
+            var displayDiv = $("div #encounterThresholds");
+            displayDiv.empty();
+            displayDiv.append('<div class="row float-end"><div class="col">Easy: ' + result[0].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col">Medium: ' + result[1].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col">Hard: ' + result[2].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col">Deadly: ' + result[3].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col">Daily: ' + result[4].toLocaleString("en-GB") + 'exp</div></div>');
         }
 
     })
-};
+}
 
-module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick }
+module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds }
 
 },{}],5:[function(require,module,exports){
 // updater-button.js
