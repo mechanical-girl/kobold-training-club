@@ -16,6 +16,16 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/index.html", methods=["GET", "POST", "PUT"])
+def home():
+    return render_template("index.html")
+
+
+@app.route("/about.html", methods=["GET", "POST", "PUT"])
+def about_page():
+    return render_template("about.html")
+
+
 @app.route("/api/environments", methods=["GET"])
 def get_environments():
     return jsonify(api.get_list_of_environments())
@@ -69,11 +79,6 @@ def get_encounter_xp():
     monsters = json.loads(request.values["monsters"])
     print(api.get_encounter_xp(monsters))
     return jsonify(api.get_encounter_xp(monsters))
-
-
-@app.route("/about.html", methods=["GET", "POST", "PUT"])
-def about_page():
-    return render_template("about.html")
 
 
 if __name__ == "__main__":
