@@ -3,6 +3,7 @@
 var addMonster = function (row) {
     var monsterListDiv = $("#monsterList");
     var monsterName = $(row).children("td:first-child").text()
+    var monsterSource = $(row).children("td:last-child").text()
     for (var i = 0; i < $('#monsterList').children('div').length; i++) {
         var monsterDiv = $('#monsterList').children('div')[i]
         if (monsterName == monsterDiv.id) {
