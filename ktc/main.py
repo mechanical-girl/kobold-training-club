@@ -3,6 +3,8 @@ from typing import List, Tuple
 import sqlite3
 import contextlib
 
+import os
+
 xp_per_day_per_character_per_level = [
     0,
     300,
@@ -92,7 +94,12 @@ encounter_xp_multipliers = [1, 1.5, 2, 2.5, 3, 4]
 
 PartyType = List[Tuple[int, int]]
 MonstersType = List[Tuple[str, int]]
-db_location = "data/monsters.db"
+
+
+path_to_database = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), os.pardir, "data/monsters.db")
+)
+db_location = path_to_database
 
 # Pass a list of tuples (number of characters, level of characters) to allow for multi-level messages
 # Pass an int of the encounter xp
@@ -157,7 +164,7 @@ def get_monster_cr(monster: str) -> str:
 
         c.execute("""SELECT cr FROM monsters WHERE name = ?""", (monster,))
         monster_cr = c.fetchone()[0]
-        return monster_cr
+    return monster_cr
 
 
 def get_encounter_difficulty(
