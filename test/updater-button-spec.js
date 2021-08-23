@@ -31,6 +31,7 @@ var dom = new JSDOM('\
                 </label>\
             </li>\
         </ul>\
+        <button id="thisButton" class="updater_button">Update</button>\
         <span class="try_me" id="test_span">\
     </body>\
 </html>'
@@ -45,5 +46,16 @@ describe("#getUpdatedValues", function () {
         let expected = ["third_input"]
         let actual = updaterButton.GetUpdatedValues("checkList");
         expect(actual).toEqual(expected);
+    })
+})
+
+describe("#floatify", function () {
+    it('should return a float of a string int or float passed', function () {
+        let inputs = ["4", "1/4", "0"]
+        let expected = [4, 0.25, 0]
+        for (var i = 0; i < inputs.length; i++) {
+            let actual = updaterButton.floatify(inputs[i])
+            expect(actual).toEqual(expected[i])
+        }
     })
 })

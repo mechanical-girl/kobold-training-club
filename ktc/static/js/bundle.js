@@ -93,7 +93,8 @@ var updaterButton = require('./updater-button.js')
 var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 const partyManager = require('./party-manager.js');
 const encounterManager = require('./encounter-manager.js')
-const sourcesManager = require('./sources-manager.js')
+const sourcesManager = require('./sources-manager.js');
+const { floatify } = require('./updater-button.js');
 
 var monsterParameters = {};
 var monsterDataTable;
@@ -129,36 +130,27 @@ $(function () {
     })
 
     // Populate the monster table
+
     monsterDataTable = $('#monsterTable').DataTable({
         "ajax": {
             "url": '/api/monsters',
             "type": 'POST',
             "data": getMonsterParameters
         },
-        "columns": [
-            { data: 0 },
+        "aoColumns": [
+            { "bSortable": true },
             {
-                data: 1,
-                render: function (data, type, row) {
-                    if (type === 'sort') {
-                        var y = data.split('/');
-                        if (y.length > 1) {
-                            return (y[0] / y[1]);
-                        }
-                        else {
-                            return (y[0]);
-                        }
-                    } else {
-                        return data
-                    }
-                }
+                "bSortable": true,
+                "sType": "cr",
             },
-            { data: 2 },
-            { data: 3 },
-            { data: 4 },
-            { data: 5 }
+            { "bSortable": true },
+            { "bSortable": true },
+            { "bSortable": true },
+            { "bSortable": true }
         ]
     });
+    $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
+    $.fn.dataTableExt.oSort["cr-asc"] = function (a, b) { return updaterButton.floatify(a) > updaterButton.floatify(b); }
     monsterDataTable.columns.adjust().draw();
 
     // Populate the character selectors
@@ -166,24 +158,13 @@ $(function () {
 
     $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
 
-
     $(document).on("click", ".party-update", function () {
         partyManager.handleClick(this)
     });
 
     // Handle sort updates
     $(".updater_button").on("click", function () {
-        var listUpdated = updaterButton.AssociatedId(this);
-        if (listUpdated == "minCr") {
-            var values = updaterButton.getUpdatedChallengeRatings();
-            monsterParameters["minimumChallengeRating"] = values[0]
-            monsterParameters["maximumChallengeRating"] = values[1]
-        } else {
-            listUpdatedName = listUpdated.split("_")[0];
-            monsterParameters[listUpdatedName] = updaterButton.GetUpdatedValues(listUpdated);
-        }
-        monsterDataTable.ajax.reload();
-        monsterDataTable.columns.adjust().draw();
+        updaterButton.sortTable();
     })
 
     $(".toggle_all_button").on("click", function () {
@@ -370,22 +351,21 @@ var GetUpdatedValues = function (updatedList) {
     }
 }
 
+var floatify = function (number) {
+    if (number.includes('/')) {
+        var y = number.split('/');
+        return (y[0] / y[1]);
+    } else {
+        return parseInt(number)
+    }
+}
+
 var getUpdatedChallengeRatings = function () {
     var minValue = $("#minCr option:selected").attr("value");
     var maxValue = $("#maxCr option:selected").attr("value");
-    if (minValue.includes('/')) {
-        var y = minValue.split('/');
-        var minValueComp = y[0] / y[1];
-    } else {
-        var minValueComp = minValue
-    }
-    if (maxValue.includes('/')) {
-        var y = maxValue.split('/');
-        var maxValueComp = y[0] / y[1];
-    } else {
-        var maxValueComp = maxValue
-    }
-    if (maxValue < minValueComp) {
+    minValueComp = floatify(minValue)
+    maxValueComp = floatify(maxValue)
+    if (maxValueComp < minValueComp) {
         $("#challengeRatingSelectorDiv").prepend('<div class="alert alert-danger" role="alert">Please ensure your minimum challenge rating is less than or equal to your maximum challenge rating.</div>')
     } else {
         var alerts = $("#challengeRatingSelectorDiv .alert")
@@ -397,6 +377,20 @@ var getUpdatedChallengeRatings = function () {
     return [minValue, maxValue];
 }
 
-module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings }
+var sortTable = function () {
+    var listUpdated = AssociatedId(this);
+    if (listUpdated == "minCr") {
+        var values = getUpdatedChallengeRatings();
+        monsterParameters["minimumChallengeRating"] = values[0]
+        monsterParameters["maximumChallengeRating"] = values[1]
+    } else {
+        listUpdatedName = listUpdated.split("_")[0];
+        monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
+    }
+    monsterDataTable.ajax.reload();
+    monsterDataTable.columns.adjust().draw();
+}
+
+module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify }
 
 },{}]},{},[1,3,4,6]);

@@ -28,22 +28,21 @@ var GetUpdatedValues = function (updatedList) {
     }
 }
 
+var floatify = function (number) {
+    if (number.includes('/')) {
+        var y = number.split('/');
+        return (y[0] / y[1]);
+    } else {
+        return parseInt(number)
+    }
+}
+
 var getUpdatedChallengeRatings = function () {
     var minValue = $("#minCr option:selected").attr("value");
     var maxValue = $("#maxCr option:selected").attr("value");
-    if (minValue.includes('/')) {
-        var y = minValue.split('/');
-        var minValueComp = y[0] / y[1];
-    } else {
-        var minValueComp = minValue
-    }
-    if (maxValue.includes('/')) {
-        var y = maxValue.split('/');
-        var maxValueComp = y[0] / y[1];
-    } else {
-        var maxValueComp = maxValue
-    }
-    if (maxValue < minValueComp) {
+    minValueComp = floatify(minValue)
+    maxValueComp = floatify(maxValue)
+    if (maxValueComp < minValueComp) {
         $("#challengeRatingSelectorDiv").prepend('<div class="alert alert-danger" role="alert">Please ensure your minimum challenge rating is less than or equal to your maximum challenge rating.</div>')
     } else {
         var alerts = $("#challengeRatingSelectorDiv .alert")
@@ -55,4 +54,18 @@ var getUpdatedChallengeRatings = function () {
     return [minValue, maxValue];
 }
 
-module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings }
+var sortTable = function () {
+    var listUpdated = AssociatedId(this);
+    if (listUpdated == "minCr") {
+        var values = getUpdatedChallengeRatings();
+        monsterParameters["minimumChallengeRating"] = values[0]
+        monsterParameters["maximumChallengeRating"] = values[1]
+    } else {
+        listUpdatedName = listUpdated.split("_")[0];
+        monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
+    }
+    monsterDataTable.ajax.reload();
+    monsterDataTable.columns.adjust().draw();
+}
+
+module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify }
