@@ -85,13 +85,28 @@ $(function () {
     // Handle sort updates
     $(".updater_button").on("click", function () {
         var listUpdated = updaterButton.AssociatedId(this);
-        if (listUpdated == "maxCr") {
+        if (listUpdated == "minCr") {
             var values = updaterButton.getUpdatedChallengeRatings();
             monsterParameters["minimumChallengeRating"] = values[0]
             monsterParameters["maximumChallengeRating"] = values[1]
         } else {
             listUpdatedName = listUpdated.split("_")[0];
             monsterParameters[listUpdatedName] = updaterButton.GetUpdatedValues(listUpdated);
+        }
+        monsterDataTable.ajax.reload();
+        monsterDataTable.columns.adjust().draw();
+    })
+
+    $(".toggle_all_button").on("click", function () {
+        var listUpdated = updaterButton.AssociatedId(this);
+        command = $(this).text()
+        console.log(command);
+        if (command == "Deselect All") {
+            $('#' + listUpdated).find(":input").prop("checked", false)
+            $(this).text("Select All");
+        } else if (command == "Select All") {
+            $('#' + listUpdated).find(":input").prop("checked", true)
+            $(this).text("Deselect All");
         }
         monsterDataTable.ajax.reload();
         monsterDataTable.columns.adjust().draw();

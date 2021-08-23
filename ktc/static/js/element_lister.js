@@ -7,7 +7,7 @@ var listElements = function (data, prefix = "") {
     }
     listText = "";
     for (let i = 0; i < data.length; i++) {
-        listText += ("<li><label><input type='checkbox' id='" + prefix + data[i] + "'>" + data[i] + "</label></li>");
+        listText += ("<li><label><input type='checkbox' id='" + prefix + data[i] + "' checked>" + data[i] + "</label></li>");
     };
     return listText;
 };

@@ -2,8 +2,11 @@
 
 var AssociatedId = function (clicked_button) {
     if (clicked_button != undefined) {
-        parent_list = $(clicked_button).prev();
-        return parent_list.attr('id');
+        attachedParamChooser = $(clicked_button).parent().children("ul")[0];
+        if (attachedParamChooser == undefined) {
+            attachedParamChooser = $(clicked_button).parent().children()[0];
+        }
+        return $(attachedParamChooser).attr('id');
     }
 }
 
