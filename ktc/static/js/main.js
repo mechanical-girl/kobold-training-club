@@ -112,7 +112,7 @@ $(function () {
         monsterDataTable.columns.adjust().draw();
     })
 
-    $(document).on("click", ".unofficial-source", function () {
+    $(document).on("click", "#customSourceFinder .unofficial-source", function () {
         var li = $(this).parent().parent()
         li.detach();
         $('#sources_selector').append(li);

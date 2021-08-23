@@ -201,7 +201,7 @@ $(function () {
         monsterDataTable.columns.adjust().draw();
     })
 
-    $(document).on("click", ".unofficial-source", function () {
+    $(document).on("click", "#customSourceFinder .unofficial-source", function () {
         var li = $(this).parent().parent()
         li.detach();
         $('#sources_selector').append(li);
@@ -344,10 +344,13 @@ module.exports = { searchSources: searchSources }
 
 var AssociatedId = function (clicked_button) {
     if (clicked_button != undefined) {
+        console.log($(clicked_button).parent());
         attachedParamChooser = $(clicked_button).parent().children("ul")[0];
+        console.log(attachedParamChooser);
         if (attachedParamChooser == undefined) {
-            attachedParamChooser = $(clicked_button).parent().children()[0];
+            attachedParamChooser = $(clicked_button).parent().children("")[0];
         }
+        console.log(attachedParamChooser);
         return $(attachedParamChooser).attr('id');
     }
 }
