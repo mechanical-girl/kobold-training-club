@@ -6,7 +6,7 @@ import csv
 from io import StringIO
 
 
-def ingest_data(csv_string: str, db_location: str, source_url="") -> str:
+def ingest_data(csv_string: str, db_location: str, source_url=""):
     source_name = None
     with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
         f = StringIO(csv_string)

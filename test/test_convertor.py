@@ -91,7 +91,7 @@ def test_ingest(setup_database):
     csv_string = convertor.load_csv_from_file("tal'dorei.csv")
     convertor.ingest_data(csv_string, "file::memory:?cache=shared")
     c.execute('''SELECT COUNT(*) FROM monsters''')
-    assert c.fetchone()[0] == 15
+    assert c.fetchone()[0] == 16
     c.execute('''DROP TABLE monsters''')
 
 
