@@ -341,5 +341,4 @@ def get_unofficial_sources() -> List[str]:
 
     sources = list(set_of_sources)
     sources.sort()
-    print(sources)
     return sources

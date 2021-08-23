@@ -26,6 +26,7 @@ def test_environments_gives_correct_list(client):
         "forest",
         "grassland",
         "mountain",
+        "no environment specified",
         "planar",
         "ruins",
         "swamp",
@@ -233,7 +234,6 @@ def test_cr_list_gives_correct_list(client):
     ]
     response = client.get("/api/crs")
     received = response.get_json()
-    print(received)
     assert expected == received
 
 

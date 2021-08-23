@@ -12,9 +12,7 @@ def ingest_data(csv_string: str, db_location: str, source_url=""):
         f = StringIO(csv_string)
         csv_reader = csv.DictReader(f, delimiter=',')
         c = conn.cursor()
-        c.execute(
-            '''SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';''')
-        print(c.fetchall())
+
         for row in csv_reader:
             if not source_name:
                 source_name = row['sources'].split(':')[0]
@@ -26,6 +24,8 @@ def ingest_data(csv_string: str, db_location: str, source_url=""):
                     values[i] = values[i].replace("'           '", "")
                     values[i] = values[i].strip()
 
+            if values[6] == "":
+                values[6] = "no environment specified"
             c.execute(
                 '''INSERT INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                 (*values,),
