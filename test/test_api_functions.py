@@ -1,5 +1,34 @@
 # -*- coding: utf-8 -*-
+from re import A
 from ktc import api
+import sqlite3
+import pytest
+
+
+@pytest.fixture
+def setup_database():
+    """Fixture to setup an in-memory database"""
+    conn = sqlite3.connect("file::memory:?cache=shared", uri=True)
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE monsters(
+                fid text,
+                name text,
+                cr text,
+                size text,
+                type text,
+                alignment text,
+                environment text,
+                ac int,
+                hp int,
+                init text,
+                lair int,
+                legendary int,
+                named int,
+                source text,
+                source_official int,
+                source_url text)''')
+
+    yield conn
 
 
 def test_environment_list_returns_list():
@@ -493,3 +522,44 @@ def test_get_encounter_xp():
     expected = 400
     actual = api.get_encounter_xp(monsters)
     assert expected == actual
+
+
+def test_ingest_custom_csv(setup_database):
+    source = """fid,name,cr,size,type,tags,section,alignment,environment,ac,hp,init,lair?,legendary?,unique?,sources
+veiled.abigor,Abigor,6,Medium,Fiend,Devil,,lawful evil,,18,19,1,,,,Veiled Threats: 3
+veiled.barathrum,Barathrum,11,Large,Construct,,,unaligned,,12,189,-1,,,,Veiled Threats: 4
+veiled.blackthraw,Blackthraw,2,Small,Fiend,Devil,,l#awful evil,,12,36,2,,,,Veiled Threats: 5
+veiled.cankerbeast,Cankerbeast,9,Large,Aberration,,Cankerbeast,neutral evil,,15,114,1,,legendary,,Veiled Threats: 7
+veiled.cankerbeast-larva,Cankerbeast Larva,1/4,Small,Ooze,,Cankerbeast,neutral evil,,9,19,-1,,,,Veiled Threats: 8
+veiled.captain-hogsblood,"Captain Hogsblood",23,Large,Fiend,Devil,,lawful evil,,21,300,3,,legendary,unique,Veiled Threats: 10
+veiled.fleetflesh-doppelganger,Fleetflesh Doppelganger,5,Medium,Monstrosity,Shapechanger,"Doppelganger, Fleetflesh",neutral evil,,14,84,4,,,,Veiled Threats: 12
+veiled.feralshifter-doppelganger,Feralshifter Doppelganger,4,Medium,Monstrosity,Shapechanger,"Doppelganger, Fleetflesh",neutral evil,,16,84,4,,,,Veiled Threats: 13
+veiled.fleshsplitter-doppelganger,Fleshsplitter Doppelganger,5,Medium,Monstrosity,Shapechanger,"Doppelganger, Fleetflesh",chaotic neutral or chaotic evil,,14,84,4,,,,Veiled Threats: 13
+veiled.eshaedra-old-blue-dragon,"Eshaedra, Old Blue Dragon",20,Huge,Dragon,,,lawful evil,,20,351,0,,legendary,unique,Veiled Threats: 15
+veiled.eshaedra-old-blue-dragon-gifted-worshipper,"Eshaedra, Old Blue Dragon (Gifted Worshipper)",24,Huge,Dragon,,,lawful evil,,20,351,0,,legendary,unique,Veiled Threats: 15
+veiled.gerasa,Gerasa,2,Medium,Fiend,Devil,,lawful evil,,17,26,1,,,,Veiled Threats: 16
+veiled.githyanki-harrier,Githyanki Harrier,12,Medium,Humanoid,Gith,,lawful evil,,19,105,2,,,,Veiled Threats: 17
+veiled.grimjaw-hound,Grimjaw Hound,1/2,Medium,Beast,,,unaligned,,12,19,1,,,,Veiled Threats: 18
+veiled.fiendish-grimjaw,Fiendish Grimjaw,3,Large,Fiend,,,neutral evil,,14,60,0,,,,Veiled Threats: 18
+veiled.halphus,Halphus,9,Medium,Fiend,Devil,,lawful evil,,18,102,-1,,,,Veiled Threats. 19
+veiled.macroscian,Macroscian,9,Large,Undead,,,chaotic evil,,15,144,5,,,,Veiled Threats: 21
+veiled.mindsnare-naga,Mindsnare Naga,10,Large,Monstrosity,,,lawful evil,,16,119,4,,,,Veiled Threats: 22
+veiled.nothic-ascendant,Nothic Ascendant,3,Medium,Aberration,,Nothic Savant,neutral evil,,15,45,3,,,,Veiled Threats: 24
+veiled.nothic-savant,Nothic Savant,10,Medium,Aberration,,Nothic Savant,neutral evil,,15,105,3,,legendary,,Veiled Threats: 25
+veiled.nothic-savant-in-lair,Nothic Savant (in lair),11,Medium,Aberration,,Nothic Savant,neutral evil,,15,105,3,lair,legendary,,Veiled Threats 25
+veiled.ogre-slug,Ogre Slug,4,Large,Monstrosity,,,chaotic evil,,12,104,-1,,,,Veiled Threats: 26
+veiled.selktas-veld-altraloth-guardian,"Selktas-Veld, Altraloth Guardian",17,Huge,Fiend,Yugoloth,,neutral evil,,20,300,-1,,legendary,unique,Veiled Threats: 28
+veiled.giant-slug-large,Giant Slug (Large),3,Large,Beast,,,unaligned,,11,85,-2,,,,Veiled Threats: 29
+veiled.giant-slug-huge,Giant Slug (Huge),5,Huge,Beast,,,unaligned,,11,136,-2,,,,Veiled Threats: 29
+veiled.giant-bolas-spider,Giant Bolas Spider,3,Large,Beast,,,unaligned,,14,52,3,,,,Veiled Threats: 30
+veiled.giant-jumping-spider,Giant Jumping Spider,1,Small,Beast,,,unaligned,,14,18,4,,,,Veiled Threats: 31
+veiled.giant-gladiator-spider,Giant Gladiator Spider,3,Large,Beast,,,unaligned,,14,52,3,,,,Veiled Threats: 32
+veiled.giant-spitting-spider,Giant Spitting Spider,2,Medium,Beast,,,unaligned,,13,45,2,,,,Veiled Threats: 32
+veiled.giant-six-eyed-sand-spider,Giant Six-Eyed Sand Spider,1/2,Medium,Beast,,,unaligned,,13,11,3,,,,Veiled Threats: 33"""
+    conn = setup_database
+    api.ingest_custom_csv_string(source, "file::memory:?cache=shared",
+                                 url="1ayOpMBbMd7ay2gOVhsZqyQEbQmP5liKnPuV_jcNkjRk")
+
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM monsters")
+    assert c.fetchone()[0] == 30

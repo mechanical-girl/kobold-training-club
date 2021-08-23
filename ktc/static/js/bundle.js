@@ -93,9 +93,12 @@ var updaterButton = require('./updater-button.js')
 var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 const partyManager = require('./party-manager.js');
 const encounterManager = require('./encounter-manager.js')
+const sourcesManager = require('./sources-manager.js')
 
 var monsterParameters = {};
 var monsterDataTable;
+var customSourceNames = [];
+var unofficialSourceNames = []
 
 var getMonsterParameters = function () {
     return {
@@ -161,6 +164,9 @@ $(function () {
     // Populate the character selectors
     partyManager.createCharLevelCombo();
 
+    $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
+
+
     $(document).on("click", ".party-update", function () {
         partyManager.handleClick(this)
     });
@@ -180,6 +186,12 @@ $(function () {
         monsterDataTable.columns.adjust().draw();
     })
 
+    $(document).on("click", ".unofficial-source", function () {
+        var li = $(this).parent().parent()
+        li.detach();
+        $('#sources_selector').append(li);
+    })
+
     // Handle monster adds
     $(document).on("click", "#monsterTable > tbody > tr", function () {
         encounterManager.addMonster(this);
@@ -192,10 +204,45 @@ $(function () {
     $(document).on("change", "select", function () {
         partyManager.updateThresholds();
     })
-});
+
+
+    $(document).on("input", "#customSourceSearcher", function () {
+        sourcesManager.searchSources(unofficialSourceNames);
+    })
+
+    $(document).on("input", "#sourceKeyInput", function () {
+        key = $("#sourceKeyInput").val()
+        $('#sourceKeyManagementDiv .alert').remove();
+        $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Requesting the sheet now...</div >')
+        var customSourceSheetRequest = $.get('https://docs.google.com/spreadsheet/pub?key=' + key + '&output=csv');
+        customSourceSheetRequest.done(function (data) {
+            $('#sourceKeyManagementDiv .alert').remove();
+            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Sheet received. Processing the sheet now...</div >')
+            var customSheetProcessRequest = $.ajax({
+                type: "POST",
+                url: "api/processCSV",
+                data: { csv: JSON.stringify(data), key: JSON.stringify(key) },
+            })
+            customSheetProcessRequest.done(function (results) {
+                customSourceNames[customSourceNames.length] = results["name"];
+                $('#sourceKeyManagementDiv .alert').remove();
+                $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Source ' + results['name'] + ' processed! Search for it in the box above.</div >')
+                $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
+            })
+            customSheetProcessRequest.fail(function () {
+                $('#sourceKeyManagementDiv .alert').remove();
+                $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" id="processing-custom-source-alert role="alert">Processing on this sheet failed. Please check that it\'s valid. If you\'re sure it is, please open an issue on Github.</div >')
+            })
+        })
+        customSourceSheetRequest.fail(function (jqXHR, textStatus, errorThrown) {
+            $('#sourceKeyManagementDiv .alert').remove();
+            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" role="alert">Error: ' + jqXHR.status + '.\n If you\'re sure the sheet exists, please open an issue on Github.</div >')
+        });
+    })
+})
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./element_lister.js":1,"./encounter-manager.js":2,"./party-manager.js":4,"./updater-button.js":5}],4:[function(require,module,exports){
+},{"./element_lister.js":1,"./encounter-manager.js":2,"./party-manager.js":4,"./sources-manager.js":5,"./updater-button.js":6}],4:[function(require,module,exports){
 //party-manager.js
 
 var createCharLevelCombo = function () {
@@ -258,6 +305,26 @@ var updateThresholds = function () {
 module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds }
 
 },{}],5:[function(require,module,exports){
+// sources-manager.js
+
+var searchSources = function (unofficialSourceNames) {
+    var searchTerm = $("#customSourceSearcher").val();
+    console.log(searchTerm);
+    if (searchTerm != undefined) {
+        $("#customSourceFinder").empty();
+        searchTerm = searchTerm.toLowerCase();
+        console.log(searchTerm);
+        for (var i = 0; i < unofficialSourceNames.length; i++) {
+            console.log(unofficialSourceNames[i])
+            if (unofficialSourceNames[i].toLowerCase().indexOf(searchTerm) != -1) {
+                console.log(unofficialSourceNames[i]);
+                $("#customSourceFinder").append('<li><label><input type="checkbox" class="unofficial-source" id="sources_' + unofficialSourceNames[i] + '">' + unofficialSourceNames[i] + '</label></li>');
+            }
+        }
+    }
+}
+module.exports = { searchSources: searchSources }
+},{}],6:[function(require,module,exports){
 // updater-button.js
 
 var AssociatedId = function (clicked_button) {
@@ -311,4 +378,4 @@ var getUpdatedChallengeRatings = function () {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings }
 
-},{}]},{},[1,3,4,5]);
+},{}]},{},[3]);
