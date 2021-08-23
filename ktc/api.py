@@ -3,12 +3,15 @@ import sqlite3
 import contextlib
 from typing import Dict, List, Any
 from fractions import Fraction
-
+from io import StringIO
+import csv
 
 try:
     import main  # type: ignore
+    import convertor  # type: ignore
 except ModuleNotFoundError:
     from ktc import main  # type: ignore
+    from ktc import convertor  # type: ignore
 
 import os
 
@@ -17,7 +20,6 @@ path_to_database = os.path.abspath(
     os.path.join(os.path.dirname(__file__), os.pardir, "data/monsters.db")
 )
 db_location = path_to_database
-print(db_location)
 
 
 def sort_sizes(size_list: List[str]) -> List[str]:
@@ -111,7 +113,8 @@ def get_list_of_sources() -> List[str]:
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
 
-        c.execute("""SELECT DISTINCT source FROM monsters""")
+        c.execute(
+            """SELECT DISTINCT source FROM monsters WHERE source_official = 0 """)
         unique_sources = [item[0] for item in c.fetchall()]
 
     set_of_sources = set()
@@ -277,7 +280,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
-        conn.set_trace_callback(print)
+        # conn.set_trace_callback(print)
 
         if query_arguments:
             c.execute(query_string, (*query_arguments,))
@@ -316,3 +319,27 @@ def get_encounter_xp(monsters):
 
     adj_xp_total = main.cr_calc(crs, quantities)
     return(adj_xp_total)
+
+
+def ingest_custom_csv_string(csv_string, db_location, url=""):
+    return convertor.ingest_data(csv_string, db_location, url)
+
+
+def get_unofficial_sources() -> List[str]:
+    with contextlib.closing(sqlite3.connect(db_location)) as conn:
+        c = conn.cursor()
+
+        c.execute(
+            """SELECT DISTINCT source FROM monsters WHERE source_official = 1""")
+        unique_sources = [item[0] for item in c.fetchall()]
+
+    set_of_sources = set()
+    for source_set in unique_sources:
+        sources = source_set.split(",")
+        for source in sources:
+            set_of_sources.add(source.split(":")[0].strip())
+
+    sources = list(set_of_sources)
+    sources.sort()
+    print(sources)
+    return sources
