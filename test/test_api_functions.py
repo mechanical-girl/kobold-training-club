@@ -48,6 +48,7 @@ def test_environment_list_returns_unique_list_of_environments():
         "forest",
         "grassland",
         "mountain",
+        "no environment specified",
         "planar",
         "ruins",
         "swamp",
