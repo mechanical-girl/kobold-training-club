@@ -114,17 +114,12 @@ def get_list_of_sources() -> List[str]:
         c = conn.cursor()
 
         c.execute(
-            """SELECT DISTINCT source FROM monsters WHERE source_official = 0 """)
+            """SELECT DISTINCT name FROM sources WHERE official = 1 """)
         unique_sources = [item[0] for item in c.fetchall()]
 
-    set_of_sources = set()
-    for source_set in unique_sources:
-        sources = source_set.split(",")
-        for source in sources:
-            set_of_sources.add(source.split(":")[0].strip())
-
-    sources = list(set_of_sources)
+    sources = list(unique_sources)
     sources.sort()
+    print(sources)
     return sources
 
 
@@ -330,7 +325,7 @@ def get_unofficial_sources() -> List[str]:
         c = conn.cursor()
 
         c.execute(
-            """SELECT DISTINCT source FROM monsters WHERE source_official = 1""")
+            """SELECT DISTINCT name FROM sources WHERE official = 0""")
         unique_sources = [item[0] for item in c.fetchall()]
 
     set_of_sources = set()

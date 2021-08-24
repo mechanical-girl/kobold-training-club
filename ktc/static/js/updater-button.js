@@ -68,4 +68,18 @@ var sortTable = function () {
     monsterDataTable.columns.adjust().draw();
 }
 
-module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify }
+var toggleAll = function () {
+    var listUpdated = AssociatedId(this);
+    command = $(this).text()
+    if (command == "Deselect All") {
+        $('#' + listUpdated).find(":input").prop("checked", false)
+        $(this).text("Select All");
+    } else if (command == "Select All") {
+        $('#' + listUpdated).find(":input").prop("checked", true)
+        $(this).text("Deselect All");
+    }
+    monsterDataTable.ajax.reload();
+    monsterDataTable.columns.adjust().draw();
+}
+
+module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }

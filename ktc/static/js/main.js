@@ -79,18 +79,7 @@ $(function () {
     })
 
     $(".toggle_all_button").on("click", function () {
-        var listUpdated = updaterButton.AssociatedId(this);
-        command = $(this).text()
-        console.log(command);
-        if (command == "Deselect All") {
-            $('#' + listUpdated).find(":input").prop("checked", false)
-            $(this).text("Select All");
-        } else if (command == "Select All") {
-            $('#' + listUpdated).find(":input").prop("checked", true)
-            $(this).text("Deselect All");
-        }
-        monsterDataTable.ajax.reload();
-        monsterDataTable.columns.adjust().draw();
+        updaterButton.ToggleAll(this);
     })
 
     $(document).on("click", "#customSourceFinder .unofficial-source", function () {
