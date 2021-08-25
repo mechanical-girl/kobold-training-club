@@ -2,6 +2,7 @@
 import pytest
 from ktc import app
 import json
+import pprint
 
 
 @pytest.fixture
@@ -104,28 +105,27 @@ def test_source_list_gives_json_with_proper_mimetype(client):
 
 
 def test_source_list_gives_correct_list(client):
-    expected = [
-        "Basic Rules v1",
-        "Curse of Strahd",
-        "Fifth Edition Foes",
-        "Hoard of the Dragon Queen",
-        "HotDQ supplement",
-        "Monster Manual",
-        "Monster Module",
-        "Monster-A-Day",
-        "Nerzugal's Extended Bestiary",
-        "Out of the Abyss",
-        "Player's Handbook",
-        "Primeval Thule Campaign Setting",
-        "Primeval Thule Gamemaster's Companion",
-        "Princes of the Apocalypse",
-        "Princes of the Apocalypse Online Supplement v1.0",
-        "Rise of Tiamat",
-        "Storm King's Thunder",
-        "Tales from the Yawning Portal",
-        "Tome of Beasts",
-        "Volo's Guide to Monsters",
-    ]
+    expected = ["Baldur's Gate: Descent into Avernus",
+                'Basic Rules v1',
+                'Curse of Strahd',
+                'Eberron: Rising from the Last War',
+                "Explorer's Guide to Wildemount",
+                'Ghosts of Saltmarsh',
+                'Hoard of the Dragon Queen',
+                'Icewind Dale: Rime of the Frost Maiden',
+                'Into The Borderlands',
+                'Monster Manual',
+                "Mordenkainen's Tome of Foes",
+                'Mythic Odysseys of Theros',
+                'Out of the Abyss',
+                "Player's Handbook",
+                'Princes of the Apocalypse',
+                'Rise of Tiamat',
+                "Storm King's Thunder",
+                'Tales from the Yawning Portal',
+                "Volo's Guide to Monsters",
+                'Waterdeep: Dragon Heist',
+                'Waterdeep: Dungeon of the Mad Mage']
     response = client.get("/api/sources")
     received = response.get_json()
     assert expected == received
@@ -168,15 +168,16 @@ def test_alignment_list_gives_json_with_proper_mimetype(client):
 def test_alignment_list_gives_correct_list(client):
     expected = [
         "any",
+        "any alignment",
         "any chaotic",
         "any evil",
         "any good",
         "any lawful",
+        "any non-good",
         "chaotic evil",
         "chaotic good",
         "chaotic neutral",
         "lawful evil",
-        "lawful good",
         "lawful good",
         "lawful neutral",
         "neutral",
@@ -230,6 +231,7 @@ def test_cr_list_gives_correct_list(client):
         "25",
         "26",
         "27",
+        "28",
         "30",
     ]
     response = client.get("/api/crs")
@@ -244,173 +246,134 @@ def test_monster_list_gives_json_with_proper_mimetype(client):
 
 
 def test_monster_list_gives_correct_list(client):
-    expected = [
-        [
-            "Aarakocra",
-            "1/4",
-            "Medium",
-            "Humanoid",
-            "neutral good",
-            "Monster Manual: 12, Princes of the Apocalypse Online Supplement v1.0: 6",
-        ],
-        [
-            "Aarakocra Captain",
-            "3",
-            "Medium",
-            "Humanoid",
-            "neutral good",
-            "Monster Module: 3",
-        ],
-        [
-            "Aarakocra Priest of Aerdrie",
-            "8",
-            "Medium",
-            "Humanoid",
-            "neutral good",
-            "Monster Module: 4",
-        ],
-        [
-            "Aarakocra Sharpshooter",
-            "1/2",
-            "Medium",
-            "Humanoid",
-            "neutral good",
-            "Monster Module: 3",
-        ],
-        [
-            "Aaztar-Ghola",
-            "4",
-            "Medium",
-            "Humanoid",
-            "chaotic evil",
-            "Fifth Edition Foes: 5",
-        ],
-        ["Abjurer", "9", "Medium", "Humanoid",
-            "any", "Volo's Guide to Monsters: 209"],
-        [
-            "Aboleth",
-            "10",
-            "Large",
-            "Aberration",
-            "lawful evil",
-            "Monster Manual: 13, Princes of the Apocalypse Online Supplement v1.0: 6",
-        ],
-        [
-            "Aboleth Sovereign",
-            "16",
-            "Huge",
-            "Aberration",
-            "lawful evil",
-            "Monster Module: 5",
-        ],
-        [
-            "Abominable Beauty",
-            "11",
-            "Medium",
-            "Fey",
-            "neutral evil",
-            "Tome of Beasts: 11",
-        ],
-        [
-            "Abominable Sloth",
-            "6",
-            "Huge",
-            "Beast",
-            "unaligned",
-            "Primeval Thule Campaign Setting: 220",
-        ],
-        [
-            "Abominable Yeti",
-            "9",
-            "Huge",
-            "Monstrosity",
-            "chaotic evil",
-            "Monster Manual: 306",
-        ],
-        [
-            "Accursed Defiler",
-            "4",
-            "Medium",
-            "Undead",
-            "neutral evil",
-            "Tome of Beasts: 12",
-        ],
-        [
-            "Acolyte",
-            "1/4",
-            "Medium",
-            "Humanoid",
-            "any",
-            "Basic Rules v1: 53, HotDQ supplement: 4, Monster Manual: 342",
-        ],
-        [
-            "Adherer",
-            "2",
-            "Medium",
-            "Aberration",
-            "lawful evil",
-            "Fifth Edition Foes: 6",
-        ],
-        [
-            "Adult Black Dragon",
-            "14",
-            "Huge",
-            "Dragon",
-            "chaotic evil",
-            "Monster Manual: 88, Princes of the Apocalypse Online Supplement v1.0: 7",
-        ],
-        [
-            "Adult Blue Dracolich",
-            "17",
-            "Huge",
-            "Undead",
-            "lawful evil",
-            "Monster Manual: 84",
-        ],
-        [
-            "Adult Blue Dragon",
-            "16",
-            "Huge",
-            "Dragon",
-            "lawful evil",
-            "HotDQ supplement: 4, Monster Manual: 91",
-        ],
-        [
-            "Adult Brass Dragon",
-            "13",
-            "Huge",
-            "Dragon",
-            "chaotic good",
-            "Monster Manual: 105",
-        ],
-        [
-            "Adult Bronze Dragon",
-            "15",
-            "Huge",
-            "Dragon",
-            "lawful good",
-            "Monster Manual: 108, Princes of the Apocalypse Online Supplement v1.0: 7",
-        ],
-        [
-            "Adult Cave Dragon",
-            "16",
-            "Huge",
-            "Dragon",
-            "neutral evil",
-            "Tome of Beasts: 125",
-        ],
-    ]
+    expected = [['Aarakocra',
+                 '1/4',
+                 'Medium',
+                 'Humanoid',
+                 'neutral good',
+                 'Monster Manual: 12, Princes of the Apocalypse Online Supplement v1.0: 6'],
+                ['Abhorrent Overlord',
+                 '9',
+                 'Large',
+                 'Fiend',
+                 'lawful evil',
+                 'Mythic Odysseys of Theros: 219'],
+                ['Abjurer', '9', 'Medium', 'Humanoid',
+                    'any', "Volo's Guide to Monsters: 209"],
+                ['Aboleth',
+                 '10',
+                 'Large',
+                 'Aberration',
+                 'lawful evil',
+                 'Monster Manual: 13, Princes of the Apocalypse Online Supplement v1.0: 6'],
+                ['Abominable Yeti',
+                 '9',
+                 'Huge',
+                 'Monstrosity',
+                 'chaotic evil',
+                 'Monster Manual: 306'],
+                ['Acolyte',
+                 '1/4',
+                 'Medium',
+                 'Humanoid',
+                 'any',
+                 'Basic Rules v1: 53, HotDQ supplement: 4, Monster Manual: 342'],
+                ['Adept',
+                 '1',
+                 'Medium',
+                 'Humanoid',
+                 'Chaotic Evil',
+                 'Into The Borderlands: 338'],
+                ['Adult Black Dragon',
+                 '14',
+                 'Huge',
+                 'Dragon',
+                 'chaotic evil',
+                 'Monster Manual: 88, Princes of the Apocalypse Online Supplement v1.0: 7'],
+                ['Adult Blue Dracolich',
+                 '17',
+                 'Huge',
+                 'Undead',
+                 'lawful evil',
+                 'Monster Manual: 84'],
+                ['Adult Blue Dragon',
+                 '16',
+                 'Huge',
+                 'Dragon',
+                 'lawful evil',
+                 'HotDQ supplement: 4, Monster Manual: 91'],
+                ['Adult Brass Dragon',
+                 '13',
+                 'Huge',
+                 'Dragon',
+                 'chaotic good',
+                 'Monster Manual: 105'],
+                ['Adult Bronze Dragon',
+                 '15',
+                 'Huge',
+                 'Dragon',
+                 'lawful good',
+                 'Monster Manual: 108, Princes of the Apocalypse Online Supplement v1.0: 7'],
+                ['Adult Copper Dragon',
+                 '14',
+                 'Huge',
+                 'Dragon',
+                 'chaotic good',
+                 'Monster Manual: 112'],
+                ['Adult Gold Dragon',
+                 '17',
+                 'Huge',
+                 'Dragon',
+                 'lawful good',
+                 'Monster Manual: 114'],
+                ['Adult Green Dragon',
+                 '15',
+                 'Huge',
+                 'Dragon',
+                 'lawful evil',
+                 'Monster Manual: 94'],
+                ['Adult Red Dragon',
+                 '17',
+                 'Huge',
+                 'Dragon',
+                 'chaotic evil',
+                 'Basic Rules v1: 8, Monster Manual: 98'],
+                ['Adult Silver Dragon',
+                 '16',
+                 'Huge',
+                 'Dragon',
+                 'lawful good',
+                 'Monster Manual: 117'],
+                ['Adult White Dragon',
+                 '13',
+                 'Huge',
+                 'Dragon',
+                 'chaotic evil',
+                 'HotDQ supplement: 5, Monster Manual: 101'],
+                ['Aeorian Hunter',
+                 '10',
+                 'Large',
+                 'Monstrosity',
+                 'Neutral Evil',
+                 "Explorer's Guide to Wildemount"],
+                ['Aeorian Nullifier',
+                 '12',
+                 'Large',
+                 'Monstrosity',
+                 'Neutral Evil',
+                 "Explorer's Guide to Wildemount"]]
     response = client.get("/api/monsters")
     received = response.get_json()["data"]
 
-    assert len(received) == 1643
+    assert len(received) == 907
     for i, monster in enumerate(expected):
         assert monster == received[i]
 
 
 def test_monster_list_returns_good_single_constraint_list(client):
-    parameters = {"sizes": ["sizes_Medium", "sizes_Large"]}
-    response = client.get("/api/monsters?params=" + str(parameters))
+    parameters = '{"sizes": ["sizes_Medium", "sizes_Large"]}'
+    response = client.get("/api/monsters?params=" +
+                          json.dumps(json.loads(parameters)))
     received = response.get_json()["data"]
 
     for monster in received:
@@ -418,79 +381,13 @@ def test_monster_list_returns_good_single_constraint_list(client):
 
 
 def test_monster_list_returns_good_multiple_constraint_list(client):
-    expected = [
-        "Aboleth",
-        "Archdruid",
-        "Boalisk",
-        "Chuul",
-        "Crabman",
-        "Crocodile",
-        "Crushing Wave Priest",
-        "Crushing Wave Reaver",
-        "Dagon",
-        "Dark Tide Knight",
-        "Dark Triton",
-        "Deep Scion",
-        "Dolphin",
-        "Eye of the Deep",
-        "Fanged Sea Serpent",
-        "Fathomer",
-        "Four-Armed Gargoyle",
-        "Giant Clam",
-        "Giant Crab",
-        "Giant Electric Catfish",
-        "Giant Frog",
-        "Giant Moray Eel",
-        "Giant Octopus",
-        "Giant Sea Horse",
-        "Giant Seahorse",
-        "Giant Toad",
-        "Giant Water Beetle",
-        "Gray Nisp",
-        "Green Guardian Gargoyle",
-        "Gulper Eel",
-        "Hippocampus",
-        "Hunter Shark",
-        "Kelpie",
-        "Kraken Priest",
-        "Kuo-toa",
-        "Kuo-toa Archpriest",
-        "Kuo-toa Whip",
-        "Lithonnite",
-        "Margoyle",
-        "Marid",
-        "Marine Basilisk",
-        "Merfolk",
-        "Merfolk Hydromancer",
-        "Merrow",
-        "Monstrous Crayfish",
-        "Morkoth",
-        "Mummy of the Deep",
-        "One-Eyed Shiver",
-        "Plesiosaurus",
-        "Reef Shark",
-        "Sahuagin",
-        "Sahuagin Baron",
-        "Sahuagin Priestess",
-        "Sea Hag",
-        "Sea Hag (coven)",
-        "Sea Spawn",
-        "Spitting Sea Serpent",
-        "Strangle Weed",
-        "Swarm of Quippers",
-        "Thalasskoptis",
-        "Tortoise",
-        "Water Elemental",
-        "Water Elemental Myrmidon",
-        "Young Aboleth",
-        "Zombie",
-    ]
-    parameters = {
-        "sizes": ["sizes_Medium", "sizes_Large"],
-        "environments": ["environments_aquatic"],
-    }
-    response = client.get("/api/monsters?params=" + str(parameters))
+    expected = ['Aboleth', 'Adept', 'Arachnia, Giant Water Spider', 'Archdruid', 'Archdruid', 'Barbarian Warrior', 'Boalisk', 'Bone Golem', 'Caryatid Column', 'Chuul', 'Coffer Corpse', 'Crabman', 'Crocodile', 'Crushing Wave Priest', 'Crushing Wave Reaver', 'Dagon', 'Dark Tide Knight', 'Dark Triton', 'Deep Scion', 'Dolphin', 'Elite Bullywug', 'Elite Hobgoblin', 'Evil Priest', 'Eye of the Deep', 'Fanged Sea Serpent', 'Fathomer', 'Fledgling Mage', 'Four-Armed Gargoyle', 'Giant Armadillo', 'Giant Clam', 'Giant Crab', 'Giant Crayfish', 'Giant Electric Catfish', 'Giant Frog', 'Giant Moray Eel', 'Giant Octopus', 'Giant Pike', 'Giant Sea Horse', 'Giant Seahorse', 'Giant Toad', 'Giant Water Beetle', 'Giant Water Spider', 'Gray Nisp', 'Green Guardian Gargoyle', 'Gulper Eel',
+                'Hippocampus', 'Hunter Shark', 'Iron Cobra', 'Kelpie', 'Kraken Priest', 'Kuo-toa', 'Kuo-toa Archpriest', 'Kuo-toa Whip', 'Lithonnite', 'Living Stone Statue', 'Living Wax Statue', 'Mad Hermit', 'Marevak, Advisor to the Castellan', 'Margoyle', 'Marid', 'Marine Basilisk', 'Merfolk', 'Merfolk Hydromancer', 'Merrow', 'Monstrous Crayfish', 'Morkoth', 'Mummy of the Deep', 'Ogre Skeleton', 'One-Eyed Shiver', 'Orc Chief', 'Plesiosaurus', 'Reef Shark', 'Sahuagin', 'Sahuagin Baron', 'Sahuagin Priestess', 'Sea Hag', 'Sea Hag (coven)', 'Sea Spawn', 'Spitting Sea Serpent', 'Strangle Weed', 'Swarm of Quippers', 'Thalasskoptis', 'Thoul', 'Tortoise', 'Troglodyte Shaman', 'Troglodyte Spore Servant', 'Water Elemental', 'Water Elemental Myrmidon', 'Wizard Golem', 'Young Aboleth', 'Zombie']
+    parameters = '{"sizes": ["sizes_Medium", "sizes_Large"], "environments": ["environments_aquatic"]}'
+    response = client.get("/api/monsters?params=" +
+                          json.dumps(json.loads(parameters)))
     received = response.get_json()["data"]
+    print([monster[0] for monster in received])
 
     for i, monster in enumerate(received):
         assert monster[2] in ["Medium", "Large"]
@@ -498,8 +395,9 @@ def test_monster_list_returns_good_multiple_constraint_list(client):
 
 
 def test_monster_list_returns_good_source_constraint_list(client):
-    parameters = {"sources": ["sources_Monster Manual"]}
-    response = client.get("/api/monsters?params=" + str(parameters))
+    parameters = '{"sources": ["sources_Monster Manual"]}'
+    response = client.get("/api/monsters?params=" +
+                          json.dumps(json.loads(parameters)))
     received = response.get_json()["data"]
 
     for monster in received:
