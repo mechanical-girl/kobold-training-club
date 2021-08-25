@@ -41,7 +41,7 @@ def ingest_data(csv_string: str, db_location: str, source_url=""):
                 else:
                     source_is_official = 0
 
-                c.execute('''INSERT OR IGNORE INTO sources VALUES (?, ?, ?)''',
+                c.execute('''INSERT OR REPLACE INTO sources VALUES (?, ?, ?)''',
                           (source_name, source_is_official, source_url))
 
             try:
@@ -130,6 +130,13 @@ if __name__ == "__main__":
                              "ac", "hp", "init", "lair", "legendary", "named", "sources"])
             writer.writerows(results)
 
+        c.execute('''SELECT * FROM sources''')
+        results = c.fetchall()
+        with open(f"{dir_path}/master_sources.csv", 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(["name", "official", "url"])
+            writer.writerows(results)
+
     configure_db(db_location)
     csv_string = load_csv_from_file("master.csv")
     ingest_data(csv_string, db_location)
@@ -140,5 +147,5 @@ if __name__ == "__main__":
         csv_reader = csv.DictReader(f, delimiter=',')
         c = conn.cursor()
         for row in csv_reader:
-            c.execute('''INSERT INTO sources VALUES (?, ?, ?)''',
+            c.execute('''INSERT OR REPLACE INTO sources VALUES (?, ?, ?)''',
                       (row['name'], row['official'], row['url'],))
