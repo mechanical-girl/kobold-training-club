@@ -176,12 +176,10 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     try:
         challenge_rating_minimum = parameters["minimumChallengeRating"]
-        print(parameters["minimumChallengeRating"])
     except (KeyError, IndexError):
         challenge_rating_minimum = None
     try:
         challenge_rating_maximum = parameters["maximumChallengeRating"]
-        print(parameters["maximumChallengeRating"])
     except (KeyError, IndexError):
         challenge_rating_maximum = None
 
