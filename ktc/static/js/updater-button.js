@@ -2,13 +2,10 @@
 
 var AssociatedId = function (clicked_button) {
     if (clicked_button != undefined) {
-        console.log($(clicked_button).parent());
         attachedParamChooser = $(clicked_button).parent().children("ul")[0];
-        console.log(attachedParamChooser);
         if (attachedParamChooser == undefined) {
             attachedParamChooser = $(clicked_button).parent().children("")[0];
         }
-        console.log(attachedParamChooser);
         return $(attachedParamChooser).attr('id');
     }
 }
@@ -17,13 +14,12 @@ var GetUpdatedValues = function (updatedList) {
     if (updatedList != undefined) {
         parent_list = $("#" + updatedList);
         var selected_elements = []
-        for (var i = 0; i < parent_list.children().length; i++) {
-            var this_box = parent_list.children()[i].children[0].children[0];
+        for (var i = 0; i < parent_list.find("input").length; i++) {
+            var this_box = parent_list.find("input")[i];
             if ($(this_box).prop("checked")) {
                 selected_elements.push(this_box.id);
             }
         }
-        console.log(selected_elements);
         return selected_elements;
     }
 }
@@ -54,32 +50,32 @@ var getUpdatedChallengeRatings = function () {
     return [minValue, maxValue];
 }
 
-var sortTable = function () {
-    var listUpdated = AssociatedId(this);
+var sortTable = function (clicked_button) {
+    var listUpdated = AssociatedId(clicked_button);
     if (listUpdated == "minCr") {
         var values = getUpdatedChallengeRatings();
         monsterParameters["minimumChallengeRating"] = values[0]
         monsterParameters["maximumChallengeRating"] = values[1]
     } else {
         listUpdatedName = listUpdated.split("_")[0];
-        monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
+        window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
     }
-    monsterDataTable.ajax.reload();
-    monsterDataTable.columns.adjust().draw();
+    window.monsterDataTable.ajax.reload();
+    window.monsterDataTable.columns.adjust().draw();
 }
 
-var toggleAll = function () {
-    var listUpdated = AssociatedId(this);
-    command = $(this).text()
+var toggleAll = function (clicked_button) {
+    var listUpdated = AssociatedId(clicked_button);
+    command = $(clicked_button).text()
     if (command == "Deselect All") {
         $('#' + listUpdated).find(":input").prop("checked", false)
-        $(this).text("Select All");
+        $(clicked_button).text("Select All");
     } else if (command == "Select All") {
         $('#' + listUpdated).find(":input").prop("checked", true)
-        $(this).text("Deselect All");
+        $(clicked_button).text("Deselect All");
     }
-    monsterDataTable.ajax.reload();
-    monsterDataTable.columns.adjust().draw();
+    window.monsterDataTable.ajax.reload();
+    window.monsterDataTable.columns.adjust().draw();
 }
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
