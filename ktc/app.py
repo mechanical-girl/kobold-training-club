@@ -77,7 +77,7 @@ def get_monsters():
         monster_parameters_string = request.values["params"]
         print(monster_parameters_string)
         monster_parameters = json.loads(
-            monster_parameters_string.replace("'", '"'))
+            monster_parameters_string)
     except:
         monster_parameters = {}
     return jsonify(api.get_list_of_monsters(monster_parameters))

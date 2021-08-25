@@ -22,7 +22,6 @@ def ingest_data(csv_string: str, db_location: str, source_url=""):
         c.execute(
             '''SELECT name FROM sources WHERE official = 1''')
         sources_official = [source[0] for source in c.fetchall()]
-        print(sources_official)
 
         for row in csv_reader:
             sources = row['sources'].split(', ')
@@ -45,8 +44,12 @@ def ingest_data(csv_string: str, db_location: str, source_url=""):
                 c.execute('''INSERT OR IGNORE INTO sources VALUES (?, ?, ?)''',
                           (source_name, source_is_official, source_url))
 
-            values = [row['fid'], row['name'], row['cr'], row['size'], row['type'], row['alignment'],
-                      row['environment'], row['ac'], row['hp'], row['init'], row['lair?'], row['legendary?'], row['unique?'], row['sources']]
+            try:
+                values = [row['fid'], row['name'], row['cr'], row['size'], row['type'], row['alignment'],
+                          row['environment'], row['ac'], row['hp'], row['init'], row['lair'], row['legendary'], row['named'], row['sources']]
+            except KeyError:
+                values = [row['fid'], row['name'], row['cr'], row['size'], row['type'], row['alignment'],
+                          row['environment'], row['ac'], row['hp'], row['init'], row['lair?'], row['legendary?'], row['unique?'], row['sources']]
 
             for i in range(len(values)):
                 if type(values[i]) == str:
@@ -64,7 +67,7 @@ def ingest_data(csv_string: str, db_location: str, source_url=""):
                 pass
 
             c.execute(
-                '''INSERT INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                '''INSERT OR IGNORE INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                 (*values,),
             )
 
@@ -72,7 +75,6 @@ def ingest_data(csv_string: str, db_location: str, source_url=""):
         c.execute(
             '''SELECT name FROM sources WHERE official = 0''')
         sources_official = [source[0] for source in c.fetchall()]
-        print(sources_official)
     return source_name
 
 
@@ -88,7 +90,7 @@ def configure_db(db_location: str) -> None:
     c.execute('''DROP TABLE IF EXISTS monsters''')
     c.execute('''DROP TABLE IF EXISTS sources''')
     c.execute('''CREATE TABLE monsters (
-                fid text,
+                fid text UNIQUE,
                 name text,
                 cr text,
                 size text,
@@ -101,7 +103,7 @@ def configure_db(db_location: str) -> None:
                 lair int,
                 legendary int,
                 named int,
-                source text)'''
+                sources text)'''
               )
     c.execute('''CREATE TABLE sources (
         name text UNIQUE,
@@ -120,29 +122,23 @@ url_pattern = re.compile(r"(?P<url>https?://[^\s]+)")
 if __name__ == "__main__":
     with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
         c = conn.cursor()
-        with open(f"{dir_path}/master.csv.bak", 'w', newline='') as f:
-            c.execute('''SELECT * FROM monsters''')
-            results = c.fetchall()
+        c.execute('''SELECT * FROM monsters''')
+        results = c.fetchall()
+        with open(f"{dir_path}/master.csv", 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(["fid", "name", "cr", "size", "type", "alignment", "environment",
-                            "ac", "hp", "init", "lair", "legendary", "named", "source"])
-            writer.writerows(results)
-
-        with open(f"{dir_path}/master_sources.csv.bak", 'w', newline='') as f:
-            c.execute('''SELECT * FROM sources''')
-            results = c.fetchall()
-            writer = csv.writer(f)
-            writer.writerow(['name', 'official', 'url'])
+                             "ac", "hp", "init", "lair", "legendary", "named", "sources"])
             writer.writerows(results)
 
     configure_db(db_location)
     csv_string = load_csv_from_file("master.csv")
     ingest_data(csv_string, db_location)
+
     csv_string = load_csv_from_file("master_sources.csv")
     with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
         f = StringIO(csv_string)
         csv_reader = csv.DictReader(f, delimiter=',')
         c = conn.cursor()
-        for row in csv.reader():
+        for row in csv_reader:
             c.execute('''INSERT INTO sources VALUES (?, ?, ?)''',
                       (row['name'], row['official'], row['url'],))
