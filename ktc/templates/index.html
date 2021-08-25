@@ -4,6 +4,40 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-13LV3TDKFN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-13LV3TDKFN');
+        import { getCLS, getFID, getLCP } from 'web-vitals';
+
+        function sendToGoogleAnalytics({ name, delta, value, id }) {
+            // Assumes the global `gtag()` function exists, see:
+            // https://developers.google.com/analytics/devguides/collection/ga4
+            gtag('event', name, {
+                // Built-in params:
+                value: delta, // Use `delta` so the value can be summed.
+                // Custom params:
+                metric_id: id, // Needed to aggregate events.
+                metric_value: value, // Optional.
+                metric_delta: delta, // Optional.
+
+                // OPTIONAL: any additional params or debug info here.
+                // See: https://web.dev/debug-web-vitals-in-the-field/
+                // metric_rating: 'good' | 'ni' | 'poor',
+                // debug_info: '...',
+                // ...
+            });
+        }
+
+        getCLS(sendToGoogleAnalytics);
+        getFID(sendToGoogleAnalytics);
+        getLCP(sendToGoogleAnalytics);
+    </script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -13,7 +47,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css"
         href="https://cdn.datatables.net/v/bs5/jq-3.3.1/dt-1.10.25/datatables.min.css" />
-
     <script type="text/javascript"
         src="https://cdn.datatables.net/v/bs5/jq-3.3.1/dt-1.10.25/datatables.min.js"></script>
     <style>

@@ -176,6 +176,23 @@ def test_source_list_returns_unique_list_of_sources():
     assert expected == actual
 
 
+def test_get_unnofficial_sources_returns_good_data():
+    expected = ['D&D Beyond',
+                'Fifth Edition Foes',
+                'HotDQ supplement',
+                'Monster Module',
+                'Monster-A-Day',
+                "Nerzugal's Extended Bestiary",
+                'Primeval Thule Campaign Setting',
+                "Primeval Thule Gamemaster's Companion",
+                'Princes of the Apocalypse Online Supplement v1.0',
+                'Tome of Beasts',
+                'Tome of Beasts II',
+                'Waterdeep Dungeon of the Mad Mage']
+    actual = api.get_unofficial_sources()
+    assert expected == actual
+
+
 def test_alignment_list_returns_list():
     expected = type(list())
     actual = type(api.get_list_of_alignments())
