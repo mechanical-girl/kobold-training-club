@@ -8,6 +8,7 @@ import re
 
 
 def ingest_data(csv_string: str, db_location: str, source_url=""):
+    print(db_location)
     official_sources = ['basicrulesv1', "player'shandbook", 'monstermanual', 'thewildbeyondthewitchlight', "vanrichten'sguidetoravenloft", 'strixhaven:acurriculumofchaos', "fizban'streasuryofdragons", 'candlekeepmysteries', "tasha'scauldronofeverything", 'strangerthingsanddungeons&dragons', 'beasts&behemoths', 'icewinddale:rimeofthefrostmaiden', 'mythicodysseysoftheros', "explorer'sguidetowildmount", 'dungeons&dragonsvsrickandmorty', 'eberron:risingfromthelastwar', 'infernalmachinerebuild', 'tyrranyofdragons', 'locathahrising', "baldur'sgate:descentintoavernus",
                         'dungeons&dragonsessentialskit', 'acquisitionsincorporated', 'ghostsofsaltmarsh', "guildmasters'guidetoravnica", 'waterdeep:dungeonofthemadmage', 'waterdeep:dragonheist', 'lostlaboratoryofkwalish', "mordenkainen'stomeoffoes", 'intotheborderlands', "xanathar'sguidetoeverything", 'tombofannihilation', 'thetortlepackage', 'talesfromtheyawningportal', "volo'sguidetomonsters", "stormking'sthunder", 'curseofstrahd', "swordcoastadventurer'sguide", 'outoftheabyss', "player'scompanion", 'princesoftheapocalypse', "dungeonmaster'sguide", 'riseoftiamat', 'hoardofthedragonqueen', "explorer'sguidetowildemount"]
     source_replace_from = [
@@ -120,7 +121,7 @@ whitespace_pattern = re.compile(r'\s+')
 url_pattern = re.compile(r"(?P<url>https?://[^\s]+)")
 
 if __name__ == "__main__":
-    with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
+    """with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
         c = conn.cursor()
         c.execute('''SELECT * FROM monsters''')
         results = c.fetchall()
@@ -135,7 +136,7 @@ if __name__ == "__main__":
         with open(f"{dir_path}/master_sources.csv", 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(["name", "official", "url"])
-            writer.writerows(results)
+            writer.writerows(results)"""
 
     configure_db(db_location)
     csv_string = load_csv_from_file("master.csv")
