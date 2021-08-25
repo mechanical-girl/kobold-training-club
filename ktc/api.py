@@ -97,6 +97,7 @@ def get_list_of_challenge_ratings() -> List[str]:
 
 
 def get_list_of_alignments() -> List[str]:
+    """Returns a unique list of alignments from the monsters table"""
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
 
@@ -105,6 +106,7 @@ def get_list_of_alignments() -> List[str]:
             item[0].lower() for item in c.fetchall() if not " or " in item[0]
         ]
 
+    unique_alignments = list(set(unique_alignments))
     unique_alignments.sort()
     return unique_alignments
 
@@ -114,16 +116,10 @@ def get_list_of_sources() -> List[str]:
         c = conn.cursor()
 
         c.execute(
-            """SELECT DISTINCT source FROM monsters WHERE source_official = 0 """)
+            """SELECT DISTINCT name FROM sources WHERE official = 1 """)
         unique_sources = [item[0] for item in c.fetchall()]
 
-    set_of_sources = set()
-    for source_set in unique_sources:
-        sources = source_set.split(",")
-        for source in sources:
-            set_of_sources.add(source.split(":")[0].strip())
-
-    sources = list(set_of_sources)
+    sources = list(unique_sources)
     sources.sort()
     return sources
 
@@ -138,45 +134,52 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         Dict[str, List[List[Any]]]
     """
 
-    if not parameters:
+    print(parameters)
+
+    if parameters == {}:
+        parameters['sources'] = [
+            f"source_{source}" for source in get_list_of_sources()]
+    elif not parameters:
         parameters = {}
+
+    print(parameters)
 
     try:
         environment_constraints = [
             param.split("_")[1] for param in parameters["environments"]
         ]
-    except KeyError:
+    except (KeyError, IndexError):
         environment_constraints = []
 
     try:
         size_constraints = [param.split("_")[1]
                             for param in parameters["sizes"]]
-    except KeyError:
+    except (KeyError, IndexError):
         size_constraints = []
 
     try:
         source_constraints = [param.split("_")[1]
                               for param in parameters["sources"]]
-    except KeyError:
+    except (KeyError, IndexError):
         source_constraints = []
 
     try:
         type_constraints = [param.split("_")[1]
                             for param in parameters["types"]]
-    except KeyError:
+    except (KeyError, IndexError):
         type_constraints = []
 
     try:
         alignment_constraints = [
             param.split("_")[1] for param in parameters["alignments"]
         ]
-    except KeyError:
+    except (KeyError, IndexError):
         alignment_constraints = []
 
     try:
         challenge_rating_minimum = parameters["minimumChallengeRating"]
         challenge_rating_maximum = parameters["maximumChallengeRating"]
-    except KeyError:
+    except (KeyError, IndexError):
         challenge_rating_minimum = None
 
     # Oh, this is clumsy, I hate this
@@ -215,6 +218,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         "25",
         "26",
         "27",
+        "28",
         "30",
     ]
 
@@ -239,7 +243,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     if source_constraints != []:
         query_from = f"(SELECT * FROM {query_from} WHERE "
         for i in range(len(source_constraints)):
-            query_from += "source LIKE ? OR "
+            query_from += "sources LIKE ? OR "
             source_constraints[i] = f"%{source_constraints[i]}%"
         query_from = query_from[:-4]
         query_from += ")"
@@ -276,7 +280,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     if where_requirements.endswith(" AND "):
         where_requirements = where_requirements[:-5]
 
-    query_string = f"""SELECT name, cr, size, type, alignment, source FROM {query_from} {where_requirements} ORDER BY name"""
+    query_string = f"""SELECT name, cr, size, type, alignment, sources FROM {query_from} {where_requirements} ORDER BY name"""
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
@@ -330,7 +334,7 @@ def get_unofficial_sources() -> List[str]:
         c = conn.cursor()
 
         c.execute(
-            """SELECT DISTINCT source FROM monsters WHERE source_official = 1""")
+            """SELECT DISTINCT name FROM sources WHERE official = 0""")
         unique_sources = [item[0] for item in c.fetchall()]
 
     set_of_sources = set()

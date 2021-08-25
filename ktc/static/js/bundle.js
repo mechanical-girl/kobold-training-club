@@ -8,7 +8,7 @@ var listElements = function (data, prefix = "") {
     }
     listText = "";
     for (let i = 0; i < data.length; i++) {
-        listText += ("<li><label><input type='checkbox' id='" + prefix + data[i] + "' checked>" + data[i] + "</label></li>");
+        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\" checked>" + data[i] + "</label></li>");
     };
     return listText;
 };
@@ -96,27 +96,31 @@ const encounterManager = require('./encounter-manager.js')
 const sourcesManager = require('./sources-manager.js');
 const { floatify } = require('./updater-button.js');
 
-var monsterParameters = {};
-var monsterDataTable;
+window.monsterParameters = {};
+window.monsterDataTable;
 var customSourceNames = [];
 var unofficialSourceNames = []
 
 var getMonsterParameters = function () {
     return {
-        params: JSON.stringify(monsterParameters)
+        params: JSON.stringify(window.monsterParameters)
     };
 }
 
 $(function () {
     // Populate the first five accordions
-    selectors = ["environments", "sizes", "types", "alignments", "sources"]
+    selectors = ["sources", "environments", "sizes", "types", "alignments"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i]
         $.getJSON("/api/" + selector, function (data) {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
+            if (selector == "sources") {
+                window.monsterParameters['sources'] = data;
+            }
         });
-    };
+    }
+
 
     // Populate the last accordion
     $.getJSON("/api/crs", function (data) {
@@ -151,7 +155,7 @@ $(function () {
     });
     $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
     $.fn.dataTableExt.oSort["cr-asc"] = function (a, b) { return updaterButton.floatify(a) > updaterButton.floatify(b); }
-    monsterDataTable.columns.adjust().draw();
+    window.monsterDataTable.columns.adjust().draw();
 
     // Populate the character selectors
     partyManager.createCharLevelCombo();
@@ -164,28 +168,20 @@ $(function () {
 
     // Handle sort updates
     $(".updater_button").on("click", function () {
-        updaterButton.sortTable();
+        updaterButton.sortTable(this);
     })
 
     $(".toggle_all_button").on("click", function () {
-        var listUpdated = updaterButton.AssociatedId(this);
-        command = $(this).text()
-        console.log(command);
-        if (command == "Deselect All") {
-            $('#' + listUpdated).find(":input").prop("checked", false)
-            $(this).text("Select All");
-        } else if (command == "Select All") {
-            $('#' + listUpdated).find(":input").prop("checked", true)
-            $(this).text("Deselect All");
-        }
-        monsterDataTable.ajax.reload();
-        monsterDataTable.columns.adjust().draw();
+        updaterButton.toggleAll(this);
     })
 
     $(document).on("click", "#customSourceFinder .unofficial-source", function () {
+        if ($("customSourcesUsed").length == 0) {
+            $("#customSourcesUsed").parent().append('<button class="updater_button">Update</button>')
+        }
         var li = $(this).parent().parent()
         li.detach();
-        $('#sources_selector').append(li);
+        $('#customSourcesUsed').append(li);
     })
 
     // Handle monster adds
@@ -236,7 +232,6 @@ $(function () {
         });
     })
 })
-
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./element_lister.js":1,"./encounter-manager.js":2,"./party-manager.js":4,"./sources-manager.js":5,"./updater-button.js":6}],4:[function(require,module,exports){
 //party-manager.js
@@ -305,15 +300,11 @@ module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: hand
 
 var searchSources = function (unofficialSourceNames) {
     var searchTerm = $("#customSourceSearcher").val();
-    console.log(searchTerm);
     if (searchTerm != undefined) {
         $("#customSourceFinder").empty();
         searchTerm = searchTerm.toLowerCase();
-        console.log(searchTerm);
         for (var i = 0; i < unofficialSourceNames.length; i++) {
-            console.log(unofficialSourceNames[i])
             if (unofficialSourceNames[i].toLowerCase().indexOf(searchTerm) != -1) {
-                console.log(unofficialSourceNames[i]);
                 $("#customSourceFinder").append('<li><label><input type="checkbox" class="unofficial-source" id="sources_' + unofficialSourceNames[i] + '">' + unofficialSourceNames[i] + '</label></li>');
             }
         }
@@ -325,13 +316,10 @@ module.exports = { searchSources: searchSources }
 
 var AssociatedId = function (clicked_button) {
     if (clicked_button != undefined) {
-        console.log($(clicked_button).parent());
         attachedParamChooser = $(clicked_button).parent().children("ul")[0];
-        console.log(attachedParamChooser);
         if (attachedParamChooser == undefined) {
             attachedParamChooser = $(clicked_button).parent().children("")[0];
         }
-        console.log(attachedParamChooser);
         return $(attachedParamChooser).attr('id');
     }
 }
@@ -340,13 +328,12 @@ var GetUpdatedValues = function (updatedList) {
     if (updatedList != undefined) {
         parent_list = $("#" + updatedList);
         var selected_elements = []
-        for (var i = 0; i < parent_list.children().length; i++) {
-            var this_box = parent_list.children()[i].children[0].children[0];
+        for (var i = 0; i < parent_list.find("input").length; i++) {
+            var this_box = parent_list.find("input")[i];
             if ($(this_box).prop("checked")) {
                 selected_elements.push(this_box.id);
             }
         }
-        console.log(selected_elements);
         return selected_elements;
     }
 }
@@ -377,20 +364,34 @@ var getUpdatedChallengeRatings = function () {
     return [minValue, maxValue];
 }
 
-var sortTable = function () {
-    var listUpdated = AssociatedId(this);
+var sortTable = function (clicked_button) {
+    var listUpdated = AssociatedId(clicked_button);
     if (listUpdated == "minCr") {
         var values = getUpdatedChallengeRatings();
         monsterParameters["minimumChallengeRating"] = values[0]
         monsterParameters["maximumChallengeRating"] = values[1]
     } else {
         listUpdatedName = listUpdated.split("_")[0];
-        monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
+        window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
     }
-    monsterDataTable.ajax.reload();
-    monsterDataTable.columns.adjust().draw();
+    window.monsterDataTable.ajax.reload();
+    window.monsterDataTable.columns.adjust().draw();
 }
 
-module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify }
+var toggleAll = function (clicked_button) {
+    var listUpdated = AssociatedId(clicked_button);
+    command = $(clicked_button).text()
+    if (command == "Deselect All") {
+        $('#' + listUpdated).find(":input").prop("checked", false)
+        $(clicked_button).text("Select All");
+    } else if (command == "Select All") {
+        $('#' + listUpdated).find(":input").prop("checked", true)
+        $(clicked_button).text("Deselect All");
+    }
+    window.monsterDataTable.ajax.reload();
+    window.monsterDataTable.columns.adjust().draw();
+}
 
-},{}]},{},[1,3,4,6]);
+module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
+
+},{}]},{},[3]);

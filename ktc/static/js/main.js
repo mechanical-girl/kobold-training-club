@@ -7,27 +7,31 @@ const encounterManager = require('./encounter-manager.js')
 const sourcesManager = require('./sources-manager.js');
 const { floatify } = require('./updater-button.js');
 
-var monsterParameters = {};
-var monsterDataTable;
+window.monsterParameters = {};
+window.monsterDataTable;
 var customSourceNames = [];
 var unofficialSourceNames = []
 
 var getMonsterParameters = function () {
     return {
-        params: JSON.stringify(monsterParameters)
+        params: JSON.stringify(window.monsterParameters)
     };
 }
 
 $(function () {
     // Populate the first five accordions
-    selectors = ["environments", "sizes", "types", "alignments", "sources"]
+    selectors = ["sources", "environments", "sizes", "types", "alignments"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i]
         $.getJSON("/api/" + selector, function (data) {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
+            if (selector == "sources") {
+                window.monsterParameters['sources'] = data;
+            }
         });
-    };
+    }
+
 
     // Populate the last accordion
     $.getJSON("/api/crs", function (data) {
@@ -62,7 +66,7 @@ $(function () {
     });
     $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
     $.fn.dataTableExt.oSort["cr-asc"] = function (a, b) { return updaterButton.floatify(a) > updaterButton.floatify(b); }
-    monsterDataTable.columns.adjust().draw();
+    window.monsterDataTable.columns.adjust().draw();
 
     // Populate the character selectors
     partyManager.createCharLevelCombo();
@@ -75,28 +79,20 @@ $(function () {
 
     // Handle sort updates
     $(".updater_button").on("click", function () {
-        updaterButton.sortTable();
+        updaterButton.sortTable(this);
     })
 
     $(".toggle_all_button").on("click", function () {
-        var listUpdated = updaterButton.AssociatedId(this);
-        command = $(this).text()
-        console.log(command);
-        if (command == "Deselect All") {
-            $('#' + listUpdated).find(":input").prop("checked", false)
-            $(this).text("Select All");
-        } else if (command == "Select All") {
-            $('#' + listUpdated).find(":input").prop("checked", true)
-            $(this).text("Deselect All");
-        }
-        monsterDataTable.ajax.reload();
-        monsterDataTable.columns.adjust().draw();
+        updaterButton.toggleAll(this);
     })
 
     $(document).on("click", "#customSourceFinder .unofficial-source", function () {
+        if ($("customSourcesUsed").length == 0) {
+            $("#customSourcesUsed").parent().append('<button class="updater_button">Update</button>')
+        }
         var li = $(this).parent().parent()
         li.detach();
-        $('#sources_selector').append(li);
+        $('#customSourcesUsed').append(li);
     })
 
     // Handle monster adds
