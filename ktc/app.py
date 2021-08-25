@@ -75,11 +75,11 @@ def get_alignments():
 def get_monsters():
     try:
         monster_parameters_string = request.values["params"]
-        print(monster_parameters_string)
         monster_parameters = json.loads(
             monster_parameters_string)
     except:
         monster_parameters = {}
+    print(monster_parameters)
     return jsonify(api.get_list_of_monsters(monster_parameters))
 
 

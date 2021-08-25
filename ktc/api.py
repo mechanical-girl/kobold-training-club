@@ -53,8 +53,6 @@ def get_list_of_environments() -> List[str]:
 
     set_of_environments = set()
     for environment in unique_environments:
-        if not environment:
-            continue
         for env in environment.split(","):
             set_of_environments.add(env.strip())
 
@@ -134,15 +132,9 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         Dict[str, List[List[Any]]]
     """
 
-    print(parameters)
-
     if parameters == {}:
         parameters['sources'] = [
             f"source_{source}" for source in get_list_of_sources()]
-    elif not parameters:
-        parameters = {}
-
-    print(parameters)
 
     try:
         environment_constraints = [
@@ -178,9 +170,14 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     try:
         challenge_rating_minimum = parameters["minimumChallengeRating"]
-        challenge_rating_maximum = parameters["maximumChallengeRating"]
+        print(parameters["minimumChallengeRating"])
     except (KeyError, IndexError):
         challenge_rating_minimum = None
+    try:
+        challenge_rating_maximum = parameters["maximumChallengeRating"]
+        print(parameters["maximumChallengeRating"])
+    except (KeyError, IndexError):
+        challenge_rating_maximum = None
 
     # Oh, this is clumsy, I hate this
     where_requirements = ""
@@ -219,6 +216,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         "26",
         "27",
         "28",
+        "29",
         "30",
     ]
 
@@ -235,11 +233,6 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         query_from += ")"
         query_arguments += environment_constraints
 
-    if size_constraints != []:
-        size_query_placeholders = f"({', '.join(['?']*len(size_constraints))})"
-        where_requirements += f"size IN {size_query_placeholders} AND "
-        query_arguments += size_constraints
-
     if source_constraints != []:
         query_from = f"(SELECT * FROM {query_from} WHERE "
         for i in range(len(source_constraints)):
@@ -247,7 +240,12 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
             source_constraints[i] = f"%{source_constraints[i]}%"
         query_from = query_from[:-4]
         query_from += ")"
-        query_arguments = source_constraints + query_arguments
+        query_arguments += source_constraints
+
+    if size_constraints != []:
+        size_query_placeholders = f"({', '.join(['?']*len(size_constraints))})"
+        where_requirements += f"size IN {size_query_placeholders} AND "
+        query_arguments += size_constraints
 
     if type_constraints != []:
         type_query_placeholders = f"({', '.join(['?']*len(type_constraints))})"
@@ -261,17 +259,24 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         where_requirements += f"alignment IN {alignment_query_placeholders} AND "
         query_arguments += alignment_constraints
 
-    if challenge_rating_minimum:
-        mindex = possible_challenge_ratings.index(
-            challenge_rating_minimum
-        )  # or min_index, if you will
-        maxdex = possible_challenge_ratings.index(challenge_rating_maximum)
-        if mindex < maxdex:
-            challenge_rating_placeholders = (
-                f"({', '.join(['?']*(len(range(mindex, maxdex))))})"
-            )
-            where_requirements += f"cr IN {challenge_rating_placeholders} AND "
-            query_arguments += possible_challenge_ratings[mindex:maxdex]
+    if challenge_rating_minimum is not None or challenge_rating_maximum is not None:
+        if challenge_rating_minimum is None:
+            minCr = possible_challenge_ratings[0]
+        else:
+            minCr = challenge_rating_minimum
+        if challenge_rating_maximum is None:
+            maxCr = possible_challenge_ratings[-1]
+        else:
+            maxCr = challenge_rating_maximum
+
+        mindex = possible_challenge_ratings.index(minCr)
+        maxdex = possible_challenge_ratings.index(maxCr)
+        no_of_placeholders = len(possible_challenge_ratings[mindex:maxdex])
+        challenge_rating_placeholders = (
+            f"({', '.join(['?']*no_of_placeholders)})"
+        )
+        where_requirements += f"cr IN {challenge_rating_placeholders} AND "
+        query_arguments += possible_challenge_ratings[mindex:maxdex]
 
     # If there are requirements, we add a WHERE to the start
     if where_requirements != "":
@@ -286,10 +291,10 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         c = conn.cursor()
         # conn.set_trace_callback(print)
 
-        if query_arguments:
-            c.execute(query_string, (*query_arguments,))
-        else:
+        if query_arguments == []:
             c.execute(query_string)
+        else:
+            c.execute(query_string, (*query_arguments,))
         monster_list = c.fetchall()
 
     monster_data = []
