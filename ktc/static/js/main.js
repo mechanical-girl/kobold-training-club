@@ -25,7 +25,7 @@ $(function () {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
             if (selector == "sources") {
-                window.monsterParameters['sources'] = data;
+                window.monsterParameters['sources'] = updaterButton.GetUpdatedValues("sources_selector");
             }
         });
     }
@@ -76,7 +76,7 @@ $(function () {
     });
 
     // Handle sort updates
-    $(".updater_button").on("click", function () {
+    $(document).on("click", ".updater_button", function () {
         updaterButton.sortTable(this);
     })
 
@@ -85,12 +85,7 @@ $(function () {
     })
 
     $(document).on("click", "#customSourceFinder .unofficial-source", function () {
-        if ($("customSourcesUsed").length == 0) {
-            $("#customSourcesUsed").parent().append('<button class="updater_button">Update</button>')
-        }
-        var li = $(this).parent().parent()
-        li.detach();
-        $('#customSourcesUsed').append(li);
+        sourcesManager.moveSourceCheckbox(this);
     })
 
     // Handle monster adds

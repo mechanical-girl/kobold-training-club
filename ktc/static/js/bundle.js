@@ -114,7 +114,7 @@ $(function () {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
             if (selector == "sources") {
-                window.monsterParameters['sources'] = data;
+                window.monsterParameters['sources'] = updaterButton.GetUpdatedValues("sources_selector");
             }
         });
     }
@@ -165,7 +165,7 @@ $(function () {
     });
 
     // Handle sort updates
-    $(".updater_button").on("click", function () {
+    $(document).on("click", ".updater_button", function () {
         updaterButton.sortTable(this);
     })
 
@@ -174,12 +174,7 @@ $(function () {
     })
 
     $(document).on("click", "#customSourceFinder .unofficial-source", function () {
-        if ($("customSourcesUsed").length == 0) {
-            $("#customSourcesUsed").parent().append('<button class="updater_button">Update</button>')
-        }
-        var li = $(this).parent().parent()
-        li.detach();
-        $('#customSourcesUsed').append(li);
+        sourcesManager.moveSourceCheckbox(this);
     })
 
     // Handle monster adds
@@ -308,7 +303,16 @@ var searchSources = function (unofficialSourceNames) {
         }
     }
 }
-module.exports = { searchSources: searchSources }
+
+var moveSourceCheckbox = function (checked_box) {
+    if ($("#customSourcesUsed").children("li").length == 0) {
+        $("#customSourcesUsed").parent().append('<button class="updater_button">Update</button>')
+    }
+    var li = $(checked_box).parent().parent()
+    li.detach();
+    $('#customSourcesUsed').append(li);
+}
+module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceCheckbox }
 },{}],6:[function(require,module,exports){
 // updater-button.js
 
@@ -392,4 +396,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[3]);
+},{}]},{},[1,3,4,6]);
