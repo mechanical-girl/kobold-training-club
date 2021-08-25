@@ -12,4 +12,14 @@ var searchSources = function (unofficialSourceNames) {
         }
     }
 }
-module.exports = { searchSources: searchSources }
+
+var moveSourceCheckbox = function (checked_box) {
+    console.log($("#customSourcesUsed").children("li").length)
+    if ($("#customSourcesUsed").children("li").length == 0) {
+        $("#customSourcesUsed").parent().append('<button class="updater_button">Update</button>')
+    }
+    var li = $(checked_box).parent().parent()
+    li.detach();
+    $('#customSourcesUsed').append(li);
+}
+module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceCheckbox }
