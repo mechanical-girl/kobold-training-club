@@ -114,7 +114,7 @@ $(function () {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
             if (selector == "sources") {
-                window.monsterParameters['sources'] = data;
+                window.monsterParameters['sources'] = updaterButton.GetUpdatedValues("sources_selector");
             }
         });
     }
@@ -305,7 +305,6 @@ var searchSources = function (unofficialSourceNames) {
 }
 
 var moveSourceCheckbox = function (checked_box) {
-    console.log($("#customSourcesUsed").children("li").length)
     if ($("#customSourcesUsed").children("li").length == 0) {
         $("#customSourcesUsed").parent().append('<button class="updater_button">Update</button>')
     }

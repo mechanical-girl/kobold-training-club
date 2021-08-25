@@ -25,7 +25,7 @@ $(function () {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
             if (selector == "sources") {
-                window.monsterParameters['sources'] = data;
+                window.monsterParameters['sources'] = updaterButton.GetUpdatedValues("sources_selector");
             }
         });
     }

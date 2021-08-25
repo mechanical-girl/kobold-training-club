@@ -14,7 +14,6 @@ var searchSources = function (unofficialSourceNames) {
 }
 
 var moveSourceCheckbox = function (checked_box) {
-    console.log($("#customSourcesUsed").children("li").length)
     if ($("#customSourcesUsed").children("li").length == 0) {
         $("#customSourcesUsed").parent().append('<button class="updater_button">Update</button>')
     }

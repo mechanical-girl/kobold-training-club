@@ -69,7 +69,6 @@ def get_monsters():
             monster_parameters_string)
     except:
         monster_parameters = {}
-    print(monster_parameters)
     return jsonify(api.get_list_of_monsters(monster_parameters))
 
 

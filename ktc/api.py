@@ -156,6 +156,12 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         source_constraints = []
 
     try:
+        source_constraints += [param.split("_")[1]
+                               for param in parameters["customSourcesUsed"]]
+    except (KeyError, IndexError):
+        pass
+
+    try:
         type_constraints = [param.split("_")[1]
                             for param in parameters["types"]]
     except (KeyError, IndexError):
@@ -289,7 +295,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
-        # conn.set_trace_callback(print)
+        conn.set_trace_callback(print)
 
         if query_arguments == []:
             c.execute(query_string)
