@@ -1,12 +1,10 @@
-var listElements = require('./element_lister.js')
-var updaterButton = require('./updater-button.js')
+const listElements = require('./element_lister.js')
+const updaterButton = require('./updater-button.js')
 // https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = require('jQuery');
 const partyManager = require('./party-manager.js');
 const encounterManager = require('./encounter-manager.js')
 const sourcesManager = require('./sources-manager.js');
-const { floatify } = require('./updater-button.js');
-
 window.monsterParameters = {};
 window.monsterDataTable;
 var customSourceNames = [];

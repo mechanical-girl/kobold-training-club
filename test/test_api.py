@@ -3,11 +3,42 @@ import pytest
 from ktc import app
 import json
 from fractions import Fraction
+import sqlite3
 
 
 @pytest.fixture
 def client():
     return app.app.test_client()
+
+
+@pytest.fixture
+def setup_database():
+    """Fixture to setup an in-memory database"""
+    conn = sqlite3.connect("test.db", uri=True)
+    c = conn.cursor()
+    c.execute("DROP TABLE IF EXISTS monsters")
+    c.execute("DROP TABLE IF EXISTS sources")
+    c.execute('''CREATE TABLE monsters(
+                fid text,
+                name text,
+                cr text,
+                size text,
+                type text,
+                alignment text,
+                environment text,
+                ac int,
+                hp int,
+                init text,
+                lair int,
+                legendary int,
+                named int,
+                source text )''')
+    c.execute('''CREATE TABLE sources(
+                name text,
+                official int,
+                url text)''')
+
+    yield conn
 
 
 def test_environments_gives_json_with_proper_mimetype(client):

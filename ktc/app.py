@@ -1,29 +1,19 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, jsonify, request, flash, redirect, url_for
+from flask import Flask, render_template, jsonify, request
 import os
 import json
-from werkzeug.utils import secure_filename
 
 try:
     import api  # type: ignore
 except ModuleNotFoundError:
     from ktc import api  # type: ignore
 
-UPLOAD_FOLDER = 'ktc/uploads'
-ALLOWED_EXTENSIONS = {'csv'}
-
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 
 path_to_database = os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.pardir, "data/monsters.db"))
 
 db_location = path_to_database
-
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @ app.route("/", methods=["GET", "POST", "PUT"])
@@ -106,34 +96,6 @@ def process_csv():
 @ app.route("/api/unofficialsources", methods=["GET"])
 def get_unofficial_sources():
     return jsonify(api.get_unofficial_sources())
-
-
-@ app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect("/")
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
 
 
 if __name__ == "__main__":
