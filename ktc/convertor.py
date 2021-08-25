@@ -122,20 +122,23 @@ url_pattern = re.compile(r"(?P<url>https?://[^\s]+)")
 if __name__ == "__main__":
     with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
         c = conn.cursor()
-        c.execute('''SELECT * FROM monsters''')
-        results = c.fetchall()
-        with open(f"{dir_path}/master.csv", 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(["fid", "name", "cr", "size", "type", "alignment", "environment",
-                             "ac", "hp", "init", "lair", "legendary", "named", "sources"])
-            writer.writerows(results)
+        c.execute('''SELECT name FROM sqlite_master WHERE type="table"''')
+        if len(c.fetchall()) > 0:
 
-        c.execute('''SELECT * FROM sources''')
-        results = c.fetchall()
-        with open(f"{dir_path}/master_sources.csv", 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(["name", "official", "url"])
-            writer.writerows(results)
+            c.execute('''SELECT * FROM monsters''')
+            results = c.fetchall()
+            with open(f"{dir_path}/master.csv", 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(["fid", "name", "cr", "size", "type", "alignment", "environment",
+                                "ac", "hp", "init", "lair", "legendary", "named", "sources"])
+                writer.writerows(results)
+
+            c.execute('''SELECT * FROM sources''')
+            results = c.fetchall()
+            with open(f"{dir_path}/master_sources.csv", 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(["name", "official", "url"])
+                writer.writerows(results)
 
     configure_db(db_location)
     csv_string = load_csv_from_file("master.csv")
