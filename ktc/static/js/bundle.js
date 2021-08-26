@@ -23,7 +23,6 @@ var addMonster = function (cell) {
     var row = $(cell).parent()
     var monsterName = $(row).children("td:first-child").text()
     var monsterSource = $(row).children("td:last-child").text()
-    console.log(row)
     for (var i = 0; i < $('#monsterList').children('div').length; i++) {
         var monsterDiv = $('#monsterList').children('div')[i]
         if (monsterName == monsterDiv.id) {
@@ -31,7 +30,6 @@ var addMonster = function (cell) {
             return
         }
     }
-    console.log(monsterName)
     level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsterName + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
     monsterListDiv.append(level_holder);
 
