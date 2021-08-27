@@ -18,8 +18,9 @@ module.exports = listElements
 },{}],2:[function(require,module,exports){
 // encounter-manager.js
 
-var addMonster = function (row) {
+var addMonster = function (cell) {
     var monsterListDiv = $("#monsterList");
+    var row = $(cell).parent()
     var monsterName = $(row).children("td:first-child").text()
     var monsterSource = $(row).children("td:last-child").text()
     for (var i = 0; i < $('#monsterList').children('div').length; i++) {
@@ -149,6 +150,9 @@ $(function () {
             { "bSortable": true },
             { "bSortable": true },
             { "bSortable": true }
+        ],
+        "columnDefs": [
+            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] }
         ]
     });
     $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
@@ -178,7 +182,7 @@ $(function () {
     })
 
     // Handle monster adds
-    $(document).on("click", "#monsterTable > tbody > tr", function () {
+    $(document).on("click", "#monsterTable > tbody > tr > .not-a-link", function () {
         encounterManager.addMonster(this);
     })
 
@@ -396,4 +400,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[1,3,4,6]);
+},{}]},{},[3]);

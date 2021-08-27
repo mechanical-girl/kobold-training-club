@@ -60,6 +60,9 @@ $(function () {
             { "bSortable": true },
             { "bSortable": true },
             { "bSortable": true }
+        ],
+        "columnDefs": [
+            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] }
         ]
     });
     $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
@@ -89,7 +92,7 @@ $(function () {
     })
 
     // Handle monster adds
-    $(document).on("click", "#monsterTable > tbody > tr", function () {
+    $(document).on("click", "#monsterTable > tbody > tr > .not-a-link", function () {
         encounterManager.addMonster(this);
     })
 

@@ -1,7 +1,8 @@
 // encounter-manager.js
 
-var addMonster = function (row) {
+var addMonster = function (cell) {
     var monsterListDiv = $("#monsterList");
+    var row = $(cell).parent()
     var monsterName = $(row).children("td:first-child").text()
     var monsterSource = $(row).children("td:last-child").text()
     for (var i = 0; i < $('#monsterList').children('div').length; i++) {
