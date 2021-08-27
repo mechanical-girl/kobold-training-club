@@ -21,7 +21,7 @@ jobs:
         - pip install -r requirements.txt
         - curl -Os https://uploader.codecov.io/latest/linux/codecov
         - chmod +x codecov
-        - python ktc/convertor.py
+        - python ktc/converter.py
       script:
         - coverage run -m pytest test
         - coverage xml
