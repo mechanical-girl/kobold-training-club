@@ -44,6 +44,17 @@ var updateMonsterCount = function (clicked_button) {
     updateEncounterDifficulty()
 }
 
+var highlightEncounterDifficulty = function () {
+    var highlight_colours = ["#fff", "#dff0d8", "#faf2cc", "#f6ce95", "#eba5a3"]
+    var difficulties = ["easy", "medium", "hard", "deadly", "daily"]
+    for (var i = 0; i < window.partyThresholds.length; i++) {
+        if (window.encounterDifficulty > window.partyThresholds[i]) {
+            $(".exp-list").css("background-color", "#fff")
+            $(".exp-list." + difficulties[i]).css("background-color", highlight_colours[i])
+        }
+    }
+}
+
 var updateEncounterDifficulty = function () {
     var monsterListDiv = $('#monsterList');
     var monstersInEncounter = new Array()
@@ -62,9 +73,10 @@ var updateEncounterDifficulty = function () {
         success: function (results) {
             $('#encounterDifficulty').empty();
             $('#encounterDifficulty').text('(' + results + 'XP)')
-
+            window.encounterDifficulty = results;
+            highlightEncounterDifficulty()
         }
     })
 
 }
-module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount }
+module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty }

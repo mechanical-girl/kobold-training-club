@@ -7,6 +7,8 @@ const encounterManager = require('./encounter-manager.js')
 const sourcesManager = require('./sources-manager.js');
 window.monsterParameters = {};
 window.monsterDataTable;
+window.partyThresholds = []
+window.encounterDifficulty = 0
 var customSourceNames = [];
 var unofficialSourceNames = []
 
