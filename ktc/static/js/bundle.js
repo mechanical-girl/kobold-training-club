@@ -18,8 +18,9 @@ module.exports = listElements
 },{}],2:[function(require,module,exports){
 // encounter-manager.js
 
-var addMonster = function (row) {
+var addMonster = function (cell) {
     var monsterListDiv = $("#monsterList");
+    var row = $(cell).parent()
     var monsterName = $(row).children("td:first-child").text()
     var monsterSource = $(row).children("td:last-child").text()
     for (var i = 0; i < $('#monsterList').children('div').length; i++) {
@@ -61,6 +62,17 @@ var updateMonsterCount = function (clicked_button) {
     updateEncounterDifficulty()
 }
 
+var highlightEncounterDifficulty = function () {
+    var highlight_colours = ["#fff", "#dff0d8", "#faf2cc", "#f6ce95", "#eba5a3"]
+    var difficulties = ["easy", "medium", "hard", "deadly", "daily"]
+    for (var i = 0; i < window.partyThresholds.length; i++) {
+        if (window.encounterDifficulty > window.partyThresholds[i]) {
+            $(".exp-list").css("background-color", "#fff")
+            $(".exp-list." + difficulties[i]).css("background-color", highlight_colours[i])
+        }
+    }
+}
+
 var updateEncounterDifficulty = function () {
     var monsterListDiv = $('#monsterList');
     var monstersInEncounter = new Array()
@@ -79,12 +91,13 @@ var updateEncounterDifficulty = function () {
         success: function (results) {
             $('#encounterDifficulty').empty();
             $('#encounterDifficulty').text('(' + results + 'XP)')
-
+            window.encounterDifficulty = results;
+            highlightEncounterDifficulty()
         }
     })
 
 }
-module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount }
+module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty }
 },{}],3:[function(require,module,exports){
 (function (global){(function (){
 const listElements = require('./element_lister.js')
@@ -96,6 +109,8 @@ const encounterManager = require('./encounter-manager.js')
 const sourcesManager = require('./sources-manager.js');
 window.monsterParameters = {};
 window.monsterDataTable;
+window.partyThresholds = []
+window.encounterDifficulty = 0
 var customSourceNames = [];
 var unofficialSourceNames = []
 
@@ -149,6 +164,9 @@ $(function () {
             { "bSortable": true },
             { "bSortable": true },
             { "bSortable": true }
+        ],
+        "columnDefs": [
+            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] }
         ]
     });
     $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
@@ -178,7 +196,7 @@ $(function () {
     })
 
     // Handle monster adds
-    $(document).on("click", "#monsterTable > tbody > tr", function () {
+    $(document).on("click", "#monsterTable > tbody > tr > .not-a-link", function () {
         encounterManager.addMonster(this);
     })
 
@@ -256,7 +274,7 @@ var handleClick = function (clicked_button) {
         $(clicked_button).parent().remove();
     }
 
-
+    updateThresholds();
 };
 
 var updateThresholds = function () {
@@ -276,11 +294,12 @@ var updateThresholds = function () {
         success: function (result) {
             var displayDiv = $("div #encounterThresholds");
             displayDiv.empty();
-            displayDiv.append('<div class="row float-end"><div class="col">Easy: ' + result[0].toLocaleString("en-GB") + 'exp</div></div>');
-            displayDiv.append('<div class="row float-end"><div class="col">Medium: ' + result[1].toLocaleString("en-GB") + 'exp</div></div>');
-            displayDiv.append('<div class="row float-end"><div class="col">Hard: ' + result[2].toLocaleString("en-GB") + 'exp</div></div>');
-            displayDiv.append('<div class="row float-end"><div class="col">Deadly: ' + result[3].toLocaleString("en-GB") + 'exp</div></div>');
-            displayDiv.append('<div class="row float-end"><div class="col">Daily: ' + result[4].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col exp-list easy">Easy: ' + result[0].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col exp-list medium">Medium: ' + result[1].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col exp-list hard">Hard: ' + result[2].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col exp-list deadly">Deadly: ' + result[3].toLocaleString("en-GB") + 'exp</div></div>');
+            displayDiv.append('<div class="row float-end"><div class="col exp-list daily">Daily: ' + result[4].toLocaleString("en-GB") + 'exp</div></div>');
+            window.partyThresholds = result;
         }
 
     })

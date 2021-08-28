@@ -18,8 +18,8 @@ def setup_database():
     c = conn.cursor()
     c.execute("DROP TABLE IF EXISTS monsters")
     c.execute("DROP TABLE IF EXISTS sources")
-    c.execute('''CREATE TABLE monsters(
-                fid text,
+    c.execute('''CREATE TABLE monsters (
+                fid text UNIQUE,
                 name text,
                 cr text,
                 size text,
@@ -32,11 +32,16 @@ def setup_database():
                 lair int,
                 legendary int,
                 named int,
-                source text )''')
-    c.execute('''CREATE TABLE sources(
-                name text,
-                official int,
-                url text)''')
+                sources text,
+                sourcehashes text)'''
+              )
+    c.execute('''CREATE TABLE sources (
+        name text,
+        official int,
+        hash text,
+        url text,
+        sourceurlhash text UNIQUE)'''
+              )
 
     yield conn
 
@@ -140,8 +145,9 @@ def test_source_list_gives_correct_list(client):
                 'Basic Rules v1',
                 'Curse of Strahd',
                 'Eberron: Rising from the Last War',
-                "Explorer's Guide to Wildemount",
+                'Explorer\'s Guide to Wildemount',
                 'Ghosts of Saltmarsh',
+                "Guildmasters' Guide to Ravnica",
                 'Hoard of the Dragon Queen',
                 'Icewind Dale: Rime of the Frost Maiden',
                 'Into The Borderlands',
@@ -303,6 +309,18 @@ def test_monster_list_gives_correct_list(client):
                  'Monstrosity',
                  'chaotic evil',
                  'Monster Manual: 306'],
+                ['Abyssal Chicken',
+                 '1/4',
+                 'Tiny',
+                 'Fiend',
+                 'chaotic evil',
+                 "Baldur's Gate: Descent into Avernus: 97"],
+                ['Abyssal Wretch',
+                '1/4',
+                 'Medium',
+                 'Fiend',
+                 'chaotic evil',
+                 "Baldur's Gate: Descent into Avernus: 118"],
                 ['Acolyte',
                  '1/4',
                  'Medium',
@@ -386,17 +404,17 @@ def test_monster_list_gives_correct_list(client):
                  'Large',
                  'Monstrosity',
                  'Neutral Evil',
-                 "Explorer's Guide to Wildemount"],
+                 "Explorer's Guide to Wildemount: "],
                 ['Aeorian Nullifier',
                  '12',
                  'Large',
                  'Monstrosity',
                  'Neutral Evil',
-                 "Explorer's Guide to Wildemount"]]
+                 "Explorer's Guide to Wildemount: "]]
     response = client.get("/api/monsters")
     received = response.get_json()["data"]
 
-    assert len(received) == 907
+    assert len(received) == 1159
     for i, monster in enumerate(expected):
         assert monster == received[i]
 
@@ -463,7 +481,6 @@ def test_monster_list_returns_good_all_constraint_list(client):
                   "minimumChallengeRating": "1",
                   "maximumChallengeRating": "15"
                   }
-    print(json.dumps(parameters))
     response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
     received = response.get_json()["data"]
 
@@ -476,7 +493,6 @@ def test_monster_list_returns_good_all_constraint_list(client):
                                 for param in parameters["alignments"]]
 
     for monster in received:
-        print(monster[1])
         assert float(Fraction(parameters["minimumChallengeRating"])) < float(Fraction(
             monster[1])) < float(Fraction(parameters["maximumChallengeRating"]))
         assert monster[2] in parameters["sizes"]

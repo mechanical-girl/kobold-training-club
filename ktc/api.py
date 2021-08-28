@@ -5,13 +5,14 @@ from typing import Dict, List, Any
 from fractions import Fraction
 from io import StringIO
 import csv
+import re
 
 try:
     import main  # type: ignore
-    import convertor  # type: ignore
+    import converter  # type: ignore
 except ModuleNotFoundError:
     from ktc import main  # type: ignore
-    from ktc import convertor  # type: ignore
+    from ktc import converter  # type: ignore
 
 import os
 
@@ -239,12 +240,17 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     if source_constraints != []:
         query_from = f"(SELECT * FROM {query_from} WHERE "
-        for i in range(len(source_constraints)):
-            query_from += "sources LIKE ? OR "
-            source_constraints[i] = f"%{source_constraints[i]}%"
+        constraint_hashes = []
+        with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
+            c = conn.cursor()
+            for constraint in source_constraints:
+                c.execute(
+                    '''SELECT hash FROM sources WHERE name = ?''', (constraint,))
+                constraint_hashes.append(f"%{c.fetchone()[0]}%")
+                query_from += "sourcehashes LIKE ? OR "
         query_from = query_from[:-4]
         query_from += ")"
-        query_arguments += source_constraints
+        query_arguments += constraint_hashes
 
     if size_constraints != []:
         size_query_placeholders = f"({', '.join(['?']*len(size_constraints))})"
@@ -293,7 +299,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
-        conn.set_trace_callback(print)
+        # conn.set_trace_callback(print)
 
         if query_arguments == []:
             c.execute(query_string)
@@ -302,6 +308,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         monster_list = c.fetchall()
 
     monster_data = []
+    url_pattern = re.compile(r"(?P<url>https?://[^\s]+)")
     for monster in monster_list:
         monster_data.append(
             [
@@ -310,9 +317,19 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
                 monster[2].strip(),
                 monster[3].strip(),
                 monster[4].strip(),
-                monster[5].strip(),
             ]
         )
+        sources = monster[5].split(",")
+        linked_sources = []
+        for source in sources:
+            (source_name, index) = converter.split_source_from_index(source)
+            if "http" in index:
+                linked_sources.append(
+                    f"<a target='_blank' href='{index}''>{source_name}</a>")
+            else:
+                linked_sources.append(f"{source_name}: {index}")
+
+        monster_data[-1].append(', '.join(linked_sources))
 
     return {"data": monster_data}
 
@@ -335,7 +352,7 @@ def get_encounter_xp(monsters):
 
 
 def ingest_custom_csv_string(csv_string, db_location, url=""):
-    return convertor.ingest_data(csv_string, db_location, url)
+    return converter.ingest_data(csv_string, db_location, url)
 
 
 def get_unofficial_sources() -> List[str]:
