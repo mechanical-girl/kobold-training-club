@@ -146,6 +146,9 @@ $(function () {
         }
     })
 
+    // Populate unofficial sources
+    sourcesManager.getUnofficialSources();
+
     // Populate the monster table
 
     monsterDataTable = $('#monsterTable').DataTable({
@@ -175,8 +178,6 @@ $(function () {
 
     // Populate the character selectors
     partyManager.createCharLevelCombo();
-
-    $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
 
     $(document).on("click", ".party-update", function () {
         partyManager.handleClick(this)
@@ -247,6 +248,8 @@ $(function () {
 },{"./element_lister.js":1,"./encounter-manager.js":2,"./party-manager.js":4,"./sources-manager.js":5,"./updater-button.js":6}],4:[function(require,module,exports){
 //party-manager.js
 
+const encounterManager = require("./encounter-manager");
+
 var createCharLevelCombo = function () {
     var characterListDiv = $("#characterList");
     var optionID = $("#characterList div").length
@@ -300,6 +303,7 @@ var updateThresholds = function () {
             displayDiv.append('<div class="row float-end"><div class="col exp-list deadly">Deadly: ' + result[3].toLocaleString("en-GB") + 'exp</div></div>');
             displayDiv.append('<div class="row float-end"><div class="col exp-list daily">Daily: ' + result[4].toLocaleString("en-GB") + 'exp</div></div>');
             window.partyThresholds = result;
+            encounterManager.highlightEncounterDifficulty()
         }
 
     })
@@ -307,20 +311,30 @@ var updateThresholds = function () {
 
 module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds }
 
-},{}],5:[function(require,module,exports){
+},{"./encounter-manager":2}],5:[function(require,module,exports){
 // sources-manager.js
 
-var searchSources = function (unofficialSourceNames) {
+const listElements = require('./element_lister.js')
+
+var searchSources = function () {
     var searchTerm = $("#customSourceSearcher").val();
     if (searchTerm != undefined) {
         $("#customSourceFinder").empty();
         searchTerm = searchTerm.toLowerCase();
-        for (var i = 0; i < unofficialSourceNames.length; i++) {
-            if (unofficialSourceNames[i].toLowerCase().indexOf(searchTerm) != -1) {
-                $("#customSourceFinder").append('<li><label><input type="checkbox" class="unofficial-source" id="sources_' + unofficialSourceNames[i] + '">' + unofficialSourceNames[i] + '</label></li>');
+        for (var i = 0; i < window.unofficialSourceNames.length; i++) {
+            if (window.unofficialSourceNames[i].toLowerCase().indexOf(searchTerm) != -1) {
+                $("#customSourceFinder").append('<li><label><input type="checkbox" class="unofficial-source" id="sources_' + window.unofficialSourceNames[i] + '">' + window.unofficialSourceNames[i] + '</label></li>');
             }
         }
     }
+}
+
+var getUnofficialSources = function () {
+    $.getJSON('/api/unofficialsources').done(function (response) {
+        unofficialSourceNames = response;
+        $("#customSourcesUsed").empty;
+        $("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"))
+    })
 }
 
 var moveSourceCheckbox = function (checked_box) {
@@ -331,8 +345,8 @@ var moveSourceCheckbox = function (checked_box) {
     li.detach();
     $('#customSourcesUsed').append(li);
 }
-module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceCheckbox }
-},{}],6:[function(require,module,exports){
+module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceCheckbox, getUnofficialSources: getUnofficialSources }
+},{"./element_lister.js":1}],6:[function(require,module,exports){
 // updater-button.js
 
 var AssociatedId = function (clicked_button) {

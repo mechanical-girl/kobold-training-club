@@ -6,13 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-13LV3TDKFN"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'G-13LV3TDKFN');
-    </script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -114,11 +107,13 @@
                                     <ul id="customSourcesUsed">
 
                                     </ul>
-                                </div>
-                                <input type="text" id="customSourceSearcher" placeholder="Search by name...">
-                                <ul id="customSourceFinder">
+                                    <button class="updater_button">Update</button>
+                                    <button class="toggle_all_button">Deselect All</button>
+                                    <input type="text" id="customSourceSearcher" placeholder="Search by name...">
+                                    <ul id="customSourceFinder">
 
-                                </ul>
+                                    </ul>
+                                </div>
                                 <p>Add custom sources! Simply copy the sheet ID from any content <a
                                         href="https://www.reddit.com/r/asmor/comments/ntrdrm/list_of_communityadded_kfc_content_6_trump_got/">here</a>
                                     and paste it into the box below.
@@ -228,5 +223,12 @@
         </div>
     </div>
 </body>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-13LV3TDKFN');
+</script>
 
 </html>
