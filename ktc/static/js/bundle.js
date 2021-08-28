@@ -4,11 +4,17 @@
 
 var listElements = function (data, prefix = "") {
     if (prefix != "") {
+        var stored = window.localStorage.getItem(prefix + "_selector")
+        console.log(stored)
         prefix = prefix + "_";
     }
     listText = "";
     for (let i = 0; i < data.length; i++) {
-        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\" checked>" + data[i] + "</label></li>");
+        var checked = " checked";
+        if (stored != null && stored.indexOf(data[i]) == -1) {
+            checked = ""
+        }
+        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\"'" + checked + ">" + data[i] + "</label></li>");
     };
     return listText;
 };
@@ -33,6 +39,18 @@ var addMonster = function (cell) {
     level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsterName + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
     monsterListDiv.append(level_holder);
 
+    updateEncounterDifficulty();
+}
+
+var importEncounter = function () {
+    var monsters = JSON.parse(window.localStorage.getItem("monsters"));
+    var monsterListDiv = $("#monsterList");
+    if (monsters != null) {
+        for (var i = 0; i < monsters.length; i++) {
+            level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsters[i][0] + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>' + monsters[i][1] + '</span>x ' + monsters[i][0] + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
+            monsterListDiv.append(level_holder);
+        }
+    }
     updateEncounterDifficulty();
 }
 
@@ -84,6 +102,9 @@ var updateEncounterDifficulty = function () {
         monstersInEncounter[monstersInEncounter.length] = new Array(monsterName, noOfMonsters)
     }
 
+    window.localStorage.setItem("monsters", JSON.stringify(monstersInEncounter));
+    console.log(monstersInEncounter)
+
     $.ajax({
         type: "POST",
         url: "api/encounterxp",
@@ -97,7 +118,7 @@ var updateEncounterDifficulty = function () {
     })
 
 }
-module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty }
+module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter }
 },{}],3:[function(require,module,exports){
 (function (global){(function (){
 const listElements = require('./element_lister.js')
@@ -113,6 +134,7 @@ window.partyThresholds = []
 window.encounterDifficulty = 0
 var customSourceNames = [];
 var unofficialSourceNames = []
+const storage = window.localStorage;
 
 var getMonsterParameters = function () {
     return {
@@ -129,11 +151,11 @@ $(function () {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
             if (selector == "sources") {
-                window.monsterParameters['sources'] = updaterButton.GetUpdatedValues("sources_selector");
+                // Populate unofficial sources
+                sourcesManager.getUnofficialSources();
             }
         });
     }
-
 
     // Populate the last accordion
     $.getJSON("/api/crs", function (data) {
@@ -146,8 +168,6 @@ $(function () {
         }
     })
 
-    // Populate unofficial sources
-    sourcesManager.getUnofficialSources();
 
     // Populate the monster table
 
@@ -177,7 +197,19 @@ $(function () {
     window.monsterDataTable.columns.adjust().draw();
 
     // Populate the character selectors
-    partyManager.createCharLevelCombo();
+    var party = JSON.parse(window.localStorage.getItem("party"));
+    if (party != null) {
+        for (var i = 0; i < party.length; i++) {
+            console.log(party[i])
+            partyManager.createCharLevelCombo(party[i][0], party[i][1]);
+        }
+    } else {
+        partyManager.createCharLevelCombo();
+    }
+    partyManager.updateThresholds();
+
+    encounterManager.importEncounter();
+
 
     $(document).on("click", ".party-update", function () {
         partyManager.handleClick(this)
@@ -250,15 +282,23 @@ $(function () {
 
 const encounterManager = require("./encounter-manager");
 
-var createCharLevelCombo = function () {
+var createCharLevelCombo = function (char, level) {
+    var char = (char != undefined) ? char : 1;
+    var level = (char != undefined) ? level : 1;
     var characterListDiv = $("#characterList");
-    var optionID = $("#characterList div").length
+    var optionID = $("#characterList div").length;
 
-    var options = "";
+    var char_options = ""
+    var level_options = ""
     for (var i = 1; i <= 20; i++) {
-        options += '<option value="' + i + '">' + i + '</option>'
+        var selected = (char == i) ? " selected=\"selected\"" : ""
+        char_options += '<option value="' + i + '"' + selected + '>' + i + '</option>'
     }
-    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
+    for (var i = 1; i <= 20; i++) {
+        var selected = (level == i) ? " selected=\"selected\"" : ""
+        level_options += '<option value="' + i + '"' + selected + '>' + i + '</option>'
+    }
+    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + char_options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + level_options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
     characterListDiv.append(level_holder);
 }
 
@@ -289,6 +329,10 @@ var updateThresholds = function () {
             party[party.length] = new Array(parseInt($(selectors[0]).val()), parseInt($(selectors[1]).val()))
         }
     }
+
+
+    window.localStorage.setItem("party", JSON.stringify(party))
+    console.log(party)
 
     $.ajax({
         type: "POST",
@@ -369,6 +413,8 @@ var GetUpdatedValues = function (updatedList) {
                 selected_elements.push(this_box.id);
             }
         }
+        console.log(updatedList)
+        window.localStorage.setItem(updatedList, selected_elements);
         return selected_elements;
     }
 }

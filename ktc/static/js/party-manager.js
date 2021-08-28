@@ -2,15 +2,23 @@
 
 const encounterManager = require("./encounter-manager");
 
-var createCharLevelCombo = function () {
+var createCharLevelCombo = function (char, level) {
+    var char = (char != undefined) ? char : 1;
+    var level = (char != undefined) ? level : 1;
     var characterListDiv = $("#characterList");
-    var optionID = $("#characterList div").length
+    var optionID = $("#characterList div").length;
 
-    var options = "";
+    var char_options = ""
+    var level_options = ""
     for (var i = 1; i <= 20; i++) {
-        options += '<option value="' + i + '">' + i + '</option>'
+        var selected = (char == i) ? " selected=\"selected\"" : ""
+        char_options += '<option value="' + i + '"' + selected + '>' + i + '</option>'
     }
-    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
+    for (var i = 1; i <= 20; i++) {
+        var selected = (level == i) ? " selected=\"selected\"" : ""
+        level_options += '<option value="' + i + '"' + selected + '>' + i + '</option>'
+    }
+    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + char_options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + level_options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
     characterListDiv.append(level_holder);
 }
 
@@ -41,6 +49,10 @@ var updateThresholds = function () {
             party[party.length] = new Array(parseInt($(selectors[0]).val()), parseInt($(selectors[1]).val()))
         }
     }
+
+
+    window.localStorage.setItem("party", JSON.stringify(party))
+    console.log(party)
 
     $.ajax({
         type: "POST",

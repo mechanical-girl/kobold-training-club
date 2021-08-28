@@ -450,6 +450,55 @@ def test_monster_list_returns_good_source_constraint_list():
         assert "Monster Manual" in monster[5]
 
 
+def test_monster_list_returns_good_all_constraint_list():
+    parameters = {"environments": ["_aquatic", "_forest", "_dungeon"],
+                  "sizes": ["_small", "_medium", "_large", "_huge"],
+                  "sources": ["_Baldur's Gate: Descent into Avernus",
+                              "_Basic Rules v1",
+                              "_Curse of Strahd",
+                              "_Eberron: Rising from the Last War",
+                              "_Explorer's Guide to Wildemount",
+                              "_Ghosts of Saltmarsh",
+                              "_Hoard of the Dragon Queen",
+                              "_Icewind Dale: Rime of the Frost Maiden",
+                              "_Into The Borderlands",
+                              "_Monster Manual",
+                              "_Mordenkainen's Tome of Foes",
+                              "_Mythic Odysseys of Theros",
+                              "_Out of the Abyss",
+                              "_Player's Handbook",
+                              "_Princes of the Apocalypse",
+                              "_Rise of Tiamat",
+                              "_Storm King's Thunder",
+                              "_Tales from the Yawning Portal",
+                              "_Volo's Guide to Monsters",
+                              "_Waterdeep: Dragon Heist",
+                              "_Waterdeep: Dungeon of the Mad Mage"],
+                  "types": ["_beast", "_humanoid", "_fiend", "_dragon", "_undead"],
+                  "alignments": ["_unaligned", "_chaotic evil", "_lawful evil", "_neutral evil", "_neutral"],
+                  "minimumChallengeRating": "1",
+                  "maximumChallengeRating": "15"
+                  }
+    actual = api.get_list_of_monsters(parameters)["data"]
+
+    parameters["environments"] = [param[1:]
+                                  for param in parameters["environments"]]
+    parameters["sizes"] = [param[1:] for param in parameters["environments"]]
+    parameters["sources"] = [param[1:] for param in parameters["sources"]]
+    parameters["types"] = [param[1:] for param in parameters["types"]]
+    parameters["alignments"] = [param[1:]
+                                for param in parameters["alignments"]]
+
+    for monster in actual:
+        assert float(Fraction(parameters["minimumChallengeRating"])) < float(Fraction(
+            monster[1])) < float(Fraction(parameters["maximumChallengeRating"]))
+        assert monster[2] in parameters["sizes"]
+        assert monster[3] in parameters["types"]
+        assert monster[4] in parameters['alignments']
+        for source in monster[5].split(","):
+            assert ':'.join(source.split[":"][:-1]) in parameters['sources']
+
+
 def test_xp_calculator_returns_good_data():
     party = [[4, 5], [1, 2]]
     expected = [1050, 2100, 3150, 4600, 14600]

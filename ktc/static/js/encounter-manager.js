@@ -18,6 +18,18 @@ var addMonster = function (cell) {
     updateEncounterDifficulty();
 }
 
+var importEncounter = function () {
+    var monsters = JSON.parse(window.localStorage.getItem("monsters"));
+    var monsterListDiv = $("#monsterList");
+    if (monsters != null) {
+        for (var i = 0; i < monsters.length; i++) {
+            level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsters[i][0] + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>' + monsters[i][1] + '</span>x ' + monsters[i][0] + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
+            monsterListDiv.append(level_holder);
+        }
+    }
+    updateEncounterDifficulty();
+}
+
 var updateMonsterCount = function (clicked_button) {
     if (clicked_button == window.document || clicked_button == undefined) { return }
 
@@ -66,6 +78,9 @@ var updateEncounterDifficulty = function () {
         monstersInEncounter[monstersInEncounter.length] = new Array(monsterName, noOfMonsters)
     }
 
+    window.localStorage.setItem("monsters", JSON.stringify(monstersInEncounter));
+    console.log(monstersInEncounter)
+
     $.ajax({
         type: "POST",
         url: "api/encounterxp",
@@ -79,4 +94,4 @@ var updateEncounterDifficulty = function () {
     })
 
 }
-module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty }
+module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter }

@@ -11,6 +11,7 @@ window.partyThresholds = []
 window.encounterDifficulty = 0
 var customSourceNames = [];
 var unofficialSourceNames = []
+const storage = window.localStorage;
 
 var getMonsterParameters = function () {
     return {
@@ -73,7 +74,19 @@ $(function () {
     window.monsterDataTable.columns.adjust().draw();
 
     // Populate the character selectors
-    partyManager.createCharLevelCombo();
+    var party = JSON.parse(window.localStorage.getItem("party"));
+    if (party != null) {
+        for (var i = 0; i < party.length; i++) {
+            console.log(party[i])
+            partyManager.createCharLevelCombo(party[i][0], party[i][1]);
+        }
+    } else {
+        partyManager.createCharLevelCombo();
+    }
+    partyManager.updateThresholds();
+
+    encounterManager.importEncounter();
+
 
     $(document).on("click", ".party-update", function () {
         partyManager.handleClick(this)

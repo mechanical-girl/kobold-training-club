@@ -3,11 +3,17 @@
 
 var listElements = function (data, prefix = "") {
     if (prefix != "") {
+        var stored = window.localStorage.getItem(prefix + "_selector")
+        console.log(stored)
         prefix = prefix + "_";
     }
     listText = "";
     for (let i = 0; i < data.length; i++) {
-        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\" checked>" + data[i] + "</label></li>");
+        var checked = " checked";
+        if (stored != null && stored.indexOf(data[i]) == -1) {
+            checked = ""
+        }
+        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\"'" + checked + ">" + data[i] + "</label></li>");
     };
     return listText;
 };
