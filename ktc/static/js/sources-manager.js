@@ -1,16 +1,26 @@
 // sources-manager.js
 
-var searchSources = function (unofficialSourceNames) {
+const listElements = require('./element_lister.js')
+
+var searchSources = function () {
     var searchTerm = $("#customSourceSearcher").val();
     if (searchTerm != undefined) {
         $("#customSourceFinder").empty();
         searchTerm = searchTerm.toLowerCase();
-        for (var i = 0; i < unofficialSourceNames.length; i++) {
-            if (unofficialSourceNames[i].toLowerCase().indexOf(searchTerm) != -1) {
-                $("#customSourceFinder").append('<li><label><input type="checkbox" class="unofficial-source" id="sources_' + unofficialSourceNames[i] + '">' + unofficialSourceNames[i] + '</label></li>');
+        for (var i = 0; i < window.unofficialSourceNames.length; i++) {
+            if (window.unofficialSourceNames[i].toLowerCase().indexOf(searchTerm) != -1) {
+                $("#customSourceFinder").append('<li><label><input type="checkbox" class="unofficial-source" id="sources_' + window.unofficialSourceNames[i] + '">' + window.unofficialSourceNames[i] + '</label></li>');
             }
         }
     }
+}
+
+var getUnofficialSources = function () {
+    $.getJSON('/api/unofficialsources').done(function (response) {
+        unofficialSourceNames = response;
+        $("#customSourcesUsed").empty;
+        $("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"))
+    })
 }
 
 var moveSourceCheckbox = function (checked_box) {
@@ -21,4 +31,4 @@ var moveSourceCheckbox = function (checked_box) {
     li.detach();
     $('#customSourcesUsed').append(li);
 }
-module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceCheckbox }
+module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceCheckbox, getUnofficialSources: getUnofficialSources }
