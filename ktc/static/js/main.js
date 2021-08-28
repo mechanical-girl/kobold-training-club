@@ -26,9 +26,6 @@ $(function () {
         $.getJSON("/api/" + selector, function (data) {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
-            if (selector == "sources") {
-                window.monsterParameters['sources'] = updaterButton.GetUpdatedValues("sources_selector");
-            }
         });
     }
 
