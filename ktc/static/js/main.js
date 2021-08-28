@@ -44,6 +44,9 @@ $(function () {
         }
     })
 
+    // Populate unofficial sources
+    sourcesManager.getUnofficialSources();
+
     // Populate the monster table
 
     monsterDataTable = $('#monsterTable').DataTable({
@@ -73,8 +76,6 @@ $(function () {
 
     // Populate the character selectors
     partyManager.createCharLevelCombo();
-
-    $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
 
     $(document).on("click", ".party-update", function () {
         partyManager.handleClick(this)
