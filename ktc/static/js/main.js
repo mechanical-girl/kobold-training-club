@@ -26,9 +26,12 @@ $(function () {
         $.getJSON("/api/" + selector, function (data) {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
+            if (selector == "sources") {
+                // Populate unofficial sources
+                sourcesManager.getUnofficialSources();
+            }
         });
     }
-
 
     // Populate the last accordion
     $.getJSON("/api/crs", function (data) {
@@ -41,8 +44,6 @@ $(function () {
         }
     })
 
-    // Populate unofficial sources
-    sourcesManager.getUnofficialSources();
 
     // Populate the monster table
 
