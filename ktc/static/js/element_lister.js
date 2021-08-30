@@ -4,7 +4,6 @@
 var listElements = function (data, prefix = "") {
     if (prefix != "") {
         var stored = window.localStorage.getItem(prefix + "_selector")
-        console.log(stored)
         prefix = prefix + "_";
     }
     listText = "";
@@ -13,7 +12,7 @@ var listElements = function (data, prefix = "") {
         if (stored != null && stored.indexOf(data[i]) == -1) {
             checked = ""
         }
-        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\"'" + checked + ">" + data[i] + "</label></li>");
+        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\"" + checked + ">" + data[i] + "</label></li>");
     };
     return listText;
 };

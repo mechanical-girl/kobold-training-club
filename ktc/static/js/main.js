@@ -66,7 +66,13 @@ $(function () {
             { "bSortable": true }
         ],
         "columnDefs": [
-            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] }
+            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] },
+            {
+                "targets": 1,
+                "createdCell": function (td, cellData, rowData, row, col) {
+                    $(td).css('background-color', encounterManager.colourCell(cellData))
+                }
+            }
         ]
     });
     $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
@@ -77,7 +83,6 @@ $(function () {
     var party = JSON.parse(window.localStorage.getItem("party"));
     if (party != null) {
         for (var i = 0; i < party.length; i++) {
-            console.log(party[i])
             partyManager.createCharLevelCombo(party[i][0], party[i][1]);
         }
     } else {

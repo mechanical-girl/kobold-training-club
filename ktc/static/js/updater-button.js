@@ -20,7 +20,6 @@ var GetUpdatedValues = function (updatedList) {
                 selected_elements.push(this_box.id);
             }
         }
-        console.log(updatedList)
         window.localStorage.setItem(updatedList, selected_elements);
         return selected_elements;
     }

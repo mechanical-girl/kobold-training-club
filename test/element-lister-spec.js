@@ -12,6 +12,6 @@ describe('#listEnvironments', function () {
         var list_of_items = ['aquatic', 'arctic',];//'cave', 'coast', 'desert', 'dungeon', 'forest', 'grassland', 'mountain', 'planar', 'ruins', 'swamp', 'underground', 'urban'];
 
         var actual = listElements(list_of_items);
-        expect(1).toBe(1);
+        expect(expected).toEqual(actual)
     })
 })

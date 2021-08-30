@@ -5,7 +5,6 @@
 var listElements = function (data, prefix = "") {
     if (prefix != "") {
         var stored = window.localStorage.getItem(prefix + "_selector")
-        console.log(stored)
         prefix = prefix + "_";
     }
     listText = "";
@@ -14,7 +13,7 @@ var listElements = function (data, prefix = "") {
         if (stored != null && stored.indexOf(data[i]) == -1) {
             checked = ""
         }
-        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\"'" + checked + ">" + data[i] + "</label></li>");
+        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\"" + checked + ">" + data[i] + "</label></li>");
     };
     return listText;
 };
@@ -23,6 +22,57 @@ module.exports = listElements
 
 },{}],2:[function(require,module,exports){
 // encounter-manager.js
+
+var cr_xp_mapping = {
+    "0": 10,
+    "1/8": 25,
+    "1/4": 50,
+    "1/2": 100,
+    "1": 200,
+    "2": 450,
+    "3": 700,
+    "4": 1100,
+    "5": 1800,
+    "6": 2300,
+    "7": 2900,
+    "8": 3900,
+    "9": 5000,
+    "10": 5900,
+    "11": 7200,
+    "12": 8400,
+    "13": 10000,
+    "14": 11500,
+    "15": 13000,
+    "16": 15000,
+    "17": 18000,
+    "18": 20000,
+    "19": 22000,
+    "20": 25000,
+    "21": 33000,
+    "22": 41000,
+    "23": 50000,
+    "24": 62000,
+    "25": 75000,
+    "26": 90000,
+    "27": 105000,
+    "28": 120000,
+    "29": 135000,
+    "30": 155000,
+}
+
+
+var highlight_colours = ["#fff", "#dff0d8", "#f6ce95", "#eba5a3", "#888"]
+
+
+$(function () {
+    $(".exp-list.easy").css("background-color", highlight_colours[0])
+    $(".exp-list.medium").css("background-color", highlight_colours[1])
+    $(".exp-list.hard").css("background-color", highlight_colours[2])
+    $(".exp-list.deadly").css("background-color", highlight_colours[3])
+    $(".exp-list.daily").css("background-color", highlight_colours[4])
+});
+
+var difficulties = ["easy", "medium", "hard", "deadly", "daily"]
 
 var addMonster = function (cell) {
     var monsterListDiv = $("#monsterList");
@@ -81,12 +131,17 @@ var updateMonsterCount = function (clicked_button) {
 }
 
 var highlightEncounterDifficulty = function () {
-    var highlight_colours = ["#fff", "#dff0d8", "#faf2cc", "#f6ce95", "#eba5a3"]
-    var difficulties = ["easy", "medium", "hard", "deadly", "daily"]
+    $(".exp-list.easy").css("background-color", highlight_colours[0])
+    $(".exp-list.medium").css("background-color", highlight_colours[1])
+    $(".exp-list.hard").css("background-color", highlight_colours[2])
+    $(".exp-list.deadly").css("background-color", highlight_colours[3])
+    $(".exp-list.daily").css("background-color", highlight_colours[4])
     for (var i = 0; i < window.partyThresholds.length; i++) {
         if (window.encounterDifficulty > window.partyThresholds[i]) {
-            $(".exp-list").css("background-color", "#fff")
-            $(".exp-list." + difficulties[i]).css("background-color", highlight_colours[i])
+            $(".exp-list").css("opacity", "0.7");
+            $(".exp-list").css("font-weight", "normal");
+            $(".exp-list." + difficulties[i]).css("opacity", "1")
+            $(".exp-list." + difficulties[i]).css("font-weight", "bold")
         }
     }
 }
@@ -118,7 +173,22 @@ var updateEncounterDifficulty = function () {
     })
 
 }
-module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter }
+
+var colourCell = function (cellData) {
+    var monsterExp = cr_xp_mapping[cellData];
+    if (monsterExp <= window.partyThresholds[0]) {
+        return highlight_colours[0]
+    } else if (monsterExp >= partyThresholds.slice(-1)) {
+        return highlight_colours.slice(-1)
+    }
+    for (var i = 0; i < window.partyThresholds.length - 1; i++) {
+        if (monsterExp >= window.partyThresholds[i] && monsterExp < window.partyThresholds[i + 1]) {
+            return highlight_colours[i]
+        }
+    }
+
+}
+module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell }
 },{}],3:[function(require,module,exports){
 (function (global){(function (){
 const listElements = require('./element_lister.js')
@@ -189,7 +259,13 @@ $(function () {
             { "bSortable": true }
         ],
         "columnDefs": [
-            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] }
+            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] },
+            {
+                "targets": 1,
+                "createdCell": function (td, cellData, rowData, row, col) {
+                    $(td).css('background-color', encounterManager.colourCell(cellData))
+                }
+            }
         ]
     });
     $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
@@ -200,7 +276,6 @@ $(function () {
     var party = JSON.parse(window.localStorage.getItem("party"));
     if (party != null) {
         for (var i = 0; i < party.length; i++) {
-            console.log(party[i])
             partyManager.createCharLevelCombo(party[i][0], party[i][1]);
         }
     } else {
@@ -413,7 +488,6 @@ var GetUpdatedValues = function (updatedList) {
                 selected_elements.push(this_box.id);
             }
         }
-        console.log(updatedList)
         window.localStorage.setItem(updatedList, selected_elements);
         return selected_elements;
     }
@@ -475,4 +549,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[3]);
+},{}]},{},[1,3,4,6]);
