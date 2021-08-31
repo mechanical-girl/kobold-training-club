@@ -102,7 +102,7 @@ def process_csv():
 @ app.route("/api/checksource", methods=["GET", "POST"])
 def check_if_key_processed():
     key = json.loads(request.values["key"])
-    result = converter.check_if_key_processed(key)
+    result = api.check_if_key_processed(key)
     return jsonify(result)
 
 

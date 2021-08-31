@@ -16,6 +16,8 @@ def hash_source_name(source: str) -> str:
 
 
 def check_if_key_processed(key: str) -> str:
+    if key == "":
+        return ""
     with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
         c = conn.cursor()
         c.execute(
