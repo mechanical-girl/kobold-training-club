@@ -52,7 +52,6 @@ var updateThresholds = function () {
 
 
     window.localStorage.setItem("party", JSON.stringify(party))
-    console.log(party)
 
     $.ajax({
         type: "POST",

@@ -158,7 +158,6 @@ var updateEncounterDifficulty = function () {
     }
 
     window.localStorage.setItem("monsters", JSON.stringify(monstersInEncounter));
-    console.log(monstersInEncounter)
 
     $.ajax({
         type: "POST",
@@ -224,20 +223,39 @@ $(function () {
                 // Populate unofficial sources
                 sourcesManager.getUnofficialSources();
             }
+            window.monsterParameters[selector] = data
         });
     }
+
 
     // Populate the last accordion
     $.getJSON("/api/crs", function (data) {
         var min = $("#challengeRatingMinimum");
-        var max = $("#challengeRatingMaximum")
-        for (let i = 0; i < data.length; i++) {
-            var option = "<option value='" + data[i] + "'>" + data[i] + "</option>"
-            min.append(option);
-            max.append(option);
+        var max = $("#challengeRatingMaximum");
+        let min_cr_stored = JSON.parse(window.localStorage.getItem("minCr"))
+        let max_cr_stored = JSON.parse(window.localStorage.getItem("maxCr"))
+        if (min_cr_stored == null) {
+            min_cr_stored = data[0]
+            max_cr_stored = data.slice(-1)
         }
-    })
+        for (let i = 0; i < data.length; i++) {
+            var standard = "<option value='" + data[i] + "'>" + data[i] + "</option>"
+            if (data[i] == min_cr_stored) {
+                min.append("<option value='" + data[i] + "' selected=\"selected\"> " + data[i] + "</option>")
+            } else {
+                min.append(standard)
+            }
+            if (data[i] == max_cr_stored) {
+                max.append("<option value='" + data[i] + "' selected=\"selected\"> " + data[i] + "</option>")
+            } else {
+                max.append(standard)
+            }
 
+        }
+
+        updaterButton.sortTable($("#challengeRatingSelectorDiv .updater_button"));
+
+    })
 
     // Populate the monster table
 
@@ -407,7 +425,6 @@ var updateThresholds = function () {
 
 
     window.localStorage.setItem("party", JSON.stringify(party))
-    console.log(party)
 
     $.ajax({
         type: "POST",
@@ -472,7 +489,7 @@ var AssociatedId = function (clicked_button) {
     if (clicked_button != undefined) {
         attachedParamChooser = $(clicked_button).parent().children("ul")[0];
         if (attachedParamChooser == undefined) {
-            attachedParamChooser = $(clicked_button).parent().children("")[0];
+            attachedParamChooser = $(clicked_button).parent().children("#minCr")[0];
         }
         return $(attachedParamChooser).attr('id');
     }
@@ -507,15 +524,14 @@ var getUpdatedChallengeRatings = function () {
     var maxValue = $("#maxCr option:selected").attr("value");
     minValueComp = floatify(minValue)
     maxValueComp = floatify(maxValue)
+    var alerts = $("#challengeRatingSelectorDiv .alert")
+    alerts.remove();
     if (maxValueComp < minValueComp) {
         $("#challengeRatingSelectorDiv").prepend('<div class="alert alert-danger" role="alert">Please ensure your minimum challenge rating is less than or equal to your maximum challenge rating.</div>')
-    } else {
-        var alerts = $("#challengeRatingSelectorDiv .alert")
-        for (var i = 0; i < alerts.length; i++) {
-            alerts[i].remove();
-        }
+        return;
     }
-
+    window.localStorage.setItem("minCr", JSON.stringify(minValue))
+    window.localStorage.setItem("maxCr", JSON.stringify(maxValue))
     return [minValue, maxValue];
 }
 
@@ -529,6 +545,7 @@ var sortTable = function (clicked_button) {
         listUpdatedName = listUpdated.split("_")[0];
         window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
     }
+    console.log(window.monsterParameters)
     window.monsterDataTable.ajax.reload();
     window.monsterDataTable.columns.adjust().draw();
 }

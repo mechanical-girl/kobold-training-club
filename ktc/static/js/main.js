@@ -31,20 +31,39 @@ $(function () {
                 // Populate unofficial sources
                 sourcesManager.getUnofficialSources();
             }
+            window.monsterParameters[selector] = data
         });
     }
+
 
     // Populate the last accordion
     $.getJSON("/api/crs", function (data) {
         var min = $("#challengeRatingMinimum");
-        var max = $("#challengeRatingMaximum")
-        for (let i = 0; i < data.length; i++) {
-            var option = "<option value='" + data[i] + "'>" + data[i] + "</option>"
-            min.append(option);
-            max.append(option);
+        var max = $("#challengeRatingMaximum");
+        let min_cr_stored = JSON.parse(window.localStorage.getItem("minCr"))
+        let max_cr_stored = JSON.parse(window.localStorage.getItem("maxCr"))
+        if (min_cr_stored == null) {
+            min_cr_stored = data[0]
+            max_cr_stored = data.slice(-1)
         }
-    })
+        for (let i = 0; i < data.length; i++) {
+            var standard = "<option value='" + data[i] + "'>" + data[i] + "</option>"
+            if (data[i] == min_cr_stored) {
+                min.append("<option value='" + data[i] + "' selected> " + data[i] + "</option>")
+            } else {
+                min.append(standard)
+            }
+            if (data[i] == max_cr_stored) {
+                max.append("<option value='" + data[i] + "' selected> " + data[i] + "</option>")
+            } else {
+                max.append(standard)
+            }
 
+        }
+
+        updaterButton.sortTable($("#challengeRatingSelectorDiv .updater_button"));
+
+    })
 
     // Populate the monster table
 

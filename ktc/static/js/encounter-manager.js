@@ -135,7 +135,6 @@ var updateEncounterDifficulty = function () {
     }
 
     window.localStorage.setItem("monsters", JSON.stringify(monstersInEncounter));
-    console.log(monstersInEncounter)
 
     $.ajax({
         type: "POST",
