@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ktc import converter
 from flask import Flask, render_template, jsonify, request
 import os
 import json
@@ -84,17 +85,16 @@ def get_encounter_xp():
     return jsonify(api.get_encounter_xp(monsters))
 
 
-@ app.route("/api/processCSV", methods=["GET", "POST"])
-def process_csv():
-    csv_string = json.loads(request.values["csv"])
-    key = json.loads(request.values["key"])
-    source_name = api.ingest_custom_csv_string(csv_string, db_location, key)
-    return jsonify({"name": source_name})
-
-
 @ app.route("/api/unofficialsources", methods=["GET"])
 def get_unofficial_sources():
     return jsonify(api.get_unofficial_sources())
+
+
+@ app.route("/api/checksource", methods=["GET", "POST"])
+def check_if_key_processed():
+    key = json.loads(request.values["key"])
+    result = converter.check_if_key_processed(key)
+    return jsonify(result)
 
 
 if __name__ == "__main__":
