@@ -241,12 +241,12 @@ $(function () {
         for (let i = 0; i < data.length; i++) {
             var standard = "<option value='" + data[i] + "'>" + data[i] + "</option>"
             if (data[i] == min_cr_stored) {
-                min.append("<option value='" + data[i] + "' selected=\"selected\"> " + data[i] + "</option>")
+                min.append("<option value='" + data[i] + "' selected> " + data[i] + "</option>")
             } else {
                 min.append(standard)
             }
             if (data[i] == max_cr_stored) {
-                max.append("<option value='" + data[i] + "' selected=\"selected\"> " + data[i] + "</option>")
+                max.append("<option value='" + data[i] + "' selected> " + data[i] + "</option>")
             } else {
                 max.append(standard)
             }
@@ -566,4 +566,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[1,3,4,6]);
+},{}]},{},[3]);
