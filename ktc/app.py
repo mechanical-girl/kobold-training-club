@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from ktc import converter
 from flask import Flask, render_template, jsonify, request
 import os
 import json
 
 try:
     import api  # type: ignore
+    import converter  # type: ignore
 except ModuleNotFoundError:
     from ktc import api  # type: ignore
+    from ktc import converter  # type: ignore
 
 app = Flask(__name__)
 
