@@ -60,7 +60,6 @@ var sortTable = function (clicked_button) {
         listUpdatedName = listUpdated.split("_")[0];
         window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
     }
-    console.log(window.monsterParameters)
     window.monsterDataTable.ajax.reload();
     window.monsterDataTable.columns.adjust().draw();
 }

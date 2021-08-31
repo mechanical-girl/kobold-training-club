@@ -525,3 +525,19 @@ def test_ingest_custom_csv(setup_database):
     c.execute("SELECT COUNT(*) FROM monsters")
     assert c.fetchone()[0] == 16
     os.remove("test.db")
+
+
+def test_check_for_processed_source():
+    expected = "Into The Borderlands"
+    actual = converter.check_if_key_processed(
+        "1NwjJS2Jpf_CxCZtHRCIJxc-6rERIo9vbFSqcs5ttE8M")
+
+    assert expected == actual
+
+
+def test_check_for_unprocessed_source():
+    expected = ""
+    actual = converter.check_if_key_processed(
+        "1qlMY1vtJhrOlrLDxA476YxkxpSP5UYudqy4WyVBlHHo")
+
+    assert expected == actual
