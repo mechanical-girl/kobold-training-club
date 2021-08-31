@@ -532,3 +532,19 @@ def test_encounter_xp_returns_good_data(client):
     received = response.get_json()
 
     assert expected == received
+
+
+def test_check_source_gives_json_with_proper_mimetype(client):
+    source = "1NwjJS2Jpf_CxCZtHRCIJxc-6rERIo9vbFSqcs5ttE8M"
+    response = client.get("/api/checksource?key=" + json.dumps(source))
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_check_source_returns_good_data(client):
+    source = "1NwjJS2Jpf_CxCZtHRCIJxc-6rERIo9vbFSqcs5ttE8M"
+    expected = "Into The Borderlands"
+    response = client.get("/api/checksource?key=" + json.dumps(source))
+    received = response.get_json()
+
+    assert expected == received

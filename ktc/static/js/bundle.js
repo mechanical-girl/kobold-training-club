@@ -137,7 +137,10 @@ var highlightEncounterDifficulty = function () {
     $(".exp-list.deadly").css("background-color", highlight_colours[3])
     $(".exp-list.daily").css("background-color", highlight_colours[4])
     for (var i = 0; i < window.partyThresholds.length; i++) {
-        if (window.encounterDifficulty > window.partyThresholds[i]) {
+        if (window.encounterDifficulty < window.partyThresholds[0]) {
+            $(".exp-list").css("opacity", "0.7");
+            $(".exp-list").css("font-weight", "normal");
+        } else if (window.encounterDifficulty > window.partyThresholds[i]) {
             $(".exp-list").css("opacity", "0.7");
             $(".exp-list").css("font-weight", "normal");
             $(".exp-list." + difficulties[i]).css("opacity", "1")
@@ -545,7 +548,6 @@ var sortTable = function (clicked_button) {
         listUpdatedName = listUpdated.split("_")[0];
         window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
     }
-    console.log(window.monsterParameters)
     window.monsterDataTable.ajax.reload();
     window.monsterDataTable.columns.adjust().draw();
 }
@@ -566,4 +568,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[1,3,4,6]);
+},{}]},{},[3]);

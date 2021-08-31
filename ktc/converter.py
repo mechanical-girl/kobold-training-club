@@ -51,7 +51,6 @@ def ingest_data(csv_string: str, db_location: str, source_url=""):
         csv_reader = csv.DictReader(f, delimiter=',')
         c = conn.cursor()
 
-        # Check to see if we've already ingested this source
         if sources_in_url := check_if_key_processed(source_url):
             return sources_in_url
 
@@ -189,7 +188,8 @@ if __name__ == "__main__":
         csv_reader = csv.DictReader(f, delimiter=',')
         c = conn.cursor()
         for row in csv_reader:
+            print(f"{row['name']}: {row['url']}")
             c.execute('''INSERT OR REPLACE INTO sources VALUES (?, ?, ?, ?, ?)''',
                       (row['name'], row['official'], row['hash'], row['url'], row['sourceurlhash']))
 
-        c.execute('''SELECT * FROM sources''')
+        conn.commit()

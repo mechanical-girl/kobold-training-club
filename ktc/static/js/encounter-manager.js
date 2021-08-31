@@ -114,7 +114,10 @@ var highlightEncounterDifficulty = function () {
     $(".exp-list.deadly").css("background-color", highlight_colours[3])
     $(".exp-list.daily").css("background-color", highlight_colours[4])
     for (var i = 0; i < window.partyThresholds.length; i++) {
-        if (window.encounterDifficulty > window.partyThresholds[i]) {
+        if (window.encounterDifficulty < window.partyThresholds[0]) {
+            $(".exp-list").css("opacity", "0.7");
+            $(".exp-list").css("font-weight", "normal");
+        } else if (window.encounterDifficulty > window.partyThresholds[i]) {
             $(".exp-list").css("opacity", "0.7");
             $(".exp-list").css("font-weight", "normal");
             $(".exp-list." + difficulties[i]).css("opacity", "1")
