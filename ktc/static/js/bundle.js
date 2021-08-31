@@ -343,37 +343,45 @@ $(function () {
     })
 
     $(document).on("input", "#sourceKeyInput", function () {
+        $('#sourceKeyManagementDiv .alert').remove();
         key = $("#sourceKeyInput").val()
+        if (key == "") { return }
         $('#sourceKeyManagementDiv .alert').remove();
         $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Requesting the sheet now...</div >')
         var checkIfSheetProcessed = $.ajax({ type: "POST", url: "/api/checksource", data: { key: JSON.stringify(key) } });
         checkIfSheetProcessed.done(function (data) {
-            console.log(data)
-        })
-        var customSourceSheetRequest = $.get('https://docs.google.com/spreadsheet/pub?key=' + key + '&output=csv');
-        customSourceSheetRequest.done(function (data) {
-            $('#sourceKeyManagementDiv .alert').remove();
-            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Sheet received. Processing the sheet now...</div >')
-            var customSheetProcessRequest = $.ajax({
-                type: "POST",
-                url: "api/processCSV",
-                data: { csv: JSON.stringify(data), key: JSON.stringify(key) },
-            })
-            customSheetProcessRequest.done(function (results) {
-                customSourceNames[customSourceNames.length] = results["name"];
+            if (data == "") {
+                var customSourceSheetRequest = $.get('https://docs.google.com/spreadsheet/pub?key=' + key + '&output=csv');
+                customSourceSheetRequest.done(function (data) {
+                    $('#sourceKeyManagementDiv .alert').remove();
+                    $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Sheet received. Processing the sheet now...</div >')
+                    var customSheetProcessRequest = $.ajax({
+                        type: "POST",
+                        url: "api/processCSV",
+                        data: { csv: JSON.stringify(data), key: JSON.stringify(key) },
+                    })
+                    customSheetProcessRequest.done(function (results) {
+                        customSourceNames[customSourceNames.length] = results["name"];
+                        $('#sourceKeyManagementDiv .alert').remove();
+                        $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Source ' + results['name'] + ' processed! Search for it in the box above.</div >')
+                        $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
+                    })
+                    customSheetProcessRequest.fail(function () {
+                        $('#sourceKeyManagementDiv .alert').remove();
+                        $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" id="processing-custom-source-alert role="alert">Processing on this sheet failed. Please check that it\'s valid. If you\'re sure it is, please open an issue on Github.</div >')
+                    })
+                })
+                customSourceSheetRequest.fail(function (jqXHR, textStatus, errorThrown) {
+                    $('#sourceKeyManagementDiv .alert').remove();
+                    $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" role="alert">Error: ' + jqXHR.status + '.\n If you\'re sure the sheet exists, please open an issue on Github.</div >')
+                });
+            } else {
                 $('#sourceKeyManagementDiv .alert').remove();
-                $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Source ' + results['name'] + ' processed! Search for it in the box above.</div >')
-                $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
-            })
-            customSheetProcessRequest.fail(function () {
-                $('#sourceKeyManagementDiv .alert').remove();
-                $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" id="processing-custom-source-alert role="alert">Processing on this sheet failed. Please check that it\'s valid. If you\'re sure it is, please open an issue on Github.</div >')
-            })
+                $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Source ' + data + ' processed! Search for it in the box above.</div >')
+
+            }
         })
-        customSourceSheetRequest.fail(function (jqXHR, textStatus, errorThrown) {
-            $('#sourceKeyManagementDiv .alert').remove();
-            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" role="alert">Error: ' + jqXHR.status + '.\n If you\'re sure the sheet exists, please open an issue on Github.</div >')
-        });
+
     })
 })
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
@@ -572,4 +580,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[3]);
+},{}]},{},[1,3,4,6]);

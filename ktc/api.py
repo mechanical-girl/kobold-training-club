@@ -372,3 +372,7 @@ def get_unofficial_sources() -> List[str]:
     sources = list(set_of_sources)
     sources.sort()
     return sources
+
+
+def check_if_key_processed(key):
+    return converter.check_if_key_processed(key)
