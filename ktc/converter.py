@@ -189,7 +189,7 @@ if __name__ == "__main__":
         c = conn.cursor()
         for row in csv_reader:
             print(f"{row['name']}: {row['url']}")
-            c.execute('''INSERT INTO sources VALUES (?, ?, ?, ?, ?)''',
+            c.execute('''INSERT OR REPLACE INTO sources VALUES (?, ?, ?, ?, ?)''',
                       (row['name'], row['official'], row['hash'], row['url'], row['sourceurlhash']))
 
         conn.commit()
