@@ -343,6 +343,10 @@ $(function () {
         key = $("#sourceKeyInput").val()
         $('#sourceKeyManagementDiv .alert').remove();
         $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Requesting the sheet now...</div >')
+        var checkIfSheetProcessed = $.ajax({ type: "POST", url: "/api/checksource", data: { key: JSON.stringify(key) } });
+        checkIfSheetProcessed.done(function (data) {
+            console.log(data)
+        })
         var customSourceSheetRequest = $.get('https://docs.google.com/spreadsheet/pub?key=' + key + '&output=csv');
         customSourceSheetRequest.done(function (data) {
             $('#sourceKeyManagementDiv .alert').remove();
