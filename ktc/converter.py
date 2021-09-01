@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import sqlite3
-import os
 import contextlib
 import csv
-from io import StringIO
-import re
 import hashlib
-from typing import Tuple, List
+import os
+import re
+import sqlite3
+from io import StringIO
+from typing import List, Tuple
 
 
 def hash_source_name(source: str) -> str:

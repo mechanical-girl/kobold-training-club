@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from typing import List, Tuple
-import sqlite3
 import contextlib
-
 import os
+import sqlite3
+from typing import List, Tuple
 
 xp_per_day_per_character_per_level = [
     0,
