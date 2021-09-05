@@ -11,6 +11,8 @@ except ModuleNotFoundError:
     from ktc import api  # type: ignore
     from ktc import converter  # type: ignore
 
+version = "v0.1.0"
+
 app = Flask(__name__)
 path_to_database = os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.pardir, "data/monsters.db"))
@@ -20,12 +22,12 @@ db_location = path_to_database
 
 @app.route("/", methods=["GET", "POST", "PUT"])
 def home():
-    return render_template("index.html")
+    return render_template("index.html", version=version)
 
 
 @app.route("/index.html", methods=["GET", "POST", "PUT"])
 def index():
-    return render_template("index.html")
+    return render_template("index.html", version=version)
 
 
 @app.route("/about.html", methods=["GET", "POST", "PUT"])

@@ -368,7 +368,7 @@ def get_unofficial_sources() -> List[str]:
         for source in sources:
             set_of_sources.add(source.split(":")[0].strip())
 
-    sources = list(set_of_sources)
+    sources = [source for source in list(set_of_sources) if source != ""]
     sources.sort()
     return sources
 
