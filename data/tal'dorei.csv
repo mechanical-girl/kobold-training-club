@@ -1,4 +1,4 @@
-fid,name,cr,size,type,tags,section,alignment,environment,ac,hp,init,lair?,legendary?,unique?,sources,sourcehashes
+fid,name,cr,size,type,alignment,environment,ac,hp,init,lair?,legendary?,unique?,sources,sourcehashes
 tcs.ashari-firetamer,Ashari Firetamer,7,Medium,Humanoid,neutral good,,no environment specified,17,92,2,,,,Tal'Dorei Campaign Setting: 128,0x64654ff7750489ef2e2a9ae135e408a4d2a40811
 tcs.ashari-stoneguard,Ashari Stoneguard,7,Medium,Humanoid,lawful good,,no environment specified,15,152,0,,,,Tal'Dorei Campaign Setting: 128,0x64654ff7750489ef2e2a9ae135e408a4d2a40811
 tcs.ashari-waverider,Ashari Waverider,4,Medium,Humanoid,neutral good,,no environment specified,14,77,2,,,,Tal'Dorei Campaign Setting: 129,0x64654ff7750489ef2e2a9ae135e408a4d2a40811
