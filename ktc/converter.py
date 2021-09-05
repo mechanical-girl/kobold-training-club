@@ -166,7 +166,11 @@ def ingest_data(csv_string: str, db_location: str, source=""):
 
 def load_csv_from_file(filename: str) -> str:
     with open(os.path.abspath(os.path.join(dir_path, filename))) as f:
-        return f.read()
+        csv_string = f.read()
+        end_of_first_line = csv_string.find("\n")
+        csv_string = csv_string.replace(
+            csv_string[:end_of_first_line], csv_string[:end_of_first_line].lower())
+        return csv_string
 
 
 def configure_db(db_location: str) -> None:
