@@ -20,6 +20,14 @@ var getMonsterParameters = function () {
 }
 
 $(function () {
+    // Show any alerts if needed
+    let versionNumber = $("#version-number").text().slice(1);
+    if (window.localStorage.getItem('lastVersion') != versionNumber && $("#updatesNotesModal .modal-body").text().length > 20) {
+        window.localStorage.setItem('lastVersion', versionNumber)
+        $('#updatesNotesModal').modal('show')
+
+    }
+
     // Populate the first five accordions
     selectors = ["sources", "environments", "sizes", "types", "alignments"]
     for (let i = 0; i < selectors.length; i++) {
@@ -111,6 +119,9 @@ $(function () {
 
     encounterManager.importEncounter();
 
+    $(document).on("click", "#updatesNotesModal .close", function () {
+        $("#updatesNotesModal").modal('hide');
+    })
 
     $(document).on("click", ".party-update", function () {
         partyManager.handleClick(this)

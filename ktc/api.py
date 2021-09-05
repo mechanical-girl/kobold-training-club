@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
-import sqlite3
 import contextlib
-from typing import Dict, List, Any
-from fractions import Fraction
-from io import StringIO
 import csv
 import re
+import sqlite3
+from fractions import Fraction
+from io import StringIO
+from typing import Any, Dict, List
 
 try:
-    import main  # type: ignore
     import converter  # type: ignore
+    import main  # type: ignore
 except ModuleNotFoundError:
     from ktc import main  # type: ignore
     from ktc import converter  # type: ignore
 
 import os
-
 
 path_to_database = os.path.abspath(
     os.path.join(os.path.dirname(__file__), os.pardir, "data/monsters.db")
@@ -369,7 +368,7 @@ def get_unofficial_sources() -> List[str]:
         for source in sources:
             set_of_sources.add(source.split(":")[0].strip())
 
-    sources = list(set_of_sources)
+    sources = [source for source in list(set_of_sources) if source != ""]
     sources.sort()
     return sources
 

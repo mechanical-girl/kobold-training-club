@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from re import A
-from ktc import api
-import sqlite3
-import pytest
-from ktc import converter
 import os
+import sqlite3
+from re import A
+
+import pytest
+
+from ktc import api, converter
 
 
 @pytest.fixture
@@ -198,7 +199,8 @@ def test_get_unofficial_sources_returns_good_data():
                 "Primeval Thule Campaign Setting",
                 "Primeval Thule Gamemaster's Companion",
                 "Princes of the Apocalypse Online Supplement v1.0",
-                "Tome of Beasts"]
+                "Tome of Beasts",
+                "Tome of Beasts II"]
     actual = api.get_unofficial_sources()
     assert expected == actual
 
@@ -211,7 +213,6 @@ def test_alignment_list_returns_list():
 
 def test_alignment_list_returns_unique_list_of_alignments():
     expected = ["any",
-                "any alignment",
                 "any chaotic",
                 "any evil",
                 "any good",
@@ -410,7 +411,7 @@ def test_monster_list_returns_full_list_if_no_parameters_passed():
                  'Neutral Evil',
                  "Explorer's Guide to Wildemount: "]]
     actual = api.get_list_of_monsters({})["data"]
-    assert len(actual) == 1159
+    assert len(actual) == 1140
     for i, item in enumerate(expected):
         assert item == actual[i]
 
@@ -423,8 +424,8 @@ def test_monster_list_returns_good_single_constraint_list():
 
 
 def test_monster_list_returns_good_multiple_constraint_list():
-    expected = ['Aboleth', 'Adept', 'Arachnia, Giant Water Spider', 'Archdruid', 'Archdruid', 'Barbarian Warrior', 'Boalisk', 'Bone Golem', 'Caryatid Column', 'Chuul', 'Coffer Corpse', 'Crabman', 'Crocodile', 'Crushing Wave Priest', 'Crushing Wave Reaver', 'Dagon', 'Dark Tide Knight', 'Dark Triton', 'Deep Scion', 'Dolphin', 'Elite Bullywug', 'Elite Hobgoblin', 'Evil Priest', 'Eye of the Deep', 'Fanged Sea Serpent', 'Fathomer', 'Fledgling Mage', 'Four-Armed Gargoyle', 'Giant Armadillo', 'Giant Clam', 'Giant Crab', 'Giant Crayfish', 'Giant Electric Catfish', 'Giant Frog', 'Giant Moray Eel', 'Giant Octopus', 'Giant Pike', 'Giant Sea Horse', 'Giant Seahorse', 'Giant Toad', 'Giant Water Beetle', 'Giant Water Spider', 'Gray Nisp', 'Green Guardian Gargoyle', 'Gulper Eel',
-                'Hippocampus', 'Hunter Shark', 'Iron Cobra', 'Kelpie', 'Kraken Priest', 'Kuo-toa', 'Kuo-toa Archpriest', 'Kuo-toa Whip', 'Lithonnite', 'Living Stone Statue', 'Living Wax Statue', 'Mad Hermit', 'Marevak, Advisor to the Castellan', 'Margoyle', 'Marid', 'Marine Basilisk', 'Merfolk', 'Merfolk Hydromancer', 'Merrow', 'Monstrous Crayfish', 'Morkoth', 'Mummy of the Deep', 'Ogre Skeleton', 'One-Eyed Shiver', 'Orc Chief', 'Plesiosaurus', 'Reef Shark', 'Sahuagin', 'Sahuagin Baron', 'Sahuagin Priestess', 'Sea Hag', 'Sea Hag (coven)', 'Sea Spawn', 'Spitting Sea Serpent', 'Strangle Weed', 'Swarm of Quippers', 'Thalasskoptis', 'Thoul', 'Tortoise', 'Troglodyte Shaman', 'Troglodyte Spore Servant', 'Water Elemental', 'Water Elemental Myrmidon', 'Wizard Golem', 'Young Aboleth', 'Zombie']
+    expected = ['Aboleth', 'Adept', 'Arachnia, Giant Water Spider', 'Barbarian Warrior', 'Boalisk', 'Chuul', 'Crabman', 'Crocodile', 'Crushing Wave Priest', 'Crushing Wave Reaver', 'Dagon', 'Dark Tide Knight', 'Dark Triton', 'Deep Scion', 'Dolphin', 'Elite Bullywug', 'Elite Hobgoblin', 'Evil Priest', 'Eye of the Deep', 'Fanged Sea Serpent', 'Fathomer', 'Fledgling Mage', 'Four-Armed Gargoyle', 'Giant Armadillo', 'Giant Clam', 'Giant Crab', 'Giant Electric Catfish', 'Giant Frog', 'Giant Moray Eel', 'Giant Octopus', 'Giant Pike', 'Giant Sea Horse', 'Giant Seahorse', 'Giant Toad', 'Giant Water Beetle', 'Giant Water Spider', 'Gray Nisp', 'Green Guardian Gargoyle', 'Gulper Eel',
+                'Hippocampus', 'Hunter Shark', 'Iron Cobra', 'Kraken Priest', 'Kuo-toa', 'Kuo-toa Archpriest', 'Kuo-toa Whip', 'Lithonnite', 'Living Stone Statue', 'Living Wax Statue', 'Mad Hermit', 'Marevak, Advisor to the Castellan', 'Margoyle', 'Marid', 'Marine Basilisk', 'Merfolk', 'Merfolk Hydromancer', 'Merrow', 'Monstrous Crayfish', 'Morkoth', 'Mummy of the Deep', 'Ogre Skeleton', 'One-Eyed Shiver', 'Orc Chief', 'Plesiosaurus', 'Reef Shark', 'Sahuagin', 'Sahuagin Baron', 'Sahuagin Priestess', 'Sea Hag', 'Sea Hag (coven)', 'Sea Spawn', 'Spitting Sea Serpent', 'Strangle Weed', 'Swarm of Quippers', 'Thalasskoptis', 'Thoul', 'Tortoise', 'Troglodyte Shaman', 'Troglodyte Spore Servant', 'Water Elemental', 'Water Elemental Myrmidon', 'Wizard Golem', 'Young Aboleth', 'Zombie']
     parameters = {
         "sizes": ["sizes_Medium", "sizes_Large"],
         "environments": ["environments_aquatic"],
@@ -432,7 +433,7 @@ def test_monster_list_returns_good_multiple_constraint_list():
     actual = api.get_list_of_monsters(parameters)["data"]
     for i, monster in enumerate(actual):
         assert monster[2] in ["Medium", "Large"]
-        assert monster[0] == expected[i]
+        assert expected[i] == monster[0]
 
 
 def test_monster_list_returns_good_challenge_rating_constrained_list():

@@ -1,0 +1,10 @@
+fid,name,cr,size,type,tags,section,alignment,environment,ac,hp,init,lair?,legendary?,unique?,sources
+tst.zzz-testing-one,ZZZ Testing One,1,Medium,,,,any,,14,14,,,,,Testing Set 1: 245
+tst.zzz-testing-two,ZZZ Testing Two,1,Medium,,,,any,,14,14,,,,,Testing Set 1: 254
+tst.zzz-testing-three,ZZZ Testing Three,1,Medium,,,,any,,14,14,,,,,Testing Set 1: 255
+tst.zzz-testing-one,ZZZ Testing One,1,Medium,,,,any,,14,14,,,,,Testing Set 2: 245
+tst.zzz-testing-two,ZZZ Testing Two,1,Medium,,,,any,,14,14,,,,,Testing Set 2: 254
+tst.zzz-testing-three,ZZZ Testing Three,1,Medium,,,,any,,14,14,,,,,Testing Set 2: 255
+tst.zzz-testing-one,ZZZ Testing One,1,Medium,,,,any,,14,14,,,,,Testing Set 3: 245
+tst.zzz-testing-two,ZZZ Testing Two,1,Medium,,,,any,,14,14,,,,,Testing Set 3: 254
+tst.zzz-testing-three,ZZZ Testing Three,1,Medium,,,,any,,14,14,,,,,Testing Set 3: 255
