@@ -127,8 +127,8 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                 storing_sources.append([source_name, source_is_official, hash_source_name(
                     source_name), source_url, hash_source_name(f"{source_name}{source_url}")])
 
-            write_to_db(
-                '''INSERT OR REPLACE INTO sources VALUES (?, ?, ?, ?, ?)''', storing_sources, db_location)
+            c.executemany('''INSERT OR REPLACE INTO sources VALUES (?, ?, ?, ?, ?)''',
+                          storing_sources)
 
             hash_string = ','.join(source_hashes)
             if corrected_sources == 0:
@@ -156,12 +156,13 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             if re.sub(whitespace_pattern, '', values[6]) == "":
                 values[6] = "no environment specified"
 
-            write_to_db(
-                '''INSERT OR REPLACE INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', [values], db_location)
+            c.execute(
+                '''INSERT OR REPLACE INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', values)
 
         c.execute('''SELECT name FROM sources WHERE url = ?''', (source_url,))
         results = [result[0] for result in c.fetchall()]  # ignore
         sources_processed = ", ".join(results)
+        conn.commit()
 
     return sources_processed
 
