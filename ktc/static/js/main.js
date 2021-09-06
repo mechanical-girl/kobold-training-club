@@ -20,7 +20,7 @@ var getMonsterParameters = function () {
 }
 
 $(function () {
-    // Show any alerts if needed
+    // Show any alerts if neede
     let versionNumber = $("#version-number").text().slice(1);
     if (window.localStorage.getItem('lastVersion') != versionNumber && $("#patchNotesModal .modal-body").text().length > 20) {
         window.localStorage.setItem('lastVersion', versionNumber)
@@ -29,10 +29,11 @@ $(function () {
     }
 
     // Populate the first five accordions
+    var listPopulatorPromises = []
     selectors = ["sources", "environments", "sizes", "types", "alignments"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i]
-        $.getJSON("/api/" + selector, function (data) {
+        listPopulatorPromises.push($.getJSON("/api/" + selector, function (data) {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
             if (selector == "sources") {
@@ -40,12 +41,12 @@ $(function () {
                 sourcesManager.getUnofficialSources();
             }
             window.monsterParameters[selector] = data
-        });
-    }
+        }));
+    };
 
 
     // Populate the last accordion
-    $.getJSON("/api/crs", function (data) {
+    listPopulatorPromises.push($.getJSON("/api/crs", function (data) {
         var min = $("#challengeRatingMinimum");
         var max = $("#challengeRatingMaximum");
         let min_cr_stored = JSON.parse(window.localStorage.getItem("minCr"))
@@ -71,40 +72,44 @@ $(function () {
 
         updaterButton.sortTable($("#challengeRatingSelectorDiv .updater_button"));
 
+    }))
+
+    $.when(listPopulatorPromises).done(function (listPopulatorPromises) {
+        // Populate the monster table
+
+        monsterDataTable = $('#monsterTable').DataTable({
+            "ajax": {
+                "url": '/api/monsters',
+                "type": 'POST',
+                "data": getMonsterParameters
+            },
+            "aoColumns": [
+                { "bSortable": true },
+                {
+                    "bSortable": true,
+                    "sType": "cr",
+                },
+                { "bSortable": true },
+                { "bSortable": true },
+                { "bSortable": true },
+                { "bSortable": true }
+            ],
+            "columnDefs": [
+                { className: "not-a-link", "targets": [0, 1, 2, 3, 4] },
+                {
+                    "targets": 1,
+                    "createdCell": function (td, cellData, rowData, row, col) {
+                        $(td).css('background-color', encounterManager.colourCell(cellData))
+                    }
+                }
+            ]
+        });
+        $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
+        $.fn.dataTableExt.oSort["cr-asc"] = function (a, b) { return updaterButton.floatify(a) > updaterButton.floatify(b); }
+        window.monsterDataTable.columns.adjust().draw();
+
     })
 
-    // Populate the monster table
-
-    monsterDataTable = $('#monsterTable').DataTable({
-        "ajax": {
-            "url": '/api/monsters',
-            "type": 'POST',
-            "data": getMonsterParameters
-        },
-        "aoColumns": [
-            { "bSortable": true },
-            {
-                "bSortable": true,
-                "sType": "cr",
-            },
-            { "bSortable": true },
-            { "bSortable": true },
-            { "bSortable": true },
-            { "bSortable": true }
-        ],
-        "columnDefs": [
-            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] },
-            {
-                "targets": 1,
-                "createdCell": function (td, cellData, rowData, row, col) {
-                    $(td).css('background-color', encounterManager.colourCell(cellData))
-                }
-            }
-        ]
-    });
-    $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
-    $.fn.dataTableExt.oSort["cr-asc"] = function (a, b) { return updaterButton.floatify(a) > updaterButton.floatify(b); }
-    window.monsterDataTable.columns.adjust().draw();
 
     // Populate the character selectors
     var party = JSON.parse(window.localStorage.getItem("party"));
