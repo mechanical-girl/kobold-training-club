@@ -134,10 +134,10 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             if corrected_sources == 0:
                 continue
 
-            if "any alignment" in row['alignment']:
-                alignment = "any"
+            if row['alignment'] == "any":
+                alignment = "any alignment"
             else:
-                alignment = row['alignment']
+                alignment = row['alignment'].lower()
 
             try:
                 values = [row['fid'], row['name'], row['cr'], row['size'], row['type'], alignment,
@@ -151,6 +151,8 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                     values[i] = values[i].replace("'           '", "")
                     values[i] = values[i].strip()
 
+            if len(values[6]) < 5:
+                print(values[6])
             if re.sub(whitespace_pattern, '', values[6]) == "":
                 values[6] = "no environment specified"
 
