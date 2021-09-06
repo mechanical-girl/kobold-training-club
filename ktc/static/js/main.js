@@ -22,9 +22,9 @@ var getMonsterParameters = function () {
 $(function () {
     // Show any alerts if needed
     let versionNumber = $("#version-number").text().slice(1);
-    if (window.localStorage.getItem('lastVersion') != versionNumber && $("#updatesNotesModal .modal-body").text().length > 20) {
+    if (window.localStorage.getItem('lastVersion') != versionNumber && $("#patchNotesModal .modal-body").text().length > 20) {
         window.localStorage.setItem('lastVersion', versionNumber)
-        $('#updatesNotesModal').modal('show')
+        $('#patchNotesModal').modal('show')
 
     }
 
