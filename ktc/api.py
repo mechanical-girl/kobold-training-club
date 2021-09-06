@@ -256,6 +256,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
                 query_from += "sourcehashes LIKE ? OR "
         query_from = query_from[:-4]
         query_from += ")"
+        query_arguments += constraint_hashes
 
     if alignment_constraints != []:
         query_from = f"(SELECT * FROM {query_from} WHERE "
