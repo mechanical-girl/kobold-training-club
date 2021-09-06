@@ -56,7 +56,8 @@ def get_list_of_environments() -> List[str]:
         for env in environment.split(","):
             set_of_environments.add(env.strip())
 
-    environments = list(set_of_environments)
+    environments = [env for env in list(
+        set_of_environments) if env != ""]
     environments.sort()
     return environments
 
@@ -106,6 +107,7 @@ def get_list_of_alignments() -> List[str]:
 
     unique_alignments = list(set(unique_alignments))
     unique_alignments.sort()
+
     return unique_alignments
 
 
