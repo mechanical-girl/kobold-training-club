@@ -97,7 +97,10 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                 except ValueError:
                     pass
                 finally:
-                    sources.append(f"{source_name}: {index}")
+                    if index == '':
+                        sources.append(f"{source_name}")
+                    else:
+                        sources.append(f"{source_name}: {index}")
 
             matches = []
 
