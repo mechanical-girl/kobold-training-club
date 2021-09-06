@@ -49,20 +49,43 @@
             </div>
         </div>
     </nav>
-    <!-- Modal -->
-    <div class="modal fade" id="updatesNotesModal" tabindex="-1" role="dialog" aria-labelledby="updatesNotesModalLabel"
+    <!-- Patch Notes Modal-->
+    <div class="modal fade" id="patchNotesModal" tabindex="-1" aria-labelledby="patchNotesModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="updatesNotesModalLabel">Welcome to {{ version }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="patchNotesModalLabel">Welcome to {{ version }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">{% include 'version-notes.html' %}</div>
+                <div class="modal-body">
+                    {% include 'version-notes.html' %}
+                </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary close" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Alignments Modal -->
+    <div class="modal fade" id="alignmentsModal" tabindex="-1" aria-labelledby="alignmentsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alignmentsModalLabel">A Note On Alignments</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>It's important to note that when you choose to sort by an option like "non-good" or "any lawful",
+                        Kobold Training Club only searches for monsters with that exact phrasing.</p>
+                    <p>For instance, if you look at the stat block for an Assassin, you will see that the alignment is
+                        given as "non-good." Likewise, the Alhoon has an alignment of "any evil".</p>
+                    <p>To search for any evil monster, you should check the following boxes: any evil, chaotic evil,
+                        lawful evil, and neutral evil.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -173,7 +196,9 @@
                                 <ul id="alignments_selector">
                                 </ul>
                                 <button class="updater_button">Update</button>
-                                <button class="toggle_all_button">Deselect All</button>
+                                <button class="toggle_all_button">Deselect All</button><i
+                                    class="bi bi-question-circle btn" data-bs-toggle="modal"
+                                    data-bs-target="#alignmentsModal"></i>
                             </div>
                         </div>
                     </div>

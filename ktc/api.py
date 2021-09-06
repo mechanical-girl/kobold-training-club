@@ -230,6 +230,8 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     # If we have size constraints, we construct a string of placeholders,
     # then put that into a IN subquery
     # and then append the constraints to the query_arguments list
+
+    # Create a custom select with "environment like x or..." for every environment in constraints
     if environment_constraints != []:
         query_from = f"(SELECT * FROM {query_from} WHERE "
         for i in range(len(environment_constraints)):
@@ -239,6 +241,9 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         query_from += ")"
         query_arguments += environment_constraints
 
+    # Create a custom select with "sourcehashes like x or", then get the source hash for every specified source
+    # You need to do this because of wildcards surrounding the source name
+    # Which makes me wonder if you need to be using those wildcards at all...
     if source_constraints != []:
         query_from = f"(SELECT * FROM {query_from} WHERE "
         constraint_hashes = []
@@ -253,6 +258,15 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         query_from += ")"
         query_arguments += constraint_hashes
 
+    if alignment_constraints != []:
+        query_from = f"(SELECT * FROM {query_from} WHERE "
+        for i in range(len(alignment_constraints)):
+            query_from += "alignment LIKE ? OR "
+            alignment_constraints[i] = f"%{alignment_constraints[i]}%"
+        query_from = query_from[:-4]
+        query_from += ")"
+        query_arguments += alignment_constraints
+
     if size_constraints != []:
         size_query_placeholders = f"({', '.join(['?']*len(size_constraints))})"
         where_requirements += f"size IN {size_query_placeholders} AND "
@@ -262,13 +276,6 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         type_query_placeholders = f"({', '.join(['?']*len(type_constraints))})"
         where_requirements += f"type IN {type_query_placeholders} AND "
         query_arguments += type_constraints
-
-    if alignment_constraints != []:
-        alignment_query_placeholders = (
-            f"({', '.join(['?']*len(alignment_constraints))})"
-        )
-        where_requirements += f"alignment IN {alignment_query_placeholders} AND "
-        query_arguments += alignment_constraints
 
     if challenge_rating_minimum is not None or challenge_rating_maximum is not None:
         if challenge_rating_minimum is None:

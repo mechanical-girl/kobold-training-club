@@ -206,7 +206,7 @@ def test_alignment_list_gives_json_with_proper_mimetype(client):
 
 def test_alignment_list_gives_correct_list(client):
     expected = [
-        "any",
+        "any alignment",
         "any chaotic",
         "any evil",
         "any good",
@@ -297,7 +297,7 @@ def test_monster_list_gives_correct_list(client):
                  'lawful evil',
                  'Mythic Odysseys of Theros: 219'],
                 ['Abjurer', '9', 'Medium', 'Humanoid',
-                    'any', "Volo's Guide to Monsters: 209"],
+                    'any alignment', "Volo's Guide to Monsters: 209"],
                 ['Aboleth',
                  '10',
                  'Large',
@@ -326,13 +326,13 @@ def test_monster_list_gives_correct_list(client):
                  '1/4',
                  'Medium',
                  'Humanoid',
-                 'any',
+                 'any alignment',
                  'Basic Rules v1: 53, HotDQ supplement: 4, Monster Manual: 342'],
                 ['Adept',
                  '1',
                  'Medium',
                  'Humanoid',
-                 'Chaotic Evil',
+                 'chaotic evil',
                  'Into The Borderlands: 338'],
                 ['Adult Black Dragon',
                  '14',
@@ -404,13 +404,13 @@ def test_monster_list_gives_correct_list(client):
                  '10',
                  'Large',
                  'Monstrosity',
-                 'Neutral Evil',
+                 'neutral evil',
                  "Explorer's Guide to Wildemount: "],
                 ['Aeorian Nullifier',
                  '12',
                  'Large',
                  'Monstrosity',
-                 'Neutral Evil',
+                 'neutral evil',
                  "Explorer's Guide to Wildemount: "]]
     response = client.get("/api/monsters")
     received = response.get_json()["data"]
