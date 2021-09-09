@@ -3,13 +3,14 @@
     left. You can search the results, and sort them by each column in the table.</p>
 <p>Kobold Training Club also accepts sheets from Kobold Fight Club without needing any modification! Open the
     "Alignments" section to the left for more information.</p>
-<p>Due to a bug during a recent database migration, you may need to re-add your custom sources. Please accept my
-    apologies for the inconvenience and rest assured that I'm working hard to bring you a better product with every
-    release!</p>
-<p>Fixed in this version:</p>
+<p>Version notes:</p>
 <ul>
-    <li>Preventing duplication when importing a sheet containing a monster which is already known</li>
-    <li>Fixing a bug known to cause truncation of sources with a url rather than page number</li>
+    <li>Fixed (and added comprehensive testing for) a funky little bug about how monsters with non-unique items are
+        handled. Expected behaviour now is that if a third-party monster shares a name with a first-party monster, the
+        third-party monster will have the acronym of the source it's in added to its name. This is to avoid any
+        confusion between monsters.</li>
+    <li>Sorted another annoying little bug which prevented CR30 monsters from being shown on occasion</li>
 </ul>
-<p>Up next: proper mobile layout!</p>
+<p>The next few updates are likely to focus on back-end stuff - specifically to do with handling 3rd-party content
+    better.</p>
 <p>Thanks again, and happy rolling!</p>
