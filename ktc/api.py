@@ -288,7 +288,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
             maxCr = challenge_rating_maximum
 
         mindex = possible_challenge_ratings.index(minCr)
-        maxdex = possible_challenge_ratings.index(maxCr)
+        maxdex = possible_challenge_ratings.index(maxCr)+1
         no_of_placeholders = len(possible_challenge_ratings[mindex:maxdex])
         challenge_rating_placeholders = (
             f"({', '.join(['?']*no_of_placeholders)})"
@@ -307,7 +307,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
-        # conn.set_trace_callback(print)
+        conn.set_trace_callback(print)
 
         if query_arguments == []:
             c.execute(query_string)
