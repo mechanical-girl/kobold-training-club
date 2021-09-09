@@ -78,10 +78,10 @@ def ingest_data(csv_string: str, db_location: str, source=""):
         f = StringIO(csv_string)
         csv_reader = csv.DictReader(f, delimiter=',')
         c = conn.cursor()
-        sources_in_url = []
+        sources_in_url: List[str] = []
 
-        if sources_in_url := check_if_key_processed(source_url):
-            return sources_in_url
+        if already_processed := check_if_key_processed(source_url):
+            return already_processed
 
         c.execute(
             '''SELECT name FROM sources WHERE official = 1''')
@@ -142,30 +142,30 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                 if monster_is_official:
                     sources = amalgamate_sources(
                         [sources, official_nametwins])
-                    values = []
+                    updates = []
                     for un_source in unofficial_nametwins:
                         name, _ = split_source_from_index(un_source)
                         source_acronym = ''.join([word[0]
                                                   for word in name.split()])
                         new_name = f"{row['name']} ({source_acronym})"
-                        values.append((new_name, monster_name, un_source))
+                        updates.append((new_name, monster_name, un_source))
                     c.executemany(
-                        '''UPDATE monsters SET name = ? WHERE name = ? AND sources = ?''', (values))
+                        '''UPDATE monsters SET name = ? WHERE name = ? AND sources = ?''', (updates))
 
                 else:
-                    values = []
+                    updates = []
                     for un_source in unofficial_nametwins:
                         name, _ = split_source_from_index(un_source)
                         source_acronym = ''.join([word[0]
                                                   for word in name.split()])
                         new_name = f"{row['name']} ({source_acronym})"
-                        values.append((new_name, monster_name, un_source))
+                        updates.append((new_name, monster_name, un_source))
                     name, _ = split_source_from_index(sources[0])
                     source_acronym = ''.join([word[0]
                                               for word in name.split()])
                     monster_name = f"{row['name']} ({source_acronym})"
                     c.executemany(
-                        '''UPDATE monsters SET name = ? WHERE name = ? AND sources = ?''', (values))
+                        '''UPDATE monsters SET name = ? WHERE name = ? AND sources = ?''', (updates))
 
             # Standardise the way sources are saved and confirm officiality - or lack thereof - of source
             source_hashes = []
@@ -198,6 +198,7 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             else:
                 alignment = row['alignment'].lower()
 
+            values: List[Any] = []
             try:
                 values = [row['fid'], monster_name, row['cr'], row['size'], row['type'], alignment,
                           row['environment'], row['ac'], row['hp'], row['init'], row['lair'], row['legendary'], row['named'], ', '.join(corrected_sources), hash_string]
@@ -218,8 +219,7 @@ def ingest_data(csv_string: str, db_location: str, source=""):
 
         conn.commit()
 
-        sources_in_url = check_if_key_processed(source_url)
-        return sources_in_url
+        return check_if_key_processed(source_url)
 
 
 def load_csv_from_file(filename: str) -> str:
