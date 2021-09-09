@@ -165,7 +165,7 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                                               for word in name.split()])
                     monster_name = f"{row['name']} ({source_acronym})"
                     c.executemany(
-                        '''UPDATE monsters SET name = ? WHERE name = ? AND sources = ?''', (updates))
+                        '''UPDATE OR IGNORE monsters SET name = ? WHERE name = ? AND sources = ?''', (updates))
 
             # Standardise the way sources are saved and confirm officiality - or lack thereof - of source
             source_hashes = []

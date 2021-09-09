@@ -19,6 +19,8 @@ var getMonsterParameters = function () {
     };
 }
 
+
+
 $(function () {
     // Show any alerts if neede
     let versionNumber = $("#version-number").text().slice(1);

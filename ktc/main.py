@@ -160,6 +160,8 @@ def cr_calc(cr: List[str], quantities: List[int]) -> int:
 def get_monster_cr(monster: str) -> str:
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
+        conn.set_trace_callback(print)
+        print(f"Monster: {monster}")
         c.execute("""SELECT cr FROM monsters WHERE name = ?""", (monster,))
         monster_cr = c.fetchone()[0]
     return monster_cr
