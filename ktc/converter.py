@@ -78,6 +78,7 @@ def ingest_data(csv_string: str, db_location: str, source=""):
         f = StringIO(csv_string)
         csv_reader = csv.DictReader(f, delimiter=',')
         c = conn.cursor()
+        sources_in_url = []
 
         if sources_in_url := check_if_key_processed(source_url):
             return sources_in_url
@@ -87,6 +88,7 @@ def ingest_data(csv_string: str, db_location: str, source=""):
         sources_official = [source[0] for source in c.fetchall()]
 
         for row in csv_reader:
+            monster_is_official = False
             dirty_sources = row['sources'].split(', ')
             sources = []
             for source in dirty_sources:
@@ -102,16 +104,68 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                     else:
                         sources.append(f"{source_name}: {index}")
 
-            matches = []
+                if re.sub(whitespace_pattern, '', source_name.lower()) in official_sources or source_name in sources_official:
+                    monster_is_official = True
+
+            # Now comes the fun; we need to define some logic for handling monsters with similar names
+            # Specifically, if monsters from multiple sources have the same name, we need to put a name
+            # abbreviation next to the name to prevent confusion.
+            # However, official monsters should not have an abbreviation next to their name, and many
+            # official monsters are in multiple sourcebooks.
+            # This logic should hold true even if a custom monster is in the db before an official monster
+            # of the same name.
+            # Start situations: official monster in db, unofficial monster in db, both in db, neither in db
+            # Changes: official monster added, unofficial monster added
+
+            monster_name = row['name']
+            sources_of_nametwins = []
 
             c.execute('SELECT sources FROM monsters WHERE name = ?',
-                      (row['name'],))
+                      (monster_name,))
 
-            match_string = c.fetchall()
-            for string in match_string:
-                matches += string[0].split(', ')
-            if matches:
-                sources = amalgamate_sources([sources, matches])
+            existing_monsters_with_name_string = c.fetchall()
+            for string in existing_monsters_with_name_string:
+                sources_of_nametwins += string[0].split(', ')
+
+            official_nametwins = []
+            unofficial_nametwins = []
+            for source in sources_of_nametwins:
+                name, _ = split_source_from_index(source)
+                c.execute(
+                    '''SELECT official FROM sources WHERE name = ?''', (name,))
+                if c.fetchall()[0][0]:
+                    official_nametwins.append(source)
+                else:
+                    unofficial_nametwins.append(source)
+
+            if sources_of_nametwins:
+                if monster_is_official:
+                    sources = amalgamate_sources(
+                        [sources, official_nametwins])
+                    values = []
+                    for un_source in unofficial_nametwins:
+                        name, _ = split_source_from_index(un_source)
+                        source_acronym = ''.join([word[0]
+                                                  for word in name.split()])
+                        new_name = f"{row['name']} ({source_acronym})"
+                        values.append((new_name, monster_name, un_source))
+                    c.executemany(
+                        '''UPDATE monsters SET name = ? WHERE name = ? AND sources = ?''', (values))
+
+                else:
+                    values = []
+                    for un_source in unofficial_nametwins:
+                        name, _ = split_source_from_index(un_source)
+                        source_acronym = ''.join([word[0]
+                                                  for word in name.split()])
+                        new_name = f"{row['name']} ({source_acronym})"
+                        values.append((new_name, monster_name, un_source))
+                    name, _ = split_source_from_index(sources[0])
+                    source_acronym = ''.join([word[0]
+                                              for word in name.split()])
+                    monster_name = f"{row['name']} ({source_acronym})"
+                    c.executemany(
+                        '''UPDATE monsters SET name = ? WHERE name = ? AND sources = ?''', (values))
 
             # Standardise the way sources are saved and confirm officiality - or lack thereof - of source
             source_hashes = []
@@ -139,14 +193,16 @@ def ingest_data(csv_string: str, db_location: str, source=""):
 
             if row['alignment'] == "any":
                 alignment = "any alignment"
+            elif row['alignment'] == "":
+                alignment = "none"
             else:
                 alignment = row['alignment'].lower()
 
             try:
-                values = [row['fid'], row['name'], row['cr'], row['size'], row['type'], alignment,
+                values = [row['fid'], monster_name, row['cr'], row['size'], row['type'], alignment,
                           row['environment'], row['ac'], row['hp'], row['init'], row['lair'], row['legendary'], row['named'], ', '.join(corrected_sources), hash_string]
             except KeyError:
-                values = [row['fid'], row['name'], row['cr'], row['size'], row['type'], alignment,
+                values = [row['fid'], monster_name, row['cr'], row['size'], row['type'], alignment,
                           row['environment'], row['ac'], row['hp'], row['init'], row['lair?'], row['legendary?'], row['unique?'], ', '.join(corrected_sources), hash_string]
 
             for i in range(len(values)):
@@ -154,20 +210,16 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                     values[i] = values[i].replace("'           '", "")
                     values[i] = values[i].strip()
 
-            if len(values[6]) < 5:
-                print(values[6])
             if re.sub(whitespace_pattern, '', values[6]) == "":
                 values[6] = "no environment specified"
 
             c.execute(
                 '''INSERT OR REPLACE INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', values)
 
-        c.execute('''SELECT name FROM sources WHERE url = ?''', (source_url,))
-        results = [result[0] for result in c.fetchall()]  # ignore
-        sources_processed = ", ".join(results)
         conn.commit()
 
-    return sources_processed
+        sources_in_url = check_if_key_processed(source_url)
+        return sources_in_url
 
 
 def load_csv_from_file(filename: str) -> str:
@@ -179,7 +231,7 @@ def load_csv_from_file(filename: str) -> str:
         return csv_string
 
 
-def configure_db(db_location: str) -> None:
+def configure_db(db_location: str):
     conn = sqlite3.connect(db_location)
     c = conn.cursor()
 
@@ -211,6 +263,7 @@ def configure_db(db_location: str) -> None:
               )
 
     conn.commit()
+    return conn
 
 
 if __name__ == "__main__":
