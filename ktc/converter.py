@@ -191,28 +191,34 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             if corrected_sources == 0:
                 continue
 
+            # Start sanity checking the data
+
+            # Tidy up alignments
             if row['alignment'] == "any":
                 alignment = "any alignment"
-            elif row['alignment'] == "":
-                alignment = "none"
+            elif row['alignment'] == "" or row['alignment'] == "none":
+                alignment = "unaligned"
             else:
                 alignment = row['alignment'].lower()
+
+            # Prevent blank environments
+            if re.sub(whitespace_pattern, '', row['environment']) == "":
+                environments = "no environment specified"
+            else:
+                environments = row['environment']
 
             values: List[Any] = []
             try:
                 values = [row['fid'], monster_name, row['cr'], row['size'], row['type'], alignment,
-                          row['environment'], row['ac'], row['hp'], row['init'], row['lair'], row['legendary'], row['named'], ', '.join(corrected_sources), hash_string]
+                          environments, row['ac'], row['hp'], row['init'], row['lair'], row['legendary'], row['named'], ', '.join(corrected_sources), hash_string]
             except KeyError:
                 values = [row['fid'], monster_name, row['cr'], row['size'], row['type'], alignment,
-                          row['environment'], row['ac'], row['hp'], row['init'], row['lair?'], row['legendary?'], row['unique?'], ', '.join(corrected_sources), hash_string]
+                          environments, row['ac'], row['hp'], row['init'], row['lair?'], row['legendary?'], row['unique?'], ', '.join(corrected_sources), hash_string]
 
             for i in range(len(values)):
                 if type(values[i]) == str:
                     values[i] = values[i].replace("'           '", "")
                     values[i] = values[i].strip()
-
-            if re.sub(whitespace_pattern, '', values[6]) == "":
-                values[6] = "no environment specified"
 
             c.execute(
                 '''INSERT OR REPLACE INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', values)

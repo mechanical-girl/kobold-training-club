@@ -181,3 +181,23 @@ kuk.monster_seven,Monster Seven, 1, Medium,,,,,,,,,,,,Klarota's Underdark Kingdo
 
     assert ("Monster Seven",
             "Klarota's Underdark Kingdom: 456") in monster_list
+
+
+def test_blank_alignment_replaced(populate_database):
+    """Expected data: when a monster with an empty string alignment is ingested, its alignment should equal "unaligned" """
+    conn = populate_database
+    c = conn.cursor()
+
+    c.execute('''SELECT DISTINCT alignment FROM monsters''')
+    alignment_list = c.fetchall()
+    assert [('unaligned',)] == alignment_list
+
+
+def test_blank_environment_replaced(populate_database):
+    """Expected data: when a monster with an empty string environment is ingested, its environment should equal "no environment specified" """
+    conn = populate_database
+    c = conn.cursor()
+
+    c.execute('''SELECT DISTINCT environment FROM monsters''')
+    alignment_list = c.fetchall()
+    assert [('no environment specified',)] == alignment_list
