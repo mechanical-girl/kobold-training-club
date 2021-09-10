@@ -196,8 +196,8 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             # Tidy up alignments
             if row['alignment'] == "any":
                 alignment = "any alignment"
-            elif row['alignment'] == "":
-                alignment = "none"
+            elif row['alignment'] == "" or row['alignment'] == "none":
+                alignment = "unaligned"
             else:
                 alignment = row['alignment'].lower()
 
