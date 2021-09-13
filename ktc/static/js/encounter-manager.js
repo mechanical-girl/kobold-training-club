@@ -172,6 +172,15 @@ var colourCell = function (cellData) {
             return highlight_colours[i]
         }
     }
-
 }
-module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell }
+
+var colourAllCells = function () {
+    var cells = $("#monsterTable .crCell")
+    for (var i = 0; i < cells.length; i++) {
+        let cell = cells[i];
+        console.log(cell)
+        $(cell).css("background-color", colourCell($(cell).text()))
+    }
+}
+
+module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell, colourAllCells: colourAllCells }

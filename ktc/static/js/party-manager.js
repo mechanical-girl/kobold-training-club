@@ -66,10 +66,12 @@ var updateThresholds = function () {
             displayDiv.append('<div class="row float-end"><div class="col exp-list deadly">Deadly: ' + result[3].toLocaleString("en-GB") + 'exp</div></div>');
             displayDiv.append('<div class="row float-end"><div class="col exp-list daily">Daily: ' + result[4].toLocaleString("en-GB") + 'exp</div></div>');
             window.partyThresholds = result;
-            encounterManager.highlightEncounterDifficulty()
+            encounterManager.highlightEncounterDifficulty();
+            encounterManager.colourAllCells();
         }
 
     })
+
 }
 
 module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds }
