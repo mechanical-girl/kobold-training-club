@@ -67,7 +67,6 @@ $(function () {
     if (window.localStorage.getItem('lastVersion') != versionNumber && $("#patchNotesModal .modal-body").text().length > 20) {
         window.localStorage.setItem('lastVersion', versionNumber)
         $('#patchNotesModal').modal('show')
-
     }
 
     // Populate the first five accordions

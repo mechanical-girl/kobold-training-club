@@ -278,7 +278,6 @@ $(function () {
     if (window.localStorage.getItem('lastVersion') != versionNumber && $("#patchNotesModal .modal-body").text().length > 20) {
         window.localStorage.setItem('lastVersion', versionNumber)
         $('#patchNotesModal').modal('show')
-
     }
 
     // Populate the first five accordions
@@ -630,4 +629,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[1,3,4,6,2,5]);
+},{}]},{},[3]);
