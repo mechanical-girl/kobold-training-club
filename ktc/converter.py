@@ -154,6 +154,10 @@ def ingest_data(csv_string: str, db_location: str, source=""):
 
                 else:
                     updates = []
+                    if list(filter(lambda x: x in sources, unofficial_nametwins)) != []:
+                        # print(amalgamate_sources([sources, unofficial_nametwins]))
+                        # c.execute('''UPDATE monsters SET sources = ? WHERE name = ? AND sources = ?''', (", ".join(amalgamate_sources([sources, unofficial_nametwins])), monster_name, un_source,))
+                        continue
                     for un_source in unofficial_nametwins:
                         name, _ = split_source_from_index(un_source)
                         source_acronym = ''.join([word[0]
@@ -196,7 +200,7 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             # Tidy up alignments
             if row['alignment'] == "any":
                 alignment = "any alignment"
-            elif row['alignment'] == "" or row['alignment'] == "none":
+            elif row['alignment'] == "":
                 alignment = "unaligned"
             else:
                 alignment = row['alignment'].lower()

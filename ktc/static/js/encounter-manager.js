@@ -178,7 +178,6 @@ var colourAllCells = function () {
     var cells = $("#monsterTable .crCell")
     for (var i = 0; i < cells.length; i++) {
         let cell = cells[i];
-        console.log(cell)
         $(cell).css("background-color", colourCell($(cell).text()))
     }
 }
