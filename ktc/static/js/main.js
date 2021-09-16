@@ -29,7 +29,10 @@ var createMonsterTable = function () {
             "data": getMonsterParameters
         },
         "aoColumns": [
-            { "bSortable": true },
+            {
+                "bSortable": true,
+                "sType": "name"
+            },
             {
                 "bSortable": true,
                 "sType": "cr",
@@ -52,6 +55,8 @@ var createMonsterTable = function () {
     });
     $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
     $.fn.dataTableExt.oSort["cr-asc"] = function (a, b) { return updaterButton.floatify(a) > updaterButton.floatify(b); }
+    $.fn.dataTableExt.oSort["name-desc"] = function (a, b) { return a.localeCompare(b) }
+    $.fn.dataTableExt.oSort["name-asc"] = function (a, b) { return b.localeCompare(a) }
     window.monsterDataTable.columns.adjust().draw();
 }
 
