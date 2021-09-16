@@ -480,7 +480,9 @@ def test_monster_list_returns_good_all_constraint_list(client):
                   "types": ["_beast", "_humanoid", "_fiend", "_dragon", "_undead"],
                   "alignments": ["_unaligned", "_chaotic evil", "_lawful evil", "_neutral evil", "_neutral"],
                   "minimumChallengeRating": "1",
-                  "maximumChallengeRating": "15"
+                  "maximumChallengeRating": "15",
+                  "allowNamed": "false",
+                  "allowLegendary": "false"
                   }
     response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
     received = response.get_json()["data"]
@@ -547,5 +549,23 @@ def test_check_source_returns_good_data(client):
     expected = "Into The Borderlands"
     response = client.get("/api/checksource?key=" + json.dumps(source))
     received = response.get_json()
+
+    assert expected == received
+
+
+def test_monster_list_returns_good_no_legendary_list(client):
+    parameters = {"allowLegendary": "false"}
+    response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
+    received = len(response.get_json()["data"])
+    expected = 2271
+
+    assert expected == received
+
+
+def test_monster_list_returns_good_no_named_list(client):
+    parameters = {"allowNamed": "false"}
+    response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
+    received = len(response.get_json()["data"])
+    expected = 2245
 
     assert expected == received

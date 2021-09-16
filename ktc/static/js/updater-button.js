@@ -37,6 +37,8 @@ var floatify = function (number) {
 var getUpdatedChallengeRatings = function () {
     var minValue = $("#minCr option:selected").attr("value");
     var maxValue = $("#maxCr option:selected").attr("value");
+    var allowLegendary = $("#allowLegendary").prop("checked");
+    var allowNamed = $("#allowNamed").prop("checked");
     minValueComp = floatify(minValue)
     maxValueComp = floatify(maxValue)
     var alerts = $("#challengeRatingSelectorDiv .alert")
@@ -47,7 +49,9 @@ var getUpdatedChallengeRatings = function () {
     }
     window.localStorage.setItem("minCr", JSON.stringify(minValue))
     window.localStorage.setItem("maxCr", JSON.stringify(maxValue))
-    return [minValue, maxValue];
+    window.localStorage.setItem("allowLegendary", JSON.stringify(allowLegendary))
+    window.localStorage.setItem("allowNamed", JSON.stringify(allowNamed))
+    return [minValue, maxValue, allowLegendary, allowNamed];
 }
 
 var sortTable = function (clicked_button) {
@@ -56,6 +60,8 @@ var sortTable = function (clicked_button) {
         var values = getUpdatedChallengeRatings();
         monsterParameters["minimumChallengeRating"] = values[0]
         monsterParameters["maximumChallengeRating"] = values[1]
+        monsterParameters["allowLegendary"] = values[2]
+        monsterParameters["allowNamed"] = values[3]
     } else {
         listUpdatedName = listUpdated.split("_")[0];
         window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);

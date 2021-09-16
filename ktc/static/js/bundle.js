@@ -225,6 +225,7 @@ var unofficialSourceNames = []
 const storage = window.localStorage;
 
 var getMonsterParameters = function () {
+    console.log(window.monsterParameters)
     return {
         params: JSON.stringify(window.monsterParameters)
     };
@@ -303,6 +304,8 @@ $(function () {
         var max = $("#challengeRatingMaximum");
         let min_cr_stored = JSON.parse(window.localStorage.getItem("minCr"))
         let max_cr_stored = JSON.parse(window.localStorage.getItem("maxCr"))
+        let allowNamed = JSON.parse(window.localStorage.getItem("allowNamed"))
+        let allowLegendary = JSON.parse(window.localStorage.getItem("allowLegendary"))
         if (min_cr_stored == null) {
             min_cr_stored = data[0]
             max_cr_stored = data.slice(-1)
@@ -320,6 +323,15 @@ $(function () {
                 max.append(standard)
             }
 
+        }
+
+        $("#allowLegendary").prop("checked", true)
+        $("#allowNamed").prop("checked", true)
+        if (allowLegendary != null && allowLegendary) {
+            $("#allowLegendary").prop("checked", true)
+        }
+        if (allowNamed == false) {
+            $("#allowNamed").prop("checked", false)
         }
 
         updaterButton.sortTable($("#challengeRatingSelectorDiv .updater_button"));
@@ -586,6 +598,8 @@ var floatify = function (number) {
 var getUpdatedChallengeRatings = function () {
     var minValue = $("#minCr option:selected").attr("value");
     var maxValue = $("#maxCr option:selected").attr("value");
+    var allowLegendary = $("#allowLegendary").prop("checked");
+    var allowNamed = $("#allowNamed").prop("checked");
     minValueComp = floatify(minValue)
     maxValueComp = floatify(maxValue)
     var alerts = $("#challengeRatingSelectorDiv .alert")
@@ -596,7 +610,9 @@ var getUpdatedChallengeRatings = function () {
     }
     window.localStorage.setItem("minCr", JSON.stringify(minValue))
     window.localStorage.setItem("maxCr", JSON.stringify(maxValue))
-    return [minValue, maxValue];
+    window.localStorage.setItem("allowLegendary", JSON.stringify(allowLegendary))
+    window.localStorage.setItem("allowNamed", JSON.stringify(allowNamed))
+    return [minValue, maxValue, allowLegendary, allowNamed];
 }
 
 var sortTable = function (clicked_button) {
@@ -605,6 +621,8 @@ var sortTable = function (clicked_button) {
         var values = getUpdatedChallengeRatings();
         monsterParameters["minimumChallengeRating"] = values[0]
         monsterParameters["maximumChallengeRating"] = values[1]
+        monsterParameters["allowLegendary"] = values[2]
+        monsterParameters["allowNamed"] = values[3]
     } else {
         listUpdatedName = listUpdated.split("_")[0];
         window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
