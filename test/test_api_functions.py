@@ -451,6 +451,18 @@ def test_monster_list_returns_good_source_constraint_list():
         assert "Monster Manual" in monster[5]
 
 
+def test_monster_list_returns_good_legendary_constraint_list():
+    parameters = {"allowLegendary": "false"}
+    actual = len(api.get_list_of_monsters(parameters)["data"])
+    assert 2271 == actual
+
+
+def test_monster_list_returns_good_named_constraint_list():
+    parameters = {"allowNamed": "false"}
+    actual = len(api.get_list_of_monsters(parameters)["data"])
+    assert 2245 == actual
+
+
 def test_monster_list_returns_good_all_constraint_list():
     parameters = {"environments": ["_aquatic", "_forest", "_dungeon"],
                   "sizes": ["_small", "_medium", "_large", "_huge"],
@@ -478,7 +490,9 @@ def test_monster_list_returns_good_all_constraint_list():
                   "types": ["_beast", "_humanoid", "_fiend", "_dragon", "_undead"],
                   "alignments": ["_unaligned", "_chaotic evil", "_lawful evil", "_neutral evil", "_neutral"],
                   "minimumChallengeRating": "1",
-                  "maximumChallengeRating": "15"
+                  "maximumChallengeRating": "15",
+                  "allowLegendary": "false",
+                  "allowNamed": "false"
                   }
     actual = api.get_list_of_monsters(parameters)["data"]
 

@@ -185,6 +185,16 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     except (KeyError, IndexError):
         challenge_rating_maximum = None
 
+    try:
+        allow_legendary = parameters["allowLegendary"]
+    except (KeyError, IndexError):
+        allow_legendary = True
+
+    try:
+        allow_named = parameters["allowNamed"]
+    except (KeyError, IndexError):
+        allow_named = True
+
     # Oh, this is clumsy, I hate this
     where_requirements = ""
     query_arguments = []
@@ -296,6 +306,12 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         where_requirements += f"cr IN {challenge_rating_placeholders} AND "
         query_arguments += possible_challenge_ratings[mindex:maxdex]
 
+    if allow_legendary is not True:
+        where_requirements += f"legendary = '' AND "
+
+    if allow_named is not True:
+        where_requirements += "named = '' AND "
+
     # If there are requirements, we add a WHERE to the start
     if where_requirements != "":
         where_requirements = ("WHERE ") + where_requirements
@@ -316,7 +332,6 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         monster_list = c.fetchall()
 
     monster_data = []
-    url_pattern = re.compile(r"(?P<url>https?://[^\s]+)")
     for monster in monster_list:
         monster_data.append(
             [

@@ -14,6 +14,7 @@ var unofficialSourceNames = []
 const storage = window.localStorage;
 
 var getMonsterParameters = function () {
+    console.log(window.monsterParameters)
     return {
         params: JSON.stringify(window.monsterParameters)
     };
@@ -92,6 +93,8 @@ $(function () {
         var max = $("#challengeRatingMaximum");
         let min_cr_stored = JSON.parse(window.localStorage.getItem("minCr"))
         let max_cr_stored = JSON.parse(window.localStorage.getItem("maxCr"))
+        let allowNamed = JSON.parse(window.localStorage.getItem("allowNamed"))
+        let allowLegendary = JSON.parse(window.localStorage.getItem("allowLegendary"))
         if (min_cr_stored == null) {
             min_cr_stored = data[0]
             max_cr_stored = data.slice(-1)
@@ -109,6 +112,15 @@ $(function () {
                 max.append(standard)
             }
 
+        }
+
+        $("#allowLegendary").prop("checked", true)
+        $("#allowNamed").prop("checked", true)
+        if (allowLegendary != null && allowLegendary) {
+            $("#allowLegendary").prop("checked", true)
+        }
+        if (allowNamed == false) {
+            $("#allowNamed").prop("checked", false)
         }
 
         updaterButton.sortTable($("#challengeRatingSelectorDiv .updater_button"));
