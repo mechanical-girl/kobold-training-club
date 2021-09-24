@@ -18,32 +18,7 @@ def setup_database():
 
     conn = sqlite3.connect("test.db", uri=True)
     c = conn.cursor()
-    c.execute("DROP TABLE IF EXISTS monsters")
-    c.execute("DROP TABLE IF EXISTS sources")
-    c.execute('''CREATE TABLE monsters (
-                fid text UNIQUE,
-                name text,
-                cr text,
-                size text,
-                type text,
-                alignment text,
-                environment text,
-                ac int,
-                hp int,
-                init text,
-                lair int,
-                legendary int,
-                named int,
-                sources text,
-                sourcehashes text)'''
-              )
-    c.execute('''CREATE TABLE sources (
-        name text,
-        official int,
-        hash text,
-        url text,
-        sourceurlhash text UNIQUE)'''
-              )
+    converter.configure_db("test.db")
 
     yield conn
 
@@ -285,133 +260,148 @@ def test_monster_list_returns_full_list_if_no_parameters_passed():
     expected = [['Aarakocra',
                  '1/4',
                  'Medium',
-                 'Humanoid',
+                 'Humanoid', 'Aarakocra', '',
                  'neutral good',
                  'Monster Manual: 12, Princes of the Apocalypse Online Supplement v1.0: 6'],
                 ['Abhorrent Overlord',
                  '9',
                  'Large',
-                 'Fiend',
+                 'Fiend', 'Demon', 'Demons of Theros',
                  'lawful evil',
                  'Mythic Odysseys of Theros: 219'],
-                ['Abjurer', '9', 'Medium', 'Humanoid',
+                ['Abjurer', '9', 'Medium', 'Humanoid', 'Any Race', 'NPCs',
                     'any alignment', "Volo's Guide to Monsters: 209"],
                 ['Aboleth',
                  '10',
                  'Large',
-                 'Aberration',
+                 'Aberration', '', '',
                  'lawful evil',
                  'Monster Manual: 13, Princes of the Apocalypse Online Supplement v1.0: 6'],
                 ['Abominable Yeti',
                  '9',
                  'Huge',
-                 'Monstrosity',
+                 'Monstrosity', '', 'Yeti',
                  'chaotic evil',
                  'Monster Manual: 306'],
                 ['Abyssal Chicken',
                  '1/4',
                  'Tiny',
-                 'Fiend',
+                 'Fiend', 'Demon', '',
                  'chaotic evil',
                  "Baldur's Gate: Descent into Avernus: 97"],
                 ['Abyssal Wretch',
                 '1/4',
                  'Medium',
-                 'Fiend',
+                 'Fiend', 'Demon', 'Demons',
                  'chaotic evil',
-                 "Baldur's Gate: Descent into Avernus: 118"],
+                 "Mordenkainen's Tome of Foes: 136, Baldur's Gate: Descent into Avernus: 118"],
                 ['Acolyte',
                  '1/4',
                  'Medium',
-                 'Humanoid',
+                 'Humanoid', 'any', 'NPCs',
                  'any alignment',
                  'Basic Rules v1: 53, HotDQ supplement: 4, Monster Manual: 342'],
                 ['Adept',
                  '1',
                  'Medium',
-                 'Humanoid',
+                 'Humanoid', 'human', 'Appendix B',
                  'chaotic evil',
                  'Into The Borderlands: 338'],
                 ['Adult Black Dragon',
                  '14',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'chaotic evil',
                  'Monster Manual: 88, Princes of the Apocalypse Online Supplement v1.0: 7'],
                 ['Adult Blue Dracolich',
                  '17',
                  'Huge',
-                 'Undead',
+                 'Undead', '', 'Dracolich',
                  'lawful evil',
                  'Monster Manual: 84'],
                 ['Adult Blue Dragon',
                  '16',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'lawful evil',
                  'HotDQ supplement: 4, Monster Manual: 91'],
                 ['Adult Brass Dragon',
                  '13',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'chaotic good',
                  'Monster Manual: 105'],
                 ['Adult Bronze Dragon',
                  '15',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'lawful good',
                  'Monster Manual: 108, Princes of the Apocalypse Online Supplement v1.0: 7'],
                 ['Adult Copper Dragon',
                  '14',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'chaotic good',
                  'Monster Manual: 112'],
                 ['Adult Gold Dragon',
                  '17',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'lawful good',
                  'Monster Manual: 114'],
                 ['Adult Green Dragon',
                  '15',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'lawful evil',
                  'Monster Manual: 94'],
+                ['Adult Kruthik',
+                 '2',
+                 'Medium',
+                 'Monstrosity', '',
+                 'Kruthiks',
+                 'unaligned',
+                 "Mordenkainen's Tome of Foes: 212"],
+                ['Adult Oblex',
+                 '5',
+                 'Medium',
+                 'Ooze',
+                 '',
+                 'Oblex',
+                 'lawful evil',
+                 "Mordenkainen's Tome of Foes: 218"],
                 ['Adult Red Dragon',
                  '17',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'chaotic evil',
                  'Basic Rules v1: 8, Monster Manual: 98'],
                 ['Adult Silver Dragon',
                  '16',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'lawful good',
                  'Monster Manual: 117'],
                 ['Adult White Dragon',
                  '13',
                  'Huge',
-                 'Dragon',
+                 'Dragon', '', 'Dragons',
                  'chaotic evil',
                  'HotDQ supplement: 5, Monster Manual: 101'],
                 ['Aeorian Hunter',
                  '10',
                  'Large',
-                 'Monstrosity',
+                 'Monstrosity', '', 'Aeorian Hunters',
                  'neutral evil',
                  "Explorer's Guide to Wildemount: "],
                 ['Aeorian Nullifier',
                  '12',
                  'Large',
-                 'Monstrosity',
+                 'Monstrosity', '', 'Aeorian Hunters',
                  'neutral evil',
                  "Explorer's Guide to Wildemount: "]]
     actual = api.get_list_of_monsters({})["data"]
-    assert len(actual) == 1140
+    assert len(actual) == 1248
     for i, item in enumerate(expected):
         assert item == actual[i]
 
@@ -424,8 +414,8 @@ def test_monster_list_returns_good_single_constraint_list():
 
 
 def test_monster_list_returns_good_multiple_constraint_list():
-    expected = ['Aboleth', 'Adept', 'Arachnia, Giant Water Spider', 'Barbarian Warrior', 'Boalisk', 'Chuul', 'Crabman', 'Crocodile', 'Crushing Wave Priest', 'Crushing Wave Reaver', 'Dagon', 'Dark Tide Knight', 'Dark Triton', 'Deep Scion', 'Dolphin', 'Elite Bullywug', 'Elite Hobgoblin', 'Evil Priest', 'Eye of the Deep', 'Fanged Sea Serpent', 'Fathomer', 'Fledgling Mage', 'Four-Armed Gargoyle', 'Giant Armadillo', 'Giant Clam', 'Giant Crab', 'Giant Electric Catfish', 'Giant Frog', 'Giant Moray Eel', 'Giant Octopus', 'Giant Pike', 'Giant Sea Horse', 'Giant Seahorse', 'Giant Toad', 'Giant Water Beetle', 'Giant Water Spider', 'Gray Nisp', 'Green Guardian Gargoyle', 'Gulper Eel',
-                'Hippocampus', 'Hunter Shark', 'Iron Cobra', 'Kraken Priest', 'Kuo-toa', 'Kuo-toa Archpriest', 'Kuo-toa Whip', 'Lithonnite', 'Living Stone Statue', 'Living Wax Statue', 'Mad Hermit', 'Marevak, Advisor to the Castellan', 'Margoyle', 'Marid', 'Marine Basilisk', 'Merfolk', 'Merfolk Hydromancer', 'Merrow', 'Monstrous Crayfish', 'Morkoth', 'Mummy of the Deep', 'Ogre Skeleton', 'One-Eyed Shiver', 'Orc Chief', 'Plesiosaurus', 'Reef Shark', 'Sahuagin', 'Sahuagin Baron', 'Sahuagin Priestess', 'Sea Hag', 'Sea Hag (coven)', 'Sea Spawn', 'Spitting Sea Serpent', 'Strangle Weed', 'Swarm of Quippers', 'Thalasskoptis', 'Thoul', 'Tortoise', 'Troglodyte Shaman', 'Troglodyte Spore Servant', 'Water Elemental', 'Water Elemental Myrmidon', 'Wizard Golem', 'Young Aboleth', 'Zombie']
+    expected = ['Aboleth', 'Adept', 'Arachnia, Giant Water Spider', 'Barbarian Warrior', 'Boalisk', 'Bone Golem', 'Caryatid Column', 'Chuul', 'Coffer Corpse', 'Crabman', 'Crocodile', 'Crushing Wave Priest', 'Crushing Wave Reaver', 'Dagon', 'Dark Tide Knight', 'Dark Triton', 'Deep Scion', 'Dolphin', 'Elite Bullywug', 'Elite Hobgoblin', 'Evil Priest', 'Eye of the Deep', 'Fanged Sea Serpent', 'Fathomer', 'Fledgling Mage', 'Four-Armed Gargoyle', 'Giant Armadillo', 'Giant Clam', 'Giant Crab', 'Giant Electric Catfish', 'Giant Frog', 'Giant Moray Eel', 'Giant Octopus', 'Giant Pike', 'Giant Sea Horse', 'Giant Seahorse', 'Giant Toad', 'Giant Water Beetle', 'Giant Water Spider', 'Gray Nisp', 'Green Guardian Gargoyle', 'Gulper Eel',
+                'Hippocampus', 'Hunter Shark', 'Kelpie (FEF)', 'Kraken Priest', 'Kuo-toa', 'Kuo-toa Archpriest', 'Kuo-toa Whip', 'Lithonnite', 'Living Stone Statue', 'Living Wax Statue', 'Mad Hermit', 'Marevak, Advisor to the Castellan', 'Margoyle', 'Marid', 'Marine Basilisk', 'Merfolk', 'Merfolk Hydromancer', 'Merrow', 'Monstrous Crayfish', 'Morkoth', 'Mummy of the Deep', 'Ogre Skeleton', 'One-Eyed Shiver', 'Orc Chief', 'Plesiosaurus', 'Reef Shark', 'Sahuagin', 'Sahuagin Baron', 'Sahuagin Priestess', 'Sea Hag', 'Sea Hag (coven)', 'Sea Spawn', 'Spitting Sea Serpent', 'Strangle Weed', 'Swarm of Quippers', 'Thalasskoptis', 'Thoul', 'Tortoise', 'Troglodyte Shaman', 'Troglodyte Spore Servant', 'Wastrilith', 'Water Elemental', 'Water Elemental Myrmidon', 'Wizard Golem', 'Young Aboleth', 'Zombie']
     parameters = {
         "sizes": ["sizes_Medium", "sizes_Large"],
         "environments": ["environments_aquatic"],
@@ -448,19 +438,19 @@ def test_monster_list_returns_good_source_constraint_list():
     parameters = {"sources": ["sources_Monster Manual"]}
     actual = api.get_list_of_monsters(parameters)["data"]
     for monster in actual:
-        assert "Monster Manual" in monster[5]
+        assert "Monster Manual" in monster[7]
 
 
 def test_monster_list_returns_good_legendary_constraint_list():
     parameters = {"allowLegendary": "false"}
     actual = len(api.get_list_of_monsters(parameters)["data"])
-    assert 2271 == actual
+    assert 2373 == actual
 
 
 def test_monster_list_returns_good_named_constraint_list():
     parameters = {"allowNamed": "false"}
     actual = len(api.get_list_of_monsters(parameters)["data"])
-    assert 2245 == actual
+    assert 2359 == actual
 
 
 def test_monster_list_returns_good_all_constraint_list():

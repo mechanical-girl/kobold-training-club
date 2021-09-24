@@ -225,7 +225,6 @@ var unofficialSourceNames = []
 const storage = window.localStorage;
 
 var getMonsterParameters = function () {
-    console.log(window.monsterParameters)
     return {
         params: JSON.stringify(window.monsterParameters)
     };
@@ -251,6 +250,8 @@ var createMonsterTable = function () {
             },
             { "bSortable": true },
             { "bSortable": true },
+            { "bSortable": false },
+            { "bSortable": false },
             { "bSortable": true },
             { "bSortable": true }
         ],
@@ -262,13 +263,19 @@ var createMonsterTable = function () {
                     $(td).css('background-color', encounterManager.colourCell(cellData));
                     $(td).attr("class", "crCell");
                 }
+            },
+            {
+                "targets": [4, 5],
+                "visible": false,
             }
         ],
+        "order": [[0, "asc"]]
+
     });
     $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
     $.fn.dataTableExt.oSort["cr-asc"] = function (a, b) { return updaterButton.floatify(a) > updaterButton.floatify(b); }
-    $.fn.dataTableExt.oSort["name-desc"] = function (a, b) { return a.localeCompare(b) }
-    $.fn.dataTableExt.oSort["name-asc"] = function (a, b) { return b.localeCompare(a) }
+    $.fn.dataTableExt.oSort["name-desc"] = function (a, b) { return b.localeCompare(a) }
+    $.fn.dataTableExt.oSort["name-asc"] = function (a, b) { return a.localeCompare(b) }
     window.monsterDataTable.columns.adjust().draw();
 }
 

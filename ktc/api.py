@@ -319,11 +319,11 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     if where_requirements.endswith(" AND "):
         where_requirements = where_requirements[:-5]
 
-    query_string = f"""SELECT name, cr, size, type, alignment, sources FROM {query_from} {where_requirements} ORDER BY name"""
+    query_string = f"""SELECT name, cr, size, type, tags, section, alignment, sources FROM {query_from} {where_requirements} ORDER BY name"""
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
-        # conn.set_trace_callback(print)
+        conn.set_trace_callback(print)
 
         if query_arguments == []:
             c.execute(query_string)
@@ -340,9 +340,11 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
                 monster[2].strip(),
                 monster[3].strip(),
                 monster[4].strip(),
+                monster[5].strip(),
+                monster[6].strip(),
             ]
         )
-        sources = monster[5].split(",")
+        sources = monster[7].split(",")
         linked_sources = []
         for source in sources:
             (source_name, index) = converter.split_source_from_index(source)
