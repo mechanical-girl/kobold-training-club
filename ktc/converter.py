@@ -211,12 +211,23 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             else:
                 environments = row['environment']
 
+            # Some source sheets don't have tags or sections...
+            try:
+                monster_tags = row["tags"]
+            except KeyError:
+                monster_tags = ""
+
+            try:
+                monster_section = row["section"]
+            except KeyError:
+                monster_section = ""
+
             values: List[Any] = []
             try:
-                values = [row['fid'], monster_name, row['cr'], row['size'], row['type'], alignment,
+                values = [row['fid'], monster_name, row['cr'], row['size'], row["type"], monster_tags, monster_section, alignment,
                           environments, row['ac'], row['hp'], row['init'], row['lair'], row['legendary'], row['named'], ', '.join(corrected_sources), hash_string]
             except KeyError:
-                values = [row['fid'], monster_name, row['cr'], row['size'], row['type'], alignment,
+                values = [row['fid'], monster_name, row['cr'], row['size'], row["type"], monster_tags, monster_section, alignment,
                           environments, row['ac'], row['hp'], row['init'], row['lair?'], row['legendary?'], row['unique?'], ', '.join(corrected_sources), hash_string]
 
             for i in range(len(values)):
@@ -225,7 +236,7 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                     values[i] = values[i].strip()
 
             c.execute(
-                '''INSERT OR REPLACE INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', values)
+                '''INSERT OR REPLACE INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', values)
 
         conn.commit()
 
@@ -253,6 +264,8 @@ def configure_db(db_location: str):
                 cr text,
                 size text,
                 type text,
+                tags text,
+                section text,
                 alignment text,
                 environment text,
                 ac int,
@@ -286,7 +299,7 @@ if __name__ == "__main__":
             results = c.fetchall()
             with open(f"{dir_path}/master.csv", 'w', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(["fid", "name", "cr", "size", "type", "alignment", "environment",
+                writer.writerow(["fid", "name", "cr", "size", "type", "tags", "section", "alignment", "environment",
                                 "ac", "hp", "init", "lair", "legendary", "named", "sources", "sourcehashes"])
                 writer.writerows(results)
 
