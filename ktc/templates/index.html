@@ -26,6 +26,10 @@
         ul {
             list-style-type: none;
         }
+
+        th.invisibleColumn, td.invisibleColumn {
+            display: none;
+        }
     </style>
 </head>
 
@@ -250,8 +254,8 @@
                     <div class="col-5">
                         <h4>Your Encounter <span id="encounterDifficulty"></span></h4>
                         <div class="row" id="monsterList">
-
                         </div>
+                        <button type="button" id="run_in_ii_button" class="btn btn-success">Run in Improved Initiative</button>
                     </div>
 
                 </div>
@@ -267,6 +271,10 @@
                                 <th scope="col">Section</th>
                                 <th scope="col">Alignment</th>
                                 <th scope="col">Source(s)</th>
+                                <th scope="col">FID</th>
+                                <th scope="col">HP</th>
+                                <th scope="col">AC</th>
+                                <th scope="col">Init</th>
                             </tr>
                         </thead>
                         <tbody>
