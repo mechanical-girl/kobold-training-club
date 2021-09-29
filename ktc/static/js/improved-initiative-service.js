@@ -1,33 +1,6 @@
 // https://github.com/Asmor/5e-monsters/blob/master/app/services/integration.service.js
 
-function openImprovedInitiative(data) {
-    var form = document.createElement("form");
-    form.style.display = "none";
-    form.setAttribute("method", "POST");
-    form.setAttribute("action", "https://www.improved-initiative.com/launchencounter/");
-
-    Object.keys(data).forEach(function (key) {
-        var textarea = document.createElement("input");
-        textarea.setAttribute("type", "hidden");
-        textarea.setAttribute("name", key);
-        textarea.setAttribute("value", JSON.stringify(data[key]));
-
-        form.appendChild(textarea);
-    });
-
-    window.document.body.appendChild(form);
-    form.submit();
-    form.parentNode.removeChild(form);
-}
-
-var sendToImprovedInitiative = function () {
-    console.log("sendToImprovedInitiative")
-
-    // get data
-    var monsters = JSON.parse(window.localStorage.getItem("monsters"));
-    var monsterData = window.monsterDataTable.data().toArray()
-
-    // generate payload
+var generateCombatantPayload = function (monsters, monsterData) {
     var combatants = [];
     monsters.forEach(function (itm) {
         var name = itm[0];
@@ -60,9 +33,30 @@ var sendToImprovedInitiative = function () {
         }
     });
 
-    // open Improved Initiative
-    openImprovedInitiative({ Combatants: combatants });
-};
+    return combatants;
+}
 
+function openImprovedInitiative(data) {
+    var form = document.createElement("form");
+    form.style.display = "none";
+    form.setAttribute("method", "POST");
+    form.setAttribute("action", "https://www.improved-initiative.com/launchencounter/");
 
-module.exports = { sendToImprovedInitiative: sendToImprovedInitiative }
+    Object.keys(data).forEach(function (key) {
+        var textarea = document.createElement("input");
+        textarea.setAttribute("type", "hidden");
+        textarea.setAttribute("name", key);
+        textarea.setAttribute("value", JSON.stringify(data[key]));
+
+        form.appendChild(textarea);
+    });
+
+    window.document.body.appendChild(form);
+    form.submit();
+    form.parentNode.removeChild(form);
+}
+
+module.exports = {
+    generateCombatantPayload: generateCombatantPayload,
+    openImprovedInitiative: openImprovedInitiative
+}

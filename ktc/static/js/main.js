@@ -179,7 +179,12 @@ $(function () {
 
         // Handle Improved Initiative button clicks
         $(document).on("click", "#run_in_ii_button", function () {
-            improvedInitiativeService.sendToImprovedInitiative()
+            var monsters = JSON.parse(window.localStorage.getItem("monsters"));
+            var monsterData = window.monsterDataTable.data().toArray()
+
+            var combatants = improvedInitiativeService.generateCombatantPayload(monsters, monsterData)
+
+            improvedInitiativeService.openImprovedInitiative({ Combatants: combatants });
         })
 
         // Handle sort updates
