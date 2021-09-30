@@ -7,3 +7,5 @@ package-lock.json
 pyvenv.cfg
 *.db
 file:*
+.coverage
+.nyc_output/*

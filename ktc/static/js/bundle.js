@@ -86,7 +86,8 @@ var addMonster = function (cell) {
     var monsterListDiv = $("#monsterList");
     var row = $(cell).parent()
     var monsterName = $(row).children("td:first-child").text()
-    var monsterSource = $(row).children("td:last-child").text()
+
+    // increase monster count if already in list
     for (var i = 0; i < $('#monsterList').children('div').length; i++) {
         var monsterDiv = $('#monsterList').children('div')[i]
         if (monsterName == monsterDiv.id) {
@@ -94,6 +95,8 @@ var addMonster = function (cell) {
             return
         }
     }
+
+    // add monster to list with count 1
     level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + escapeText(monsterName) + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
     monsterListDiv.append(level_holder);
 
@@ -208,6 +211,70 @@ var colourAllCells = function () {
 
 module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell, colourAllCells: colourAllCells }
 },{}],3:[function(require,module,exports){
+// https://github.com/Asmor/5e-monsters/blob/master/app/services/integration.service.js
+
+var generateCombatantPayload = function (monsters, monsterData) {
+    var combatants = [];
+    monsters.forEach(function (itm) {
+        var name = itm[0];
+        var qty = itm[1];
+        var hp = 0;
+        var init = 0;
+        var ac = 0;
+        var fid = "<unknown>";
+
+        // find more data by name
+        for (var itmData of monsterData) {
+            if (itmData[0] == name) {
+                fid = itmData[8];
+                hp = parseInt(itmData[9]);
+                ac = parseInt(itmData[10]);
+                init = parseInt(itmData[11]);
+                break;
+            }
+        }
+
+        for (var i = 1; i <= qty; i++) {
+            combatants.push({
+                Name: name,
+                HP: { Value: hp },
+                TotalInitiativeModifier: init,
+                AC: { Value: ac },
+                Player: "npc",
+                Id: fid,
+            });
+        }
+    });
+
+    return combatants;
+}
+
+function openImprovedInitiative(data) {
+    var form = document.createElement("form");
+    form.style.display = "none";
+    form.setAttribute("method", "POST");
+    form.setAttribute("action", "https://www.improved-initiative.com/launchencounter/");
+
+    Object.keys(data).forEach(function (key) {
+        var textarea = document.createElement("input");
+        textarea.setAttribute("type", "hidden");
+        textarea.setAttribute("name", key);
+        textarea.setAttribute("value", JSON.stringify(data[key]));
+
+        form.appendChild(textarea);
+    });
+
+    window.document.body.appendChild(form);
+    form.submit();
+    form.parentNode.removeChild(form);
+}
+
+module.exports = {
+    generateCombatantPayload: generateCombatantPayload,
+    openImprovedInitiative: openImprovedInitiative
+}
+
+},{}],4:[function(require,module,exports){
 (function (global){(function (){
 const listElements = require('./element_lister.js')
 const updaterButton = require('./updater-button.js')
@@ -216,6 +283,7 @@ var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "u
 const partyManager = require('./party-manager.js');
 const encounterManager = require('./encounter-manager.js')
 const sourcesManager = require('./sources-manager.js');
+const improvedInitiativeService = require('./improved-initiative-service.js');
 window.monsterParameters = {};
 window.monsterDataTable;
 window.partyThresholds = []
@@ -253,20 +321,31 @@ var createMonsterTable = function () {
             { "bSortable": false },
             { "bSortable": false },
             { "bSortable": true },
-            { "bSortable": true }
+            { "bSortable": true },
+            { "bSortable": false },
+            { "bSortable": false },
+            { "bSortable": false },
+            { "bSortable": false },
         ],
         "columnDefs": [
-            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] },
+            {
+                "targets": [0, 1, 2, 3, 4],
+                "className": "not-a-link",
+            },
             {
                 "targets": 1,
                 "createdCell": function (td, cellData, rowData, row, col) {
                     $(td).css('background-color', encounterManager.colourCell(cellData));
-                    $(td).attr("class", "crCell");
+                    $(td).attr("class", "crCell not-a-link");
                 }
             },
             {
                 "targets": [4, 5],
                 "visible": false,
+            },
+            {
+                "targets": [8, 9, 10, 11],
+                "className": "invisibleColumn"
             }
         ],
         "order": [[0, "asc"]]
@@ -376,6 +455,16 @@ $(function () {
             partyManager.handleClick(this)
         });
 
+        // Handle Improved Initiative button clicks
+        $(document).on("click", "#run_in_ii_button", function () {
+            var monsters = JSON.parse(window.localStorage.getItem("monsters"));
+            var monsterData = window.monsterDataTable.data().toArray()
+
+            var combatants = improvedInitiativeService.generateCombatantPayload(monsters, monsterData)
+
+            improvedInitiativeService.openImprovedInitiative({ Combatants: combatants });
+        })
+
         // Handle sort updates
         $(document).on("click", ".updater_button", function () {
             updaterButton.sortTable(this);
@@ -451,7 +540,7 @@ $(function () {
     })
 })
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./element_lister.js":1,"./encounter-manager.js":2,"./party-manager.js":4,"./sources-manager.js":5,"./updater-button.js":6}],4:[function(require,module,exports){
+},{"./element_lister.js":1,"./encounter-manager.js":2,"./improved-initiative-service.js":3,"./party-manager.js":5,"./sources-manager.js":6,"./updater-button.js":7}],5:[function(require,module,exports){
 //party-manager.js
 
 const encounterManager = require("./encounter-manager");
@@ -530,7 +619,7 @@ var updateThresholds = function () {
 
 module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds }
 
-},{"./encounter-manager":2}],5:[function(require,module,exports){
+},{"./encounter-manager":2}],6:[function(require,module,exports){
 // sources-manager.js
 
 const listElements = require('./element_lister.js')
@@ -565,7 +654,7 @@ var moveSourceCheckbox = function (checked_box) {
     $('#customSourcesUsed').append(li);
 }
 module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceCheckbox, getUnofficialSources: getUnofficialSources }
-},{"./element_lister.js":1}],6:[function(require,module,exports){
+},{"./element_lister.js":1}],7:[function(require,module,exports){
 // updater-button.js
 
 var AssociatedId = function (clicked_button) {
@@ -654,4 +743,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[3]);
+},{}]},{},[4]);

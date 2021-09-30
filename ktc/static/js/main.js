@@ -5,6 +5,7 @@ var $ = require('jQuery');
 const partyManager = require('./party-manager.js');
 const encounterManager = require('./encounter-manager.js')
 const sourcesManager = require('./sources-manager.js');
+const improvedInitiativeService = require('./improved-initiative-service.js');
 window.monsterParameters = {};
 window.monsterDataTable;
 window.partyThresholds = []
@@ -42,20 +43,31 @@ var createMonsterTable = function () {
             { "bSortable": false },
             { "bSortable": false },
             { "bSortable": true },
-            { "bSortable": true }
+            { "bSortable": true },
+            { "bSortable": false },
+            { "bSortable": false },
+            { "bSortable": false },
+            { "bSortable": false },
         ],
         "columnDefs": [
-            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] },
+            {
+                "targets": [0, 1, 2, 3, 4],
+                "className": "not-a-link",
+            },
             {
                 "targets": 1,
                 "createdCell": function (td, cellData, rowData, row, col) {
                     $(td).css('background-color', encounterManager.colourCell(cellData));
-                    $(td).attr("class", "crCell");
+                    $(td).attr("class", "crCell not-a-link");
                 }
             },
             {
                 "targets": [4, 5],
                 "visible": false,
+            },
+            {
+                "targets": [8, 9, 10, 11],
+                "className": "invisibleColumn"
             }
         ],
         "order": [[0, "asc"]]
@@ -164,6 +176,16 @@ $(function () {
         $(document).on("click", ".party-update", function () {
             partyManager.handleClick(this)
         });
+
+        // Handle Improved Initiative button clicks
+        $(document).on("click", "#run_in_ii_button", function () {
+            var monsters = JSON.parse(window.localStorage.getItem("monsters"));
+            var monsterData = window.monsterDataTable.data().toArray()
+
+            var combatants = improvedInitiativeService.generateCombatantPayload(monsters, monsterData)
+
+            improvedInitiativeService.openImprovedInitiative({ Combatants: combatants });
+        })
 
         // Handle sort updates
         $(document).on("click", ".updater_button", function () {
