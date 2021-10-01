@@ -9,3 +9,4 @@ pyvenv.cfg
 file:*
 .coverage
 .nyc_output/*
+pylintbadge

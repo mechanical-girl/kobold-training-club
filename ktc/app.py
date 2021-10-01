@@ -11,7 +11,7 @@ except ModuleNotFoundError:
     from ktc import api  # type: ignore
     from ktc import converter  # type: ignore
 
-version = "v0.3.0"
+version = "v0.4.0"
 
 app = Flask(__name__)
 path_to_database = os.path.abspath(os.path.join(
