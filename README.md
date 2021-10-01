@@ -2,6 +2,7 @@
 
 [![codecov](https://codecov.io/gh/struandw/kobold-training-club/branch/master/graph/badge.svg?token=YHPHF6CDMG)](https://codecov.io/gh/struandw/kobold-training-club)
 [![Build Status](https://app.travis-ci.com/struandw/kobold-training-club.svg?branch=master)](https://app.travis-ci.com/github/struandw/kobold-training-club)
+[ktc.svg](ktc.svg)
 
 ## Quickstart Guide
 ### Required Software
@@ -33,6 +34,7 @@ flask run
 
 ### Browserify JS Changes
 ```bash
-browserify ktc/static/js/main.js -o ktc/static/js/bundle.js
+browserify ktc/static/js/js/* -o ktc/static/js/bundle.js
+# Optionally, to automatically update bundle.js ```
+watchify ktc/static/js/js/* -o ktc/static/js/bundle.js -v &
 ```
-
