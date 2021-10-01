@@ -18,10 +18,18 @@ var listElements = function (data, prefix = "") {
     return listText;
 };
 
+
 module.exports = listElements
 
 },{}],2:[function(require,module,exports){
 // encounter-manager.js
+var escapeText = function (text) {
+    return text.replace(/&/g, '&amp;')
+        .replace(/>/g, '&gt;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
 
 var cr_xp_mapping = {
     "0": 10,
@@ -78,7 +86,8 @@ var addMonster = function (cell) {
     var monsterListDiv = $("#monsterList");
     var row = $(cell).parent()
     var monsterName = $(row).children("td:first-child").text()
-    var monsterSource = $(row).children("td:last-child").text()
+
+    // increase monster count if already in list
     for (var i = 0; i < $('#monsterList').children('div').length; i++) {
         var monsterDiv = $('#monsterList').children('div')[i]
         if (monsterName == monsterDiv.id) {
@@ -86,7 +95,9 @@ var addMonster = function (cell) {
             return
         }
     }
-    level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsterName + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
+
+    // add monster to list with count 1
+    level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + escapeText(monsterName) + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
     monsterListDiv.append(level_holder);
 
     updateEncounterDifficulty();
@@ -137,7 +148,10 @@ var highlightEncounterDifficulty = function () {
     $(".exp-list.deadly").css("background-color", highlight_colours[3])
     $(".exp-list.daily").css("background-color", highlight_colours[4])
     for (var i = 0; i < window.partyThresholds.length; i++) {
-        if (window.encounterDifficulty > window.partyThresholds[i]) {
+        if (window.encounterDifficulty < window.partyThresholds[0]) {
+            $(".exp-list").css("opacity", "0.7");
+            $(".exp-list").css("font-weight", "normal");
+        } else if (window.encounterDifficulty > window.partyThresholds[i]) {
             $(".exp-list").css("opacity", "0.7");
             $(".exp-list").css("font-weight", "normal");
             $(".exp-list." + difficulties[i]).css("opacity", "1")
@@ -185,10 +199,82 @@ var colourCell = function (cellData) {
             return highlight_colours[i]
         }
     }
-
 }
-module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell }
+
+var colourAllCells = function () {
+    var cells = $("#monsterTable .crCell")
+    for (var i = 0; i < cells.length; i++) {
+        let cell = cells[i];
+        $(cell).css("background-color", colourCell($(cell).text()))
+    }
+}
+
+module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell, colourAllCells: colourAllCells }
 },{}],3:[function(require,module,exports){
+// https://github.com/Asmor/5e-monsters/blob/master/app/services/integration.service.js
+
+var generateCombatantPayload = function (monsters, monsterData) {
+    var combatants = [];
+    monsters.forEach(function (itm) {
+        var name = itm[0];
+        var qty = itm[1];
+        var hp = 0;
+        var init = 0;
+        var ac = 0;
+        var fid = "<unknown>";
+
+        // find more data by name
+        for (var itmData of monsterData) {
+            if (itmData[0] == name) {
+                fid = itmData[8];
+                hp = parseInt(itmData[9]);
+                ac = parseInt(itmData[10]);
+                init = parseInt(itmData[11]);
+                break;
+            }
+        }
+
+        for (var i = 1; i <= qty; i++) {
+            combatants.push({
+                Name: name,
+                HP: { Value: hp },
+                TotalInitiativeModifier: init,
+                AC: { Value: ac },
+                Player: "npc",
+                Id: fid,
+            });
+        }
+    });
+
+    return combatants;
+}
+
+function openImprovedInitiative(data) {
+    var form = document.createElement("form");
+    form.style.display = "none";
+    form.setAttribute("method", "POST");
+    form.setAttribute("action", "https://www.improved-initiative.com/launchencounter/");
+
+    Object.keys(data).forEach(function (key) {
+        var textarea = document.createElement("input");
+        textarea.setAttribute("type", "hidden");
+        textarea.setAttribute("name", key);
+        textarea.setAttribute("value", JSON.stringify(data[key]));
+
+        form.appendChild(textarea);
+    });
+
+    window.document.body.appendChild(form);
+    form.submit();
+    form.parentNode.removeChild(form);
+}
+
+module.exports = {
+    generateCombatantPayload: generateCombatantPayload,
+    openImprovedInitiative: openImprovedInitiative
+}
+
+},{}],4:[function(require,module,exports){
 (function (global){(function (){
 const listElements = require('./element_lister.js')
 const updaterButton = require('./updater-button.js')
@@ -197,6 +283,7 @@ var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "u
 const partyManager = require('./party-manager.js');
 const encounterManager = require('./encounter-manager.js')
 const sourcesManager = require('./sources-manager.js');
+const improvedInitiativeService = require('./improved-initiative-service.js');
 window.monsterParameters = {};
 window.monsterDataTable;
 window.partyThresholds = []
@@ -211,12 +298,89 @@ var getMonsterParameters = function () {
     };
 }
 
+var createMonsterTable = function () {
+    // Populate the monster table
+
+    window.monsterDataTable = $('#monsterTable').DataTable({
+        "ajax": {
+            "url": '/api/monsters',
+            "type": 'POST',
+            "data": getMonsterParameters
+        },
+        "aoColumns": [
+            {
+                "bSortable": true,
+                "sType": "name"
+            },
+            {
+                "bSortable": true,
+                "sType": "cr",
+            },
+            { "bSortable": true },
+            { "bSortable": true },
+            { "bSortable": false },
+            { "bSortable": false },
+            { "bSortable": true },
+            { "bSortable": true },
+            { "bSortable": false },
+            { "bSortable": false },
+            { "bSortable": false },
+            { "bSortable": false },
+        ],
+        "columnDefs": [
+            {
+                "targets": [0, 1, 2, 3, 4],
+                "className": "not-a-link",
+            },
+            {
+                "targets": 1,
+                "createdCell": function (td, cellData, rowData, row, col) {
+                    $(td).css('background-color', encounterManager.colourCell(cellData));
+                    $(td).attr("class", "crCell not-a-link");
+                }
+            },
+            {
+                "targets": [4, 5],
+                "visible": false,
+            },
+            {
+                "targets": [8, 9, 10, 11],
+                "className": "invisibleColumn"
+            }
+        ],
+        "order": [[0, "asc"]]
+
+    });
+    $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) {
+        a = updaterButton.floatify(a);
+        b = updaterButton.floatify(b);
+        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    }
+    $.fn.dataTableExt.oSort["cr-asc"] = function (a, b) {
+        a = updaterButton.floatify(a);
+        b = updaterButton.floatify(b);
+        return ((a > b) ? -1 : ((a < b) ? 1 : 0));
+    }
+    $.fn.dataTableExt.oSort["name-desc"] = function (a, b) { return b.localeCompare(a) }
+    $.fn.dataTableExt.oSort["name-asc"] = function (a, b) { return a.localeCompare(b) }
+    window.monsterDataTable.columns.adjust().draw();
+}
+
+
 $(function () {
+    // Show any alerts if neede
+    let versionNumber = $("#version-number").text().slice(1);
+    if (window.localStorage.getItem('lastVersion') != versionNumber && $("#patchNotesModal .modal-body").text().length > 20) {
+        window.localStorage.setItem('lastVersion', versionNumber)
+        $('#patchNotesModal').modal('show')
+    }
+
     // Populate the first five accordions
+    var listPopulatorPromises = []
     selectors = ["sources", "environments", "sizes", "types", "alignments"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i]
-        $.getJSON("/api/" + selector, function (data) {
+        listPopulatorPromises.push($.getJSON("/api/" + selector, function (data) {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
             if (selector == "sources") {
@@ -224,16 +388,18 @@ $(function () {
                 sourcesManager.getUnofficialSources();
             }
             window.monsterParameters[selector] = data
-        });
-    }
+        }));
+    };
 
 
     // Populate the last accordion
-    $.getJSON("/api/crs", function (data) {
+    listPopulatorPromises.push($.getJSON("/api/crs", function (data) {
         var min = $("#challengeRatingMinimum");
         var max = $("#challengeRatingMaximum");
         let min_cr_stored = JSON.parse(window.localStorage.getItem("minCr"))
         let max_cr_stored = JSON.parse(window.localStorage.getItem("maxCr"))
+        let allowNamed = JSON.parse(window.localStorage.getItem("allowNamed"))
+        let allowLegendary = JSON.parse(window.localStorage.getItem("allowLegendary"))
         if (min_cr_stored == null) {
             min_cr_stored = data[0]
             max_cr_stored = data.slice(-1)
@@ -253,124 +419,136 @@ $(function () {
 
         }
 
+        $("#allowLegendary").prop("checked", true)
+        $("#allowNamed").prop("checked", true)
+        if (allowLegendary != null && allowLegendary) {
+            $("#allowLegendary").prop("checked", true)
+        }
+        if (allowNamed == false) {
+            $("#allowNamed").prop("checked", false)
+        }
+
         updaterButton.sortTable($("#challengeRatingSelectorDiv .updater_button"));
 
-    })
 
-    // Populate the monster table
-
-    monsterDataTable = $('#monsterTable').DataTable({
-        "ajax": {
-            "url": '/api/monsters',
-            "type": 'POST',
-            "data": getMonsterParameters
-        },
-        "aoColumns": [
-            { "bSortable": true },
-            {
-                "bSortable": true,
-                "sType": "cr",
-            },
-            { "bSortable": true },
-            { "bSortable": true },
-            { "bSortable": true },
-            { "bSortable": true }
-        ],
-        "columnDefs": [
-            { className: "not-a-link", "targets": [0, 1, 2, 3, 4] },
-            {
-                "targets": 1,
-                "createdCell": function (td, cellData, rowData, row, col) {
-                    $(td).css('background-color', encounterManager.colourCell(cellData))
-                }
-            }
-        ]
-    });
-    $.fn.dataTableExt.oSort["cr-desc"] = function (a, b) { return updaterButton.floatify(a) < updaterButton.floatify(b); }
-    $.fn.dataTableExt.oSort["cr-asc"] = function (a, b) { return updaterButton.floatify(a) > updaterButton.floatify(b); }
-    window.monsterDataTable.columns.adjust().draw();
-
-    // Populate the character selectors
-    var party = JSON.parse(window.localStorage.getItem("party"));
-    if (party != null) {
-        for (var i = 0; i < party.length; i++) {
-            partyManager.createCharLevelCombo(party[i][0], party[i][1]);
-        }
-    } else {
-        partyManager.createCharLevelCombo();
-    }
-    partyManager.updateThresholds();
-
-    encounterManager.importEncounter();
-
-
-    $(document).on("click", ".party-update", function () {
-        partyManager.handleClick(this)
-    });
-
-    // Handle sort updates
-    $(document).on("click", ".updater_button", function () {
-        updaterButton.sortTable(this);
-    })
-
-    $(".toggle_all_button").on("click", function () {
-        updaterButton.toggleAll(this);
-    })
-
-    $(document).on("click", "#customSourceFinder .unofficial-source", function () {
-        sourcesManager.moveSourceCheckbox(this);
-    })
-
-    // Handle monster adds
-    $(document).on("click", "#monsterTable > tbody > tr > .not-a-link", function () {
-        encounterManager.addMonster(this);
-    })
-
-    $(document).on("click", ".encounter-update", function () {
-        encounterManager.updateMonsterCount(this);
-    })
-
-    $(document).on("change", "select", function () {
-        partyManager.updateThresholds();
-    })
-
-
-    $(document).on("input", "#customSourceSearcher", function () {
-        sourcesManager.searchSources(unofficialSourceNames);
-    })
-
-    $(document).on("input", "#sourceKeyInput", function () {
-        key = $("#sourceKeyInput").val()
-        $('#sourceKeyManagementDiv .alert').remove();
-        $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Requesting the sheet now...</div >')
-        var customSourceSheetRequest = $.get('https://docs.google.com/spreadsheet/pub?key=' + key + '&output=csv');
-        customSourceSheetRequest.done(function (data) {
-            $('#sourceKeyManagementDiv .alert').remove();
-            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Sheet received. Processing the sheet now...</div >')
-            var customSheetProcessRequest = $.ajax({
-                type: "POST",
-                url: "api/processCSV",
-                data: { csv: JSON.stringify(data), key: JSON.stringify(key) },
-            })
-            customSheetProcessRequest.done(function (results) {
-                customSourceNames[customSourceNames.length] = results["name"];
-                $('#sourceKeyManagementDiv .alert').remove();
-                $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Source ' + results['name'] + ' processed! Search for it in the box above.</div >')
-                $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
-            })
-            customSheetProcessRequest.fail(function () {
-                $('#sourceKeyManagementDiv .alert').remove();
-                $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" id="processing-custom-source-alert role="alert">Processing on this sheet failed. Please check that it\'s valid. If you\'re sure it is, please open an issue on Github.</div >')
-            })
+        table = $("#monsterTable").DataTable();
+        table.on('draw', function () {
+            encounterManager.colourAllCells();
         })
-        customSourceSheetRequest.fail(function (jqXHR, textStatus, errorThrown) {
-            $('#sourceKeyManagementDiv .alert').remove();
-            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" role="alert">Error: ' + jqXHR.status + '.\n If you\'re sure the sheet exists, please open an issue on Github.</div >')
+
+    }))
+
+    $.when(listPopulatorPromises).done(function (listPopulatorPromises) {
+        createMonsterTable()
+
+
+        // Populate the character selectors
+        var party = JSON.parse(window.localStorage.getItem("party"));
+        if (party != null) {
+            for (var i = 0; i < party.length; i++) {
+                partyManager.createCharLevelCombo(party[i][0], party[i][1]);
+            }
+        } else {
+            partyManager.createCharLevelCombo();
+        }
+        partyManager.updateThresholds();
+
+        encounterManager.importEncounter();
+
+        $(document).on("click", "#updatesNotesModal .close", function () {
+            $("#updatesNotesModal").modal('hide');
+        })
+
+        $(document).on("click", ".party-update", function () {
+            partyManager.handleClick(this)
         });
+
+        // Handle Improved Initiative button clicks
+        $(document).on("click", "#run_in_ii_button", function () {
+            var monsters = JSON.parse(window.localStorage.getItem("monsters"));
+            var monsterData = window.monsterDataTable.data().toArray()
+
+            var combatants = improvedInitiativeService.generateCombatantPayload(monsters, monsterData)
+
+            improvedInitiativeService.openImprovedInitiative({ Combatants: combatants });
+        })
+
+        // Handle sort updates
+        $(document).on("click", ".updater_button", function () {
+            updaterButton.sortTable(this);
+        })
+
+        $(".toggle_all_button").on("click", function () {
+            updaterButton.toggleAll(this);
+        })
+
+        $(document).on("click", "#customSourceFinder .unofficial-source", function () {
+            sourcesManager.moveSourceCheckbox(this);
+        })
+
+        // Handle monster adds
+        $(document).on("click", "#monsterTable > tbody > tr > .not-a-link", function () {
+            encounterManager.addMonster(this);
+        })
+
+        $(document).on("click", ".encounter-update", function () {
+            encounterManager.updateMonsterCount(this);
+        })
+
+        $(document).on("change", "select", function () {
+            partyManager.updateThresholds();
+        })
+
+
+        $(document).on("input", "#customSourceSearcher", function () {
+            sourcesManager.searchSources(unofficialSourceNames);
+        })
+
+        $(document).on("input", "#sourceKeyInput", function () {
+            $('#sourceKeyManagementDiv .alert').remove();
+            key = $("#sourceKeyInput").val()
+            if (key == "") { return }
+            $('#sourceKeyManagementDiv .alert').remove();
+            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Requesting the sheet now...</div >')
+            var checkIfSheetProcessed = $.ajax({ type: "POST", url: "/api/checksource", data: { key: JSON.stringify(key) } });
+            checkIfSheetProcessed.done(function (data) {
+                if (data == "") {
+                    var customSourceSheetRequest = $.get('https://docs.google.com/spreadsheet/pub?key=' + key + '&output=csv');
+                    customSourceSheetRequest.done(function (data) {
+                        $('#sourceKeyManagementDiv .alert').remove();
+                        $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Sheet received. Processing the sheet now...</div >')
+                        var customSheetProcessRequest = $.ajax({
+                            type: "POST",
+                            url: "api/processCSV",
+                            data: { csv: JSON.stringify(data), key: JSON.stringify(key) },
+                        })
+                        customSheetProcessRequest.done(function (results) {
+                            customSourceNames[customSourceNames.length] = results["name"];
+                            $('#sourceKeyManagementDiv .alert').remove();
+                            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Source ' + results['name'] + ' processed! Search for it in the box above.</div >')
+                            $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
+                        })
+                        customSheetProcessRequest.fail(function () {
+                            $('#sourceKeyManagementDiv .alert').remove();
+                            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" id="processing-custom-source-alert role="alert">Processing on this sheet failed. Please check that it\'s valid. If you\'re sure it is, please open an issue on Github.</div >')
+                        })
+                    })
+                    customSourceSheetRequest.fail(function (jqXHR, textStatus, errorThrown) {
+                        $('#sourceKeyManagementDiv .alert').remove();
+                        $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" role="alert">Error: ' + jqXHR.status + '.\n If you\'re sure the sheet exists, please open an issue on Github.</div >')
+                    });
+                } else {
+                    $('#sourceKeyManagementDiv .alert').remove();
+                    $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Source ' + data + ' processed! Search for it in the box above.</div >')
+
+                }
+            })
+
+        })
     })
 })
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./element_lister.js":1,"./encounter-manager.js":2,"./party-manager.js":4,"./sources-manager.js":5,"./updater-button.js":6}],4:[function(require,module,exports){
+},{"./element_lister.js":1,"./encounter-manager.js":2,"./improved-initiative-service.js":3,"./party-manager.js":5,"./sources-manager.js":6,"./updater-button.js":7}],5:[function(require,module,exports){
 //party-manager.js
 
 const encounterManager = require("./encounter-manager");
@@ -439,15 +617,17 @@ var updateThresholds = function () {
             displayDiv.append('<div class="row float-end"><div class="col exp-list deadly">Deadly: ' + result[3].toLocaleString("en-GB") + 'exp</div></div>');
             displayDiv.append('<div class="row float-end"><div class="col exp-list daily">Daily: ' + result[4].toLocaleString("en-GB") + 'exp</div></div>');
             window.partyThresholds = result;
-            encounterManager.highlightEncounterDifficulty()
+            encounterManager.highlightEncounterDifficulty();
+            encounterManager.colourAllCells();
         }
 
     })
+
 }
 
 module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds }
 
-},{"./encounter-manager":2}],5:[function(require,module,exports){
+},{"./encounter-manager":2}],6:[function(require,module,exports){
 // sources-manager.js
 
 const listElements = require('./element_lister.js')
@@ -482,7 +662,7 @@ var moveSourceCheckbox = function (checked_box) {
     $('#customSourcesUsed').append(li);
 }
 module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceCheckbox, getUnofficialSources: getUnofficialSources }
-},{"./element_lister.js":1}],6:[function(require,module,exports){
+},{"./element_lister.js":1}],7:[function(require,module,exports){
 // updater-button.js
 
 var AssociatedId = function (clicked_button) {
@@ -522,6 +702,8 @@ var floatify = function (number) {
 var getUpdatedChallengeRatings = function () {
     var minValue = $("#minCr option:selected").attr("value");
     var maxValue = $("#maxCr option:selected").attr("value");
+    var allowLegendary = $("#allowLegendary").prop("checked");
+    var allowNamed = $("#allowNamed").prop("checked");
     minValueComp = floatify(minValue)
     maxValueComp = floatify(maxValue)
     var alerts = $("#challengeRatingSelectorDiv .alert")
@@ -532,7 +714,9 @@ var getUpdatedChallengeRatings = function () {
     }
     window.localStorage.setItem("minCr", JSON.stringify(minValue))
     window.localStorage.setItem("maxCr", JSON.stringify(maxValue))
-    return [minValue, maxValue];
+    window.localStorage.setItem("allowLegendary", JSON.stringify(allowLegendary))
+    window.localStorage.setItem("allowNamed", JSON.stringify(allowNamed))
+    return [minValue, maxValue, allowLegendary, allowNamed];
 }
 
 var sortTable = function (clicked_button) {
@@ -541,11 +725,12 @@ var sortTable = function (clicked_button) {
         var values = getUpdatedChallengeRatings();
         monsterParameters["minimumChallengeRating"] = values[0]
         monsterParameters["maximumChallengeRating"] = values[1]
+        monsterParameters["allowLegendary"] = values[2]
+        monsterParameters["allowNamed"] = values[3]
     } else {
         listUpdatedName = listUpdated.split("_")[0];
         window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
     }
-    console.log(window.monsterParameters)
     window.monsterDataTable.ajax.reload();
     window.monsterDataTable.columns.adjust().draw();
 }
@@ -566,4 +751,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[1,3,4,6,2,5]);
+},{}]},{},[1,4,5,7,2,6]);

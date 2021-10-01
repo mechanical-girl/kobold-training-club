@@ -22,6 +22,14 @@
         i {
             font-size: 150%;
         }
+
+        ul {
+            list-style-type: none;
+        }
+
+        th.invisibleColumn, td.invisibleColumn {
+            display: none;
+        }
     </style>
 </head>
 
@@ -29,6 +37,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Kobold Training Club</a>
+            <span class="navbar-text" id="version-number">{{ version }}</span>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
                 aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -48,6 +57,47 @@
             </div>
         </div>
     </nav>
+    <!-- Patch Notes Modal-->
+    <div class="modal fade" id="patchNotesModal" tabindex="-1" aria-labelledby="patchNotesModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="patchNotesModalLabel">Welcome to {{ version }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% include 'version-notes.html' %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Alignments Modal -->
+    <div class="modal fade" id="alignmentsModal" tabindex="-1" aria-labelledby="alignmentsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alignmentsModalLabel">A Note On Alignments</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>It's important to note that when you choose to sort by an option like "non-good" or "any lawful",
+                        Kobold Training Club only searches for monsters with that exact phrasing.</p>
+                    <p>For instance, if you look at the stat block for an Assassin, you will see that the alignment is
+                        given as "non-good." Likewise, the Alhoon has an alignment of "any evil".</p>
+                    <p>To search for any evil monster, you should check the following boxes: any evil, chaotic evil,
+                        lawful evil, and neutral evil.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container" style="font-size: 10pt; margin-top: 25px;">
         <div class="row">
             <div class="col-4">
@@ -154,7 +204,9 @@
                                 <ul id="alignments_selector">
                                 </ul>
                                 <button class="updater_button">Update</button>
-                                <button class="toggle_all_button">Deselect All</button>
+                                <button class="toggle_all_button">Deselect All</button><i
+                                    class="bi bi-question-circle btn" data-bs-toggle="modal"
+                                    data-bs-target="#alignmentsModal"></i>
                             </div>
                         </div>
                     </div>
@@ -163,7 +215,7 @@
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#collapseChallengeRatings" aria-expanded="false"
                                 aria-controls="collapseChallengeRatings">
-                                Challenge Ratings
+                                Challenge Ratings, Named, and Legendary
                             </button>
                         </h2>
                         <div id="collapseChallengeRatings" class="accordion-collapse collapse"
@@ -174,6 +226,13 @@
                                 </div>
                                 <div id="maxCr">
                                     Maximum Challenge Rating<select id="challengeRatingMaximum"></select>
+                                </div>
+                                <div id="legendary">
+                                    <input type="checkbox" id="allowLegendary">Include Monsters with Legendary
+                                    Actions/Resistances
+                                </div>
+                                <div id="named">
+                                    <input type="checkbox" id="allowNamed">Include Named Monsters
                                 </div>
                                 <button class="updater_button">Update</button>
                             </div>
@@ -195,8 +254,8 @@
                     <div class="col-5">
                         <h4>Your Encounter <span id="encounterDifficulty"></span></h4>
                         <div class="row" id="monsterList">
-
                         </div>
+                        <button type="button" id="run_in_ii_button" class="btn btn-success">Run in Improved Initiative</button>
                     </div>
 
                 </div>
@@ -208,8 +267,14 @@
                                 <th scope="col">CR</th>
                                 <th scope="col">Size</th>
                                 <th scope="col">Type</th>
+                                <th scope="col">Tags</th>
+                                <th scope="col">Section</th>
                                 <th scope="col">Alignment</th>
                                 <th scope="col">Source(s)</th>
+                                <th scope="col">FID</th>
+                                <th scope="col">HP</th>
+                                <th scope="col">AC</th>
+                                <th scope="col">Init</th>
                             </tr>
                         </thead>
                         <tbody>

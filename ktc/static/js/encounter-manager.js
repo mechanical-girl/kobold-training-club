@@ -1,4 +1,11 @@
 // encounter-manager.js
+var escapeText = function (text) {
+    return text.replace(/&/g, '&amp;')
+        .replace(/>/g, '&gt;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
 
 var cr_xp_mapping = {
     "0": 10,
@@ -55,7 +62,8 @@ var addMonster = function (cell) {
     var monsterListDiv = $("#monsterList");
     var row = $(cell).parent()
     var monsterName = $(row).children("td:first-child").text()
-    var monsterSource = $(row).children("td:last-child").text()
+
+    // increase monster count if already in list
     for (var i = 0; i < $('#monsterList').children('div').length; i++) {
         var monsterDiv = $('#monsterList').children('div')[i]
         if (monsterName == monsterDiv.id) {
@@ -63,7 +71,9 @@ var addMonster = function (cell) {
             return
         }
     }
-    level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsterName + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
+
+    // add monster to list with count 1
+    level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + escapeText(monsterName) + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
     monsterListDiv.append(level_holder);
 
     updateEncounterDifficulty();
@@ -114,7 +124,10 @@ var highlightEncounterDifficulty = function () {
     $(".exp-list.deadly").css("background-color", highlight_colours[3])
     $(".exp-list.daily").css("background-color", highlight_colours[4])
     for (var i = 0; i < window.partyThresholds.length; i++) {
-        if (window.encounterDifficulty > window.partyThresholds[i]) {
+        if (window.encounterDifficulty < window.partyThresholds[0]) {
+            $(".exp-list").css("opacity", "0.7");
+            $(".exp-list").css("font-weight", "normal");
+        } else if (window.encounterDifficulty > window.partyThresholds[i]) {
             $(".exp-list").css("opacity", "0.7");
             $(".exp-list").css("font-weight", "normal");
             $(".exp-list." + difficulties[i]).css("opacity", "1")
@@ -162,6 +175,14 @@ var colourCell = function (cellData) {
             return highlight_colours[i]
         }
     }
-
 }
-module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell }
+
+var colourAllCells = function () {
+    var cells = $("#monsterTable .crCell")
+    for (var i = 0; i < cells.length; i++) {
+        let cell = cells[i];
+        $(cell).css("background-color", colourCell($(cell).text()))
+    }
+}
+
+module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell, colourAllCells: colourAllCells }
