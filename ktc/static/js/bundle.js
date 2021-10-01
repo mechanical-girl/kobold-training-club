@@ -566,4 +566,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[1,3,4,6]);
+},{}]},{},[1,3,4,6,2,5]);
