@@ -275,6 +275,9 @@ module.exports = {
 }
 
 },{}],4:[function(require,module,exports){
+module.exports = window.jQuery;
+
+},{}],5:[function(require,module,exports){
 (function (global){(function (){
 const listElements = require('./element_lister.js')
 const updaterButton = require('./updater-button.js')
@@ -548,7 +551,7 @@ $(function () {
     })
 })
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./element_lister.js":1,"./encounter-manager.js":2,"./improved-initiative-service.js":3,"./party-manager.js":5,"./sources-manager.js":6,"./updater-button.js":7}],5:[function(require,module,exports){
+},{"./element_lister.js":1,"./encounter-manager.js":2,"./improved-initiative-service.js":3,"./party-manager.js":6,"./sources-manager.js":7,"./updater-button.js":8}],6:[function(require,module,exports){
 //party-manager.js
 
 const encounterManager = require("./encounter-manager");
@@ -627,7 +630,7 @@ var updateThresholds = function () {
 
 module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds }
 
-},{"./encounter-manager":2}],6:[function(require,module,exports){
+},{"./encounter-manager":2}],7:[function(require,module,exports){
 // sources-manager.js
 
 const listElements = require('./element_lister.js')
@@ -662,7 +665,7 @@ var moveSourceCheckbox = function (checked_box) {
     $('#customSourcesUsed').append(li);
 }
 module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceCheckbox, getUnofficialSources: getUnofficialSources }
-},{"./element_lister.js":1}],7:[function(require,module,exports){
+},{"./element_lister.js":1}],8:[function(require,module,exports){
 // updater-button.js
 
 var AssociatedId = function (clicked_button) {
@@ -751,4 +754,4 @@ var toggleAll = function (clicked_button) {
 
 module.exports = { GetUpdatedValues: GetUpdatedValues, AssociatedId: AssociatedId, getUpdatedChallengeRatings: getUpdatedChallengeRatings, floatify: floatify, sortTable: sortTable, toggleAll: toggleAll }
 
-},{}]},{},[1,4,5,7,2,6]);
+},{}]},{},[1,2,3,4,5,6,7,8]);
