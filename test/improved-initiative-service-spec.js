@@ -109,44 +109,46 @@ describe('generateCombatantPayload', function () {
 
 describe('openImprovedInitiative', function () {
     it('should open Improved Initiative using the provided payload', function () {
-        var payload = { Combatants: [
-            {
-                "Name": "Aalpamac",
-                "HP": {
-                    "Value": 136
+        var payload = {
+            Combatants: [
+                {
+                    "Name": "Aalpamac",
+                    "HP": {
+                        "Value": 136
+                    },
+                    "TotalInitiativeModifier": 0,
+                    "AC": {
+                        "Value": 16
+                    },
+                    "Player": "npc",
+                    "Id": "tob2.aalpamac"
                 },
-                "TotalInitiativeModifier": 0,
-                "AC": {
-                    "Value": 16
+                {
+                    "Name": "Aalpamac",
+                    "HP": {
+                        "Value": 136
+                    },
+                    "TotalInitiativeModifier": 0,
+                    "AC": {
+                        "Value": 16
+                    },
+                    "Player": "npc",
+                    "Id": "tob2.aalpamac"
                 },
-                "Player": "npc",
-                "Id": "tob2.aalpamac"
-            },
-            {
-                "Name": "Aalpamac",
-                "HP": {
-                    "Value": 136
-                },
-                "TotalInitiativeModifier": 0,
-                "AC": {
-                    "Value": 16
-                },
-                "Player": "npc",
-                "Id": "tob2.aalpamac"
-            },
-            {
-                "Name": "Abjurer",
-                "HP": {
-                    "Value": 84
-                },
-                "TotalInitiativeModifier": 2,
-                "AC": {
-                    "Value": 12
-                },
-                "Player": "npc",
-                "Id": "volo.abjurer"
-            }
-        ] };
+                {
+                    "Name": "Abjurer",
+                    "HP": {
+                        "Value": 84
+                    },
+                    "TotalInitiativeModifier": 2,
+                    "AC": {
+                        "Value": 12
+                    },
+                    "Player": "npc",
+                    "Id": "volo.abjurer"
+                }
+            ]
+        };
 
         var submitted = false;
         var correctUrl = false;
@@ -163,12 +165,12 @@ describe('openImprovedInitiative', function () {
                             }
                         }
                     },
-                    appendChild: () => {},
+                    appendChild: () => { },
                     submit: () => {
                         submitted = true;
                     },
                     parentNode: {
-                        removeChild: () => {}
+                        removeChild: () => { }
                     }
                 }
             },

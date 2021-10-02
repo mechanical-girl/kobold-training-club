@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+"""A list of functions for performing encounter maths"""
+
 import contextlib
 import os
 import sqlite3
@@ -100,26 +103,34 @@ path_to_database = os.path.abspath(
 )
 db_location = path_to_database
 
-# Pass a list of tuples (number of characters, level of characters) to allow for multi-level messages
-# Pass an int of the encounter xp
-
 
 def diff_calc(party: PartyType, enc_xp: int) -> str:
+    """Calculate which threshold an encounter meets for a given party"""
     party_thresholds = party_thresholds_calc(party)
 
     if enc_xp < party_thresholds[0]:
-        return "trifling"
+        threshold = "trifling"
     elif enc_xp < party_thresholds[1]:
-        return "easy"
+        threshold = "easy"
     elif enc_xp < party_thresholds[2]:
-        return "medium"
+        threshold = "medium"
     elif enc_xp < party_thresholds[3]:
-        return "hard"
+        threshold = "hard"
     else:
-        return "deadly"
+        threshold = "deadly"
+
+    return threshold
 
 
 def party_thresholds_calc(party: PartyType) -> List[int]:
+    """Generates a list of XP thresholds for encounters based on the party
+
+    Args:
+        party (PartyType): the party to calculate the thresholds for
+
+    Returns:
+        List[int]: a list of xp values where each threshold is
+    """
     party_thresholds = [0, 0, 0, 0, 0]
     for tup in party:
         (size, level) = tup
@@ -132,11 +143,18 @@ def party_thresholds_calc(party: PartyType) -> List[int]:
 
 # Pass a list of CRs and a list of quantities of monsters
 # TODO: refactor to a list of tuples (cr, quantity)
-def cr_calc(cr: List[str], quantities: List[int]) -> int:
-    # Loop through the two lists to get the xp of the monster and multiply by the number of them
-    # then add that to the total
+def cr_calc(challenge_ratings: List[str], quantities: List[int]) -> int:
+    """Adjust the CR of an encounter to take into account monster quantity multipliers
+
+    Args:
+        cr (List[str]): A list of the crs of the monsters in the encounter
+        quantities (List[int]): a list of the numbers of each monster
+
+    Returns:
+        int: the XP the encounter is worth, adjusted based on the number of enemies
+    """
     unadj_cr_total = 0
-    for i, monster_cr in enumerate(cr):
+    for i, monster_cr in enumerate(challenge_ratings):
         unadj_cr_total += cr_xp_mapping[monster_cr] * quantities[i]
 
     quantity: int = sum(quantities)
@@ -158,18 +176,26 @@ def cr_calc(cr: List[str], quantities: List[int]) -> int:
 
 
 def get_monster_cr(monster: str) -> str:
+    """Return the CR of a monster given its name"""
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
-        c = conn.cursor()
-        conn.set_trace_callback(print)
-        print(f"Monster: {monster}")
-        c.execute("""SELECT cr FROM monsters WHERE name = ?""", (monster,))
-        monster_cr = c.fetchone()[0]
+        cursor = conn.cursor()
+        # conn.set_trace_callback(print)
+        cursor.execute(
+            """SELECT cr FROM monsters WHERE name = ?""", (monster,))
+        monster_cr = cursor.fetchone()[0]
     return monster_cr
 
 
-def get_encounter_difficulty(
-    party: PartyType, monsters: MonstersType
-) -> Tuple[int, str]:
+def get_encounter_difficulty(party: PartyType, monsters: MonstersType) -> Tuple[int, str]:
+    """Return the XP earned in an encounter and which threshold it meets
+
+    Args:
+        party (PartyType): The party which will face the monsters
+        monsters (MonstersType): The monsters making up the encounter
+
+    Returns:
+        Tuple[int, str]: A tuple of the XP earned in an encounter and which threshold it meets
+    """
     crs = []
     quantities = []
 

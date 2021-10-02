@@ -34,7 +34,8 @@ flask run
 
 ### Browserify JS Changes
 ```bash
-browserify ktc/static/js/js/* -o ktc/static/js/bundle.js
+cd static/js
+browserify element_lister.js encounter-manager.js improved-initiative-service.js main.js party-manager.js sources-manager.js updater-button.js -o bundle.js
 # Optionally, to automatically update bundle.js ```
-watchify ktc/static/js/js/* -o ktc/static/js/bundle.js -v &
+watchify element_lister.js encounter-manager.js improved-initiative-service.js main.js party-manager.js sources-manager.js updater-button.js -o bundle.js &
 ```

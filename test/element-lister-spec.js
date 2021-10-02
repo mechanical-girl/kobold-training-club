@@ -14,4 +14,4 @@ describe('#listEnvironments', function () {
         var actual = listElements(list_of_items);
         expect(expected).toEqual(actual)
     })
-})
+});

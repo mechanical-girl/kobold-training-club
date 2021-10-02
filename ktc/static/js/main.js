@@ -1,9 +1,10 @@
-const listElements = require('./element_lister.js')
-const updaterButton = require('./updater-button.js')
+require('requirish')._(module);
 // https://stackoverflow.com/questions/23125338/how-do-i-use-browserify-with-external-dependencies
 var $ = require('jQuery');
+const listElements = require('./element_lister.js');
+const updaterButton = require('./updater-button.js');
 const partyManager = require('./party-manager.js');
-const encounterManager = require('./encounter-manager.js')
+const encounterManager = require('./encounter-manager.js');
 const sourcesManager = require('./sources-manager.js');
 const improvedInitiativeService = require('./improved-initiative-service.js');
 window.monsterParameters = {};

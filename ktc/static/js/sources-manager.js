@@ -1,6 +1,6 @@
 // sources-manager.js
 
-const listElements = require('./element_lister.js')
+const listElements = require('./element_lister.js');
 
 var searchSources = function () {
     var searchTerm = $("#customSourceSearcher").val();
@@ -19,7 +19,7 @@ var getUnofficialSources = function () {
     $.getJSON('/api/unofficialsources').done(function (response) {
         unofficialSourceNames = response;
         $("#customSourcesUsed").empty;
-        $("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"))
+        $("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"));
     })
 }
 
