@@ -41,6 +41,7 @@ function openImprovedInitiative(data) {
     form.style.display = "none";
     form.setAttribute("method", "POST");
     form.setAttribute("action", "https://www.improved-initiative.com/launchencounter/");
+    form.setAttribute("target", "_blank")
 
     Object.keys(data).forEach(function (key) {
         var textarea = document.createElement("input");
