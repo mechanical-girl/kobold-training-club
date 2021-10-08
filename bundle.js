@@ -1,0 +1,1 @@
+console.error("Error: Can't walk dependency graph: Cannot find module '/Users/struan/Documents/kobold-training-club/element_lister.js' from '/Users/struan/Documents/kobold-training-club/_fake.js'\n    required by /Users/struan/Documents/kobold-training-club/_fake.js");

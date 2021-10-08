@@ -14,10 +14,12 @@ from flask import Flask, jsonify, render_template, request
 
 try:
     import api  # type: ignore
+    import random_encounter_generator  # type: ignore
 except ModuleNotFoundError:
     from ktc import api  # type: ignore
+    from ktc import random_encounter_generator  # type: ignore
 
-version = "v0.4.0"
+VERSION = "v0.4.1"
 
 app = Flask(__name__)
 path_to_database = os.path.abspath(os.path.join(
@@ -29,13 +31,13 @@ db_location = path_to_database
 @app.route("/", methods=["GET", "POST", "PUT"])
 def home():
     """Renders the main encounter generator"""
-    return render_template("index.html", version=version)
+    return render_template("index.html", version=VERSION)
 
 
 @app.route("/index.html", methods=["GET", "POST", "PUT"])
 def index():
     """Renders the main encounter generator"""
-    return render_template("index.html", version=version)
+    return render_template("index.html", version=VERSION)
 
 
 @app.route("/about.html", methods=["GET", "POST", "PUT"])
@@ -126,6 +128,18 @@ def check_if_key_processed():
     """Checks if the existing key has been processed"""
     key = json.loads(request.values["key"])
     result = api.check_if_key_processed(key)
+    return jsonify(result)
+
+
+@app.route("/api/encountergenerator", methods=["GET", "POST"])
+def generate_encounter():
+    """Wrapper for the encounter generator function"""
+    try:
+        params = json.loads(request.values["params"])
+    except:
+        params = {"bing": "bong"}
+
+    result = random_encounter_generator.generate(params)
     return jsonify(result)
 
 
