@@ -220,6 +220,9 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     except (KeyError, IndexError):
         allow_named = True
 
+    if environment_constraints + size_constraints + source_constraints + type_constraints + alignment_constraints == []:
+        return {"data": []}
+
     # Oh, this is clumsy, I hate this
     where_requirements = ""
     query_arguments = []
