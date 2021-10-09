@@ -10,3 +10,4 @@ file:*
 .coverage
 .nyc_output/*
 pylintbadge
+bundle.js
