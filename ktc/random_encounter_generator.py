@@ -38,7 +38,11 @@ def fits_rarity(monster, encounter_rarity):
     else:
         monster_rarity = 3
 
-    monster_rarity += taldorei_type_rarity_modifiers[monster[3].lower()]
+    try:
+        # TODO allow user to define rarity modifiers
+        monster_rarity += taldorei_type_rarity_modifiers[monster[3].lower()]
+    except KeyError:
+        monster_rarity = 3
     if monster_rarity > 3:
         monster_rarity = 3
 
