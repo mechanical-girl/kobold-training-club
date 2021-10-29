@@ -19,7 +19,7 @@ except ModuleNotFoundError:
     from ktc import api  # type: ignore
     from ktc import random_encounter_generator  # type: ignore
 
-VERSION = "v0.4.1"
+VERSION = "v0.5"
 
 app = Flask(__name__)
 path_to_database = os.path.abspath(os.path.join(
