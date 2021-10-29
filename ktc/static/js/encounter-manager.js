@@ -63,6 +63,10 @@ var addMonster = function (cell) {
     var row = $(cell).parent()
     var monsterName = $(row).children("td:first-child").text()
 
+    addMonsterByName(monsterName);
+}
+
+const addMonsterByName = function(monsterName) {
     // increase monster count if already in list
     for (var i = 0; i < $('#monsterList').children('div').length; i++) {
         var monsterDiv = $('#monsterList').children('div')[i]
@@ -74,7 +78,8 @@ var addMonster = function (cell) {
 
     // add monster to list with count 1
     level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + escapeText(monsterName) + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
-    monsterListDiv.append(level_holder);
+
+    $("#monsterList").append(level_holder);
 
     updateEncounterDifficulty();
 }
@@ -163,6 +168,30 @@ var updateEncounterDifficulty = function () {
 
 }
 
+const clearEncounter = function() {
+    $("#monsterList").empty();
+}
+
+const generateEncounter = function(data) {
+    console.log(data)
+    let encounterRequest = $.ajax({
+        type: "POST",
+        url: '/api/encountergenerator',
+        data: {params: JSON.stringify(data)}
+    })
+    encounterRequest.done(function(results) {
+        console.log(results);
+        clearEncounter();
+        results.forEach(function(currentValue) {
+            addMonsterByName(currentValue)
+        })
+    })
+
+    encounterRequest.fail(function () {
+        $('.encounter-col').prepend('<div class="alert alert-danger" id="encounter-generation-alert" role="alert">Encounter generation failed. Please try again with different parameters.</div >')
+    })
+}
+
 var colourCell = function (cellData) {
     var monsterExp = cr_xp_mapping[cellData];
     if (monsterExp <= window.partyThresholds[0]) {
@@ -185,4 +214,4 @@ var colourAllCells = function () {
     }
 }
 
-module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell, colourAllCells: colourAllCells }
+module.exports = { addMonster: addMonster, updateMonsterCount: updateMonsterCount, highlightEncounterDifficulty: highlightEncounterDifficulty, importEncounter: importEncounter, colourCell: colourCell, colourAllCells: colourAllCells, generateEncounter: generateEncounter }

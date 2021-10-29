@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pprint
 import random
 from fractions import Fraction
 from typing import Dict, List, Tuple
@@ -9,6 +10,21 @@ try:
 except ModuleNotFoundError:
     from ktc import api  # type: ignore
     from ktc import main  # type: ignore
+
+
+class Monster:
+    """Just a simple monster object. Attributes & nothing else
+    """
+
+    def __init__(self, monster_as_list: List[str]):
+        self.name = monster_as_list[0]
+        self.cr = monster_as_list[1]
+        self.size = monster_as_list[2]
+        self.type = monster_as_list[3]
+        self.tags = monster_as_list[4]
+        self.section = monster_as_list[5]
+        self.alignment = monster_as_list[6]
+        self.sources = monster_as_list[7]
 
 
 def fits_rarity(monster, encounter_rarity):
@@ -31,17 +47,17 @@ def fits_rarity(monster, encounter_rarity):
     return False
 
 
-def randomise(monsters):
-    random_monsters = []
-    crs = [monster[1] for monster in monsters]
+def randomise_within_cr(monsters: List[Monster]) -> List[List[Monster]]:
+    monsters_by_cr = []
+    crs = [monster.cr for monster in monsters]
     crs = list(set(crs))
     crs.sort(key=lambda x: float(Fraction(x)))
     for cr in crs[::-1]:
-        cr_monsters = [monster for monster in monsters if monster[1] == cr]
+        cr_monsters = [monster for monster in monsters if monster.cr == cr]
         random.shuffle(cr_monsters)
-        random_monsters += cr_monsters
+        monsters_by_cr.append(cr_monsters)
 
-    return random_monsters
+    return monsters_by_cr
 
 
 rarities = ["common", "uncommon", "rare", "very rare"]
@@ -52,6 +68,47 @@ taldorei_type_rarity_modifiers = {"aberration": 1, "beast": 0, "celestial": 2, "
 
 
 def generate(params: Dict) -> List[Tuple[int, str]]:
+    pprint.pprint(params)
+    if "environments" in params:
+        environments = params["environments"]
+    else:
+        environments = []
+
+    if "sources" in params:
+        sources = params["sources"]
+    else:
+        sources = ['_Basic Rules v1',
+                   '_Curse of Strahd',
+                   '_Explorer\'s Guide to Wildemount',
+                   '_Ghosts of Saltmarsh',
+                   "_Guildmasters' Guide to Ravnica",
+                   '_Hoard of the Dragon Queen',
+                   '_Icewind Dale: Rime of the Frost Maiden',
+                   '_Into The Borderlands',
+                   '_Monster Manual',
+                   "_Mordenkainen's Tome of Foes",
+                   '_Mythic Odysseys of Theros',
+                   '_Out of the Abyss',
+                   "_Player's Handbook",
+                   '_Princes of the Apocalypse',
+                   '_Rise of Tiamat',
+                   "_Storm King's Thunder",
+                   '_Tales from the Yawning Portal',
+                   "_Volo's Guide to Monsters",
+                   '_Waterdeep: Dragon Heist',
+                   '_Waterdeep: Dungeon of the Mad Mage']
+
+    if "difficulty" in params:
+        difficulty = params["difficulty"]
+    else:
+        difficulty = "hard"
+
+    if "party" in params:
+        party = params["party"]
+    else:
+        party = [(4, 1)]
+
+    print(difficulty)
 
     # roll d8 + d12 to determine creature rarities
     rarity_roll = random.randint(1, 9) + random.randint(1, 13)
@@ -67,71 +124,81 @@ def generate(params: Dict) -> List[Tuple[int, str]]:
     else:
         encounter_rarity = ["common"]
 
-    # select all creatures in environment, filter to only those matching rarity
+    # Select all monsters matching environment and source constraints
     possible_monsters = api.get_list_of_monsters(
-        {"environments": ["_forest", "_mountain", "_no environment specified"],
-         "sources": ['_Basic Rules v1',
-                     '_Curse of Strahd',
-                     '_Explorer\'s Guide to Wildemount',
-                     '_Ghosts of Saltmarsh',
-                     "_Guildmasters' Guide to Ravnica",
-                     '_Hoard of the Dragon Queen',
-                     '_Icewind Dale: Rime of the Frost Maiden',
-                     '_Into The Borderlands',
-                     '_Monster Manual',
-                     "_Mordenkainen's Tome of Foes",
-                     '_Mythic Odysseys of Theros',
-                     '_Out of the Abyss',
-                     "_Player's Handbook",
-                     '_Princes of the Apocalypse',
-                     '_Rise of Tiamat',
-                     "_Storm King's Thunder",
-                     '_Tales from the Yawning Portal',
-                     "_Volo's Guide to Monsters",
-                     '_Waterdeep: Dragon Heist',
-                     '_Waterdeep: Dungeon of the Mad Mage'],
+        {"environments": environments,
+         "sources": sources,
          "allowLegendary": False,
          "allowNamed": False, })["data"]
 
-    monsters = [monster for monster in possible_monsters if fits_rarity(
+    # Filter those monsters to match the required rarity
+    ordered_monsters = [Monster(monster) for monster in possible_monsters if fits_rarity(
         monster, encounter_rarity)]
-    random.shuffle(monsters)
-    # Sort by difficulty ascending
-    monsters.sort(key=lambda x: float(Fraction(x[1])))
-    monsters = monsters[::-1]  # Sort by difficulty descending
-    monsters = randomise(monsters)
 
-    # add creatures by descending CR until desired encounter difficulty is reached
-    party = [(5, 11)]
+    # Calculate the CR range for the encounter
     thresholds = main.party_thresholds_calc(party)
-    upper_xp = thresholds[3]
-    lower_xp = thresholds[2]
+    if difficulty == "trifling":
+        upper_xp = thresholds[0]
+        lower_xp = 0
+    elif difficulty == "easy":
+        upper_xp = thresholds[1]
+        lower_xp = thresholds[0]
+    elif difficulty == "medium":
+        upper_xp = thresholds[2]
+        lower_xp = thresholds[1]
+    elif difficulty == "hard":
+        upper_xp = thresholds[3]
+        lower_xp = thresholds[2]
+    else:
+        upper_xp = thresholds[4]
+        lower_xp = thresholds[3]
 
     # Add a beginning monster
+    # Specifically, this will be 1-3 monsters randomly selected
+    # and the only check made here is that that selection doesn't
+    # violate the encounter's upper difficulty constraint.
+    # TODO: Fix this bloody encounter DS, for the love of god. Use a List[Tuple[str, int]]
     while True:
-        monster = random.choice(monsters)
+        monster = random.choice(ordered_monsters)
         quantity = random.randint(1, 3)
-        if main.cr_calc([monster[1]], [quantity]) < upper_xp:
-            encounter_monsters = [monster[0]]
+        if main.cr_calc([monster.cr], [quantity]) < upper_xp:
+            encounter_monsters = [monster.name]
             encounter_quantities = [quantity]
-            encounter_monster_crs = [monster[1]]
+            encounter_monster_crs = [monster.cr]
             break
 
-    encounter_xp = 0
-    for monster in monsters:
-        if upper_xp > main.cr_calc(encounter_monster_crs+[monster[1]], encounter_quantities + [1]):
-            if monster[0] in encounter_monsters:
-                encounter_quantities[encounter_monsters.index(monster[0])] += 1
-            else:
-                encounter_monsters.append(monster[0])
-                encounter_monster_crs.append(monster[1])
-                encounter_quantities.append(1)
-            if main.cr_calc(encounter_monster_crs, encounter_quantities) > lower_xp:
-                break
-            continue
+    coherent_monsters = [
+        mon for mon in ordered_monsters if mon.type == monster.type]
 
-    print(encounter_monsters)
-    print(encounter_quantities)
+    # Sort monsters by CR ascending
+    monsters_by_cr = randomise_within_cr(coherent_monsters)
+
+    encounter_xp = 0
+    for challenge_rating in monsters_by_cr:
+        # We know the CR of all these monsters is the same, so all we need to do
+        # is figure out how many of these CRs makes an encounter of the right difficulty
+        proposed_crs = encounter_monster_crs + [challenge_rating[0].cr]
+        proposed_quantities = encounter_quantities + [0]
+        while upper_xp > main.cr_calc(proposed_crs, proposed_quantities) and proposed_quantities[-1] < 4:
+            # Find the max number of this CR of monster we can add.
+            proposed_quantities[-1] += 1
+        # Loop breaks when we have one monster too many, so subtract one
+        proposed_quantities[-1] -= 1
+
+        # Append the new monsters to the encounter
+        if proposed_quantities[-1] > 0:
+            encounter_monster_crs.append(challenge_rating[0].cr)
+            encounter_quantities.append(proposed_quantities[-1])
+            # We want to avoid duplicating the random starter monster
+            monster_index = 0
+            while monster_index < len(challenge_rating)-1 and challenge_rating[monster_index].name in encounter_monsters:
+                monster_index += 1
+            encounter_monsters.append(challenge_rating[monster_index].name)
+
+    for i in range(len(encounter_quantities)):
+        print(f"{encounter_quantities[i]}x {encounter_monsters[i]}")
+    print()
+
     encounter = []
 
     for i in range(len(encounter_monsters)):
@@ -140,4 +207,5 @@ def generate(params: Dict) -> List[Tuple[int, str]]:
     return encounter
 
 
-generate({})
+if __name__ == "__main__":
+    generate({"party": [(4, 5)]})

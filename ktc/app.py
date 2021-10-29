@@ -137,10 +137,14 @@ def generate_encounter():
     try:
         params = json.loads(request.values["params"])
     except:
-        params = {"bing": "bong"}
+        params = {}
 
     result = random_encounter_generator.generate(params)
-    return jsonify(result)
+    return_list = []
+    for res_tup in result:
+        for _ in range(res_tup[0]):
+            return_list.append(res_tup[1])
+    return jsonify(return_list)
 
 
 if __name__ == "__main__":
