@@ -173,7 +173,8 @@ const clearEncounter = function() {
 }
 
 const generateEncounter = function(data) {
-    console.log(data)
+    clearEncounter();
+    $("#monsterList").html('<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>');
     let encounterRequest = $.ajax({
         type: "POST",
         url: '/api/encountergenerator',

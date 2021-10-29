@@ -173,8 +173,6 @@ $(function () {
         partyManager.updateThresholds();
         encounterManager.importEncounter();
 
-        updaterButton.
-
         $(document).on("click", "#updatesNotesModal .close", function () {
             $("#updatesNotesModal").modal('hide');
         })
@@ -216,8 +214,17 @@ $(function () {
             console.log("Generating encounter...");
             let encounterParameters = window.monsterParameters;
             encounterParameters["party"] = partyManager.getParty()
+            encounterParameters["difficulty"] = $("#generate-encounter-button").text().split(' ')[0].toLowerCase()
             console.log(encounterParameters)
             encounterManager.generateEncounter(encounterParameters);
+        })
+
+        // Handle random encounter difficulty selection
+        $(document).on("click", ".random-encounter-difficulty", function() {
+            let selectedId = $(this).attr('id');
+            let buttonLabel = selectedId.charAt(0).toUpperCase() + selectedId.slice(1) + " Encounter";
+            $("#generate-encounter-button").text(buttonLabel);
+
         })
 
         $(document).on("input", "#customSourceSearcher", function () {

@@ -197,7 +197,8 @@ const clearEncounter = function() {
 }
 
 const generateEncounter = function(data) {
-    console.log(data)
+    clearEncounter();
+    $("#monsterList").html('<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>');
     let encounterRequest = $.ajax({
         type: "POST",
         url: '/api/encountergenerator',
@@ -481,8 +482,6 @@ $(function () {
         partyManager.updateThresholds();
         encounterManager.importEncounter();
 
-        updaterButton.
-
         $(document).on("click", "#updatesNotesModal .close", function () {
             $("#updatesNotesModal").modal('hide');
         })
@@ -524,8 +523,17 @@ $(function () {
             console.log("Generating encounter...");
             let encounterParameters = window.monsterParameters;
             encounterParameters["party"] = partyManager.getParty()
+            encounterParameters["difficulty"] = $("#generate-encounter-button").text().split(' ')[0].toLowerCase()
             console.log(encounterParameters)
             encounterManager.generateEncounter(encounterParameters);
+        })
+
+        // Handle random encounter difficulty selection
+        $(document).on("click", ".random-encounter-difficulty", function() {
+            let selectedId = $(this).attr('id');
+            let buttonLabel = selectedId.charAt(0).toUpperCase() + selectedId.slice(1) + " Encounter";
+            $("#generate-encounter-button").text(buttonLabel);
+
         })
 
         $(document).on("input", "#customSourceSearcher", function () {
@@ -10134,5 +10142,4 @@ module.exports = function whichTypedArray(value) {
 };
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"available-typed-arrays":42,"call-bind/callBound":47,"es-abstract/helpers/getOwnPropertyDescriptor":49,"foreach":51,"has-tostringtag/shams":57,"is-typed-array":64}]},{},[2,3,4,5,6,7]);
-;
+},{"available-typed-arrays":42,"call-bind/callBound":47,"es-abstract/helpers/getOwnPropertyDescriptor":49,"foreach":51,"has-tostringtag/shams":57,"is-typed-array":64}]},{},[1,2,3,4,5,6,7]);

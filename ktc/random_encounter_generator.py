@@ -68,7 +68,6 @@ taldorei_type_rarity_modifiers = {"aberration": 1, "beast": 0, "celestial": 2, "
 
 
 def generate(params: Dict) -> List[Tuple[int, str]]:
-    pprint.pprint(params)
     if "environments" in params:
         environments = params["environments"]
     else:
@@ -98,7 +97,7 @@ def generate(params: Dict) -> List[Tuple[int, str]]:
                    '_Waterdeep: Dragon Heist',
                    '_Waterdeep: Dungeon of the Mad Mage']
 
-    if "difficulty" in params:
+    if "difficulty" in params and params["difficulty"] in ["easy", "medium", "hard", "deadly"]:
         difficulty = params["difficulty"]
     else:
         difficulty = "hard"
@@ -107,8 +106,6 @@ def generate(params: Dict) -> List[Tuple[int, str]]:
         party = params["party"]
     else:
         party = [(4, 1)]
-
-    print(difficulty)
 
     # roll d8 + d12 to determine creature rarities
     rarity_roll = random.randint(1, 9) + random.randint(1, 13)
@@ -150,50 +147,56 @@ def generate(params: Dict) -> List[Tuple[int, str]]:
         upper_xp = thresholds[3]
         lower_xp = thresholds[2]
     else:
-        upper_xp = thresholds[4]
+        upper_xp = thresholds[4]/2
         lower_xp = thresholds[3]
 
-    # Add a beginning monster
-    # Specifically, this will be 1-3 monsters randomly selected
-    # and the only check made here is that that selection doesn't
-    # violate the encounter's upper difficulty constraint.
-    # TODO: Fix this bloody encounter DS, for the love of god. Use a List[Tuple[str, int]]
     while True:
-        monster = random.choice(ordered_monsters)
-        quantity = random.randint(1, 3)
-        if main.cr_calc([monster.cr], [quantity]) < upper_xp:
-            encounter_monsters = [monster.name]
-            encounter_quantities = [quantity]
-            encounter_monster_crs = [monster.cr]
+        # Add a beginning monster
+        # Specifically, this will be 1-3 monsters randomly selected
+        # and the only check made here is that that selection doesn't
+        # violate the encounter's upper difficulty constraint.
+        # TODO: Fix this bloody encounter DS, for the love of god. Use a List[Tuple[str, int]]
+        while True:
+            monster = random.choice(ordered_monsters)
+            quantity = random.randint(1, 3)
+            if main.cr_calc([monster.cr], [quantity]) < upper_xp:
+                encounter_monsters = [monster.name]
+                encounter_quantities = [quantity]
+                encounter_monster_crs = [monster.cr]
+                break
+
+        coherent_monsters = [
+            mon for mon in ordered_monsters if mon.type == monster.type]
+
+        # Sort monsters by CR ascending
+        monsters_by_cr = randomise_within_cr(coherent_monsters)
+
+        monsters_by_cr = randomise_within_cr(coherent_monsters)
+        for challenge_rating in monsters_by_cr:
+            # breakpoint()
+            # We know the CR of all these monsters is the same, so all we need to do
+            # is figure out how many of these CRs makes an encounter of the right difficulty
+            proposed_crs = encounter_monster_crs + [challenge_rating[0].cr]
+            proposed_quantities = encounter_quantities + [0]
+            while upper_xp > main.cr_calc(proposed_crs, proposed_quantities) and proposed_quantities[-1] < 4:
+                # Find the max number of this CR of monster we can add.
+                # breakpoint
+                proposed_quantities[-1] += 1
+            # Loop breaks when we have one monster too many, so subtract one
+            proposed_quantities[-1] -= 1
+
+            # Append the new monsters to the encounter
+            if proposed_quantities[-1] > 0:
+                encounter_monster_crs = proposed_crs
+                encounter_quantities = proposed_quantities
+                # We want to avoid duplicating the random starter monster
+                monster_index = 0
+                while monster_index < len(challenge_rating)-1 and challenge_rating[monster_index].name in encounter_monsters:
+                    monster_index += 1
+                encounter_monsters.append(challenge_rating[monster_index].name)
+
+        if lower_xp < main.cr_calc(encounter_monster_crs, encounter_quantities) < upper_xp:
             break
-
-    coherent_monsters = [
-        mon for mon in ordered_monsters if mon.type == monster.type]
-
-    # Sort monsters by CR ascending
-    monsters_by_cr = randomise_within_cr(coherent_monsters)
-
-    encounter_xp = 0
-    for challenge_rating in monsters_by_cr:
-        # We know the CR of all these monsters is the same, so all we need to do
-        # is figure out how many of these CRs makes an encounter of the right difficulty
-        proposed_crs = encounter_monster_crs + [challenge_rating[0].cr]
-        proposed_quantities = encounter_quantities + [0]
-        while upper_xp > main.cr_calc(proposed_crs, proposed_quantities) and proposed_quantities[-1] < 4:
-            # Find the max number of this CR of monster we can add.
-            proposed_quantities[-1] += 1
-        # Loop breaks when we have one monster too many, so subtract one
-        proposed_quantities[-1] -= 1
-
-        # Append the new monsters to the encounter
-        if proposed_quantities[-1] > 0:
-            encounter_monster_crs.append(challenge_rating[0].cr)
-            encounter_quantities.append(proposed_quantities[-1])
-            # We want to avoid duplicating the random starter monster
-            monster_index = 0
-            while monster_index < len(challenge_rating)-1 and challenge_rating[monster_index].name in encounter_monsters:
-                monster_index += 1
-            encounter_monsters.append(challenge_rating[monster_index].name)
 
     for i in range(len(encounter_quantities)):
         print(f"{encounter_quantities[i]}x {encounter_monsters[i]}")
