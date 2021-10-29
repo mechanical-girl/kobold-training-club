@@ -3,6 +3,7 @@
 """The API module contains most of the important functions for KTC and wrappers for the rest"""
 
 import contextlib
+import pprint
 import sqlite3
 from fractions import Fraction
 from typing import Dict, List, Tuple
@@ -162,6 +163,8 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     if parameters == {}:
         parameters['sources'] = [
             f"source_{source}" for source in get_list_of_sources()]
+    else:
+        pprint.pprint(parameters)
 
     try:
         environment_constraints = [
@@ -211,17 +214,22 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         challenge_rating_maximum = None
 
     try:
-        allow_legendary = parameters["allowLegendary"]
+        if parameters["allowLegendary"] and parameters["allowLegendary"] == "false":
+            print("foo")
+            allow_legendary = False
+        else:
+            allow_legendary = True
     except (KeyError, IndexError):
         allow_legendary = True
 
     try:
-        allow_named = parameters["allowNamed"]
+        if parameters["allowNamed"] and parameters["allowNamed"] == "false":
+            allow_named = False
+            print("bar")
+        else:
+            allow_named = True
     except (KeyError, IndexError):
         allow_named = True
-
-    if environment_constraints + size_constraints + source_constraints + type_constraints + alignment_constraints == []:
-        return {"data": []}
 
     # Oh, this is clumsy, I hate this
     where_requirements = ""
@@ -338,10 +346,10 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         query_arguments += possible_challenge_ratings[mindex:maxdex]
 
     if allow_legendary is not True:
-        where_requirements += "legendary = '' AND "
+        where_requirements += "legendary = 0 AND "
 
     if allow_named is not True:
-        where_requirements += "named = '' AND "
+        where_requirements += "named = 0 AND "
 
     # If there are requirements, we add a WHERE to the start
     if where_requirements != "":

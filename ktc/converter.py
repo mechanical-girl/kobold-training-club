@@ -223,13 +223,23 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             except KeyError:
                 monster_section = ""
 
+            try:
+                is_legendary = 1 if row['legendary'] == "legendary" else 0
+            except KeyError:
+                is_legendary = 0
+
+            try:
+                is_named = 1 if row['named'] == "named" else 0
+            except KeyError:
+                is_named = 0
+
             values: List[Any] = []
             try:
                 values = [row['fid'], monster_name, row['cr'], row['size'], row["type"], monster_tags, monster_section, alignment,
-                          environments, row['ac'], row['hp'], row['init'], row['lair'], row['legendary'], row['named'], ', '.join(corrected_sources), hash_string]
+                          environments, row['ac'], row['hp'], row['init'], row['lair'], is_legendary, is_named, ', '.join(corrected_sources), hash_string]
             except KeyError:
                 values = [row['fid'], monster_name, row['cr'], row['size'], row["type"], monster_tags, monster_section, alignment,
-                          environments, row['ac'], row['hp'], row['init'], row['lair?'], row['legendary?'], row['unique?'], ', '.join(corrected_sources), hash_string]
+                          environments, row['ac'], row['hp'], row['init'], row['lair?'], is_legendary, is_named, ', '.join(corrected_sources), hash_string]
 
             for i in range(len(values)):
                 if type(values[i]) == str:

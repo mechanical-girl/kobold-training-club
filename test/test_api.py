@@ -431,7 +431,7 @@ def test_monster_list_returns_good_no_legendary_list(client):
     parameters = {"allowLegendary": "false"}
     response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
     received = len(response.get_json()["data"])
-    expected = 2373
+    expected = 2576
 
     assert expected == received
 
@@ -440,7 +440,7 @@ def test_monster_list_returns_good_no_named_list(client):
     parameters = {"allowNamed": "false"}
     response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
     received = len(response.get_json()["data"])
-    expected = 2359
+    expected = 2576
 
     assert expected == received
 
