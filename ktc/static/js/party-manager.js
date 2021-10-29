@@ -40,7 +40,7 @@ var handleClick = function (clicked_button) {
     updateThresholds();
 };
 
-var updateThresholds = function () {
+var getParty = function() {
     var party = [];
     var comboSelectorDivs = $("div .charLevelComboSelector");
     for (var i = 0; i <= comboSelectorDivs.length; i++) {
@@ -49,6 +49,12 @@ var updateThresholds = function () {
             party[party.length] = new Array(parseInt($(selectors[0]).val()), parseInt($(selectors[1]).val()))
         }
     }
+
+    return party
+}
+
+var updateThresholds = function () {
+    let party = getParty();
 
 
     window.localStorage.setItem("party", JSON.stringify(party))
@@ -74,4 +80,4 @@ var updateThresholds = function () {
 
 }
 
-module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds }
+module.exports = { createCharLevelCombo: createCharLevelCombo, handleClick: handleClick, updateThresholds: updateThresholds, getParty: getParty }

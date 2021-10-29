@@ -14,10 +14,12 @@ from flask import Flask, jsonify, render_template, request
 
 try:
     import api  # type: ignore
+    import random_encounter_generator  # type: ignore
 except ModuleNotFoundError:
     from ktc import api  # type: ignore
+    from ktc import random_encounter_generator  # type: ignore
 
-version = "v0.4.0"
+VERSION = "v0.4.1"
 
 app = Flask(__name__)
 path_to_database = os.path.abspath(os.path.join(
@@ -29,13 +31,13 @@ db_location = path_to_database
 @app.route("/", methods=["GET", "POST", "PUT"])
 def home():
     """Renders the main encounter generator"""
-    return render_template("index.html", version=version)
+    return render_template("index.html", version=VERSION)
 
 
 @app.route("/index.html", methods=["GET", "POST", "PUT"])
 def index():
     """Renders the main encounter generator"""
-    return render_template("index.html", version=version)
+    return render_template("index.html", version=VERSION)
 
 
 @app.route("/about.html", methods=["GET", "POST", "PUT"])
@@ -127,6 +129,22 @@ def check_if_key_processed():
     key = json.loads(request.values["key"])
     result = api.check_if_key_processed(key)
     return jsonify(result)
+
+
+@app.route("/api/encountergenerator", methods=["GET", "POST"])
+def generate_encounter():
+    """Wrapper for the encounter generator function"""
+    try:
+        params = json.loads(request.values["params"])
+    except:
+        params = {}
+
+    result = random_encounter_generator.generate(params)
+    return_list = []
+    for res_tup in result:
+        for _ in range(res_tup[0]):
+            return_list.append(res_tup[1])
+    return jsonify(return_list)
 
 
 if __name__ == "__main__":

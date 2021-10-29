@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import contextlib
-import csv
-import re
 import sqlite3
 from fractions import Fraction
-from io import StringIO
-from typing import Any, Dict, List
+from typing import Dict, List, Tuple
 
 try:
     import converter  # type: ignore
@@ -334,14 +331,15 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     monster_data = []
     for monster in monster_list:
         modified_monster = list(monster)
-        
+
         # convert sources with links to hrefs
         sources = monster[7].split(",")
         linked_sources = []
         for source in sources:
             (source_name, index) = converter.split_source_from_index(source)
             if "http" in index:
-                linked_sources.append(f"<a target='_blank' href='{index}''>{source_name}</a>")
+                linked_sources.append(
+                    f"<a target='_blank' href='{index}''>{source_name}</a>")
             else:
                 linked_sources.append(f"{source_name}: {index}")
 
@@ -357,7 +355,8 @@ def get_party_thresholds(party):
     return main.party_thresholds_calc(party)
 
 
-def get_encounter_xp(monsters):
+def get_encounter_xp(monsters: List[Tuple[str, str]]) -> int:
+    ""
     crs = []
     quantities = []
     for monster_pair in monsters:
@@ -371,10 +370,16 @@ def get_encounter_xp(monsters):
 
 
 def ingest_custom_csv_string(csv_string, db_location, url=""):
+    """Simply a wrapper for the converter function"""
     return converter.ingest_data(csv_string, db_location, url)
 
 
 def get_unofficial_sources() -> List[str]:
+    """Returns a deduplicated list of unofficial sources
+
+    Returns:
+        List[str]: a deduplicated list of unofficial sources
+    """
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         c = conn.cursor()
 
@@ -394,4 +399,5 @@ def get_unofficial_sources() -> List[str]:
 
 
 def check_if_key_processed(key):
+    """Simply a wrapper for the converter function"""
     return converter.check_if_key_processed(key)

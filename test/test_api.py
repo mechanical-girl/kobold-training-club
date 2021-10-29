@@ -285,30 +285,54 @@ def test_monster_list_gives_json_with_proper_mimetype(client):
 
 def test_monster_list_gives_correct_list(client):
     expected = [
-        ['Aarakocra', '1/4', 'Medium', 'Humanoid', 'Aarakocra', '', 'neutral good', 'Monster Manual: 12, Princes of the Apocalypse Online Supplement v1.0: 6', 'mm.aarakocra', '13', '12', '2'],
-        ['Abhorrent Overlord', '9', 'Large', 'Fiend', 'Demon', 'Demons of Theros', 'lawful evil', 'Mythic Odysseys of Theros: 219', 'moot.abhorrent-overlord', '136', '16', '4'],
-        ['Abjurer', '9', 'Medium', 'Humanoid', 'Any Race', 'NPCs', 'any alignment', "Volo's Guide to Monsters: 209", 'volo.abjurer', '84', '12', '2'],
-        ['Aboleth', '10', 'Large', 'Aberration', '', '', 'lawful evil', 'Monster Manual: 13, Princes of the Apocalypse Online Supplement v1.0: 6', 'mm.aboleth', '135', '17', '-1'],
-        ['Abominable Yeti', '9', 'Huge', 'Monstrosity', '', 'Yeti', 'chaotic evil', 'Monster Manual: 306', 'mm.abominable-yeti', '137', '15', '0'],
-        ['Abyssal Chicken', '1/4', 'Tiny', 'Fiend', 'Demon', '', 'chaotic evil', "Baldur's Gate: Descent into Avernus: 97", 'avenus.abyssal-chicken', '10', '13', '2'],
-        ['Abyssal Wretch', '1/4', 'Medium', 'Fiend', 'Demon', 'Demons', 'chaotic evil', "Mordenkainen's Tome of Foes: 136, Baldur's Gate: Descent into Avernus: 118", 'mtof.abyssal-wretch', '18', '11', '1'],
-        ['Acolyte', '1/4', 'Medium', 'Humanoid', 'any', 'NPCs', 'any alignment', 'Basic Rules v1: 53, HotDQ supplement: 4, Monster Manual: 342', 'mm.acolyte', '9', '10', '0'],
-        ['Adept', '1', 'Medium', 'Humanoid', 'human', 'Appendix B', 'chaotic evil', 'Into The Borderlands: 338', 'itb.adept', '11', '18', '0'],
-        ['Adult Black Dragon', '14', 'Huge', 'Dragon', '', 'Dragons', 'chaotic evil', 'Monster Manual: 88, Princes of the Apocalypse Online Supplement v1.0: 7', 'mm.adult-black-dragon', '195', '19', '2'],
-        ['Adult Blue Dracolich', '17', 'Huge', 'Undead', '', 'Dracolich', 'lawful evil', 'Monster Manual: 84', 'mm.adult-blue-dracolich', '225', '19', '0'],
-        ['Adult Blue Dragon', '16', 'Huge', 'Dragon', '', 'Dragons', 'lawful evil', 'HotDQ supplement: 4, Monster Manual: 91', 'mm.adult-blue-dragon', '225', '19', '0'],
-        ['Adult Brass Dragon', '13', 'Huge', 'Dragon', '', 'Dragons', 'chaotic good', 'Monster Manual: 105', 'mm.adult-brass-dragon', '172', '18', '0'],
-        ['Adult Bronze Dragon', '15', 'Huge', 'Dragon', '', 'Dragons', 'lawful good', 'Monster Manual: 108, Princes of the Apocalypse Online Supplement v1.0: 7', 'mm.adult-bronze-dragon', '212', '19', '0'],
-        ['Adult Copper Dragon', '14', 'Huge', 'Dragon', '', 'Dragons', 'chaotic good', 'Monster Manual: 112', 'mm.adult-copper-dragon', '184', '18', '1'],
-        ['Adult Gold Dragon', '17', 'Huge', 'Dragon', '', 'Dragons', 'lawful good', 'Monster Manual: 114', 'mm.adult-gold-dragon', '256', '19', '2'],
-        ['Adult Green Dragon', '15', 'Huge', 'Dragon', '', 'Dragons', 'lawful evil', 'Monster Manual: 94', 'mm.adult-green-dragon', '207', '19', '1'],
-        ['Adult Kruthik', '2', 'Medium', 'Monstrosity', '', 'Kruthiks', 'unaligned', "Mordenkainen's Tome of Foes: 212", 'mtof.adult-kruthik', '39', '18', '3'],
-        ['Adult Oblex', '5', 'Medium', 'Ooze', '', 'Oblex', 'lawful evil', "Mordenkainen's Tome of Foes: 218", 'mtof.adult-oblex', '75', '14', '3'],
-        ['Adult Red Dragon', '17', 'Huge', 'Dragon', '', 'Dragons', 'chaotic evil', 'Basic Rules v1: 8, Monster Manual: 98', 'mm.adult-red-dragon', '256', '19', '0'],
-        ['Adult Silver Dragon', '16', 'Huge', 'Dragon', '', 'Dragons', 'lawful good', 'Monster Manual: 117', 'mm.adult-silver-dragon', '243', '19', '0'],
-        ['Adult White Dragon', '13', 'Huge', 'Dragon', '', 'Dragons', 'chaotic evil', 'HotDQ supplement: 5, Monster Manual: 101', 'mm.adult-white-dragon', '200', '18', '0'],
-        ['Aeorian Hunter', '10', 'Large', 'Monstrosity', '', 'Aeorian Hunters', 'neutral evil', "Explorer's Guide to Wildemount:", 'egtw.aeorian-hunter', '171', '15', '4'],
-        ['Aeorian Nullifier', '12', 'Large', 'Monstrosity', '', 'Aeorian Hunters', 'neutral evil', "Explorer's Guide to Wildemount:", 'egtw.aeorian-nullifier', '180', '17', '2']
+        ['Aarakocra', '1/4', 'Medium', 'Humanoid', 'Aarakocra', '', 'neutral good',
+            'Monster Manual: 12, Princes of the Apocalypse Online Supplement v1.0: 6', 'mm.aarakocra', '13', '12', '2'],
+        ['Abhorrent Overlord', '9', 'Large', 'Fiend', 'Demon', 'Demons of Theros', 'lawful evil',
+            'Mythic Odysseys of Theros: 219', 'moot.abhorrent-overlord', '136', '16', '4'],
+        ['Abjurer', '9', 'Medium', 'Humanoid', 'Any Race', 'NPCs', 'any alignment',
+            "Volo's Guide to Monsters: 209", 'volo.abjurer', '84', '12', '2'],
+        ['Aboleth', '10', 'Large', 'Aberration', '', '', 'lawful evil',
+            'Monster Manual: 13, Princes of the Apocalypse Online Supplement v1.0: 6', 'mm.aboleth', '135', '17', '-1'],
+        ['Abominable Yeti', '9', 'Huge', 'Monstrosity', '', 'Yeti', 'chaotic evil',
+            'Monster Manual: 306', 'mm.abominable-yeti', '137', '15', '0'],
+        ['Abyssal Chicken', '1/4', 'Tiny', 'Fiend', 'Demon', '', 'chaotic evil',
+            "Baldur's Gate: Descent into Avernus: 97", 'avenus.abyssal-chicken', '10', '13', '2'],
+        ['Abyssal Wretch', '1/4', 'Medium', 'Fiend', 'Demon', 'Demons', 'chaotic evil',
+            "Mordenkainen's Tome of Foes: 136, Baldur's Gate: Descent into Avernus: 118", 'mtof.abyssal-wretch', '18', '11', '1'],
+        ['Acolyte', '1/4', 'Medium', 'Humanoid', 'any', 'NPCs', 'any alignment',
+            'Basic Rules v1: 53, HotDQ supplement: 4, Monster Manual: 342', 'mm.acolyte', '9', '10', '0'],
+        ['Adept', '1', 'Medium', 'Humanoid', 'human', 'Appendix B', 'chaotic evil',
+            'Into The Borderlands: 338', 'itb.adept', '11', '18', '0'],
+        ['Adult Black Dragon', '14', 'Huge', 'Dragon', '', 'Dragons', 'chaotic evil',
+            'Monster Manual: 88, Princes of the Apocalypse Online Supplement v1.0: 7', 'mm.adult-black-dragon', '195', '19', '2'],
+        ['Adult Blue Dracolich', '17', 'Huge', 'Undead', '', 'Dracolich', 'lawful evil',
+            'Monster Manual: 84', 'mm.adult-blue-dracolich', '225', '19', '0'],
+        ['Adult Blue Dragon', '16', 'Huge', 'Dragon', '', 'Dragons', 'lawful evil',
+            'HotDQ supplement: 4, Monster Manual: 91', 'mm.adult-blue-dragon', '225', '19', '0'],
+        ['Adult Brass Dragon', '13', 'Huge', 'Dragon', '', 'Dragons', 'chaotic good',
+            'Monster Manual: 105', 'mm.adult-brass-dragon', '172', '18', '0'],
+        ['Adult Bronze Dragon', '15', 'Huge', 'Dragon', '', 'Dragons', 'lawful good',
+            'Monster Manual: 108, Princes of the Apocalypse Online Supplement v1.0: 7', 'mm.adult-bronze-dragon', '212', '19', '0'],
+        ['Adult Copper Dragon', '14', 'Huge', 'Dragon', '', 'Dragons', 'chaotic good',
+            'Monster Manual: 112', 'mm.adult-copper-dragon', '184', '18', '1'],
+        ['Adult Gold Dragon', '17', 'Huge', 'Dragon', '', 'Dragons', 'lawful good',
+            'Monster Manual: 114', 'mm.adult-gold-dragon', '256', '19', '2'],
+        ['Adult Green Dragon', '15', 'Huge', 'Dragon', '', 'Dragons', 'lawful evil',
+            'Monster Manual: 94', 'mm.adult-green-dragon', '207', '19', '1'],
+        ['Adult Kruthik', '2', 'Medium', 'Monstrosity', '', 'Kruthiks', 'unaligned',
+            "Mordenkainen's Tome of Foes: 212", 'mtof.adult-kruthik', '39', '18', '3'],
+        ['Adult Oblex', '5', 'Medium', 'Ooze', '', 'Oblex', 'lawful evil',
+            "Mordenkainen's Tome of Foes: 218", 'mtof.adult-oblex', '75', '14', '3'],
+        ['Adult Red Dragon', '17', 'Huge', 'Dragon', '', 'Dragons', 'chaotic evil',
+            'Basic Rules v1: 8, Monster Manual: 98', 'mm.adult-red-dragon', '256', '19', '0'],
+        ['Adult Silver Dragon', '16', 'Huge', 'Dragon', '', 'Dragons', 'lawful good',
+            'Monster Manual: 117', 'mm.adult-silver-dragon', '243', '19', '0'],
+        ['Adult White Dragon', '13', 'Huge', 'Dragon', '', 'Dragons', 'chaotic evil',
+            'HotDQ supplement: 5, Monster Manual: 101', 'mm.adult-white-dragon', '200', '18', '0'],
+        ['Aeorian Hunter', '10', 'Large', 'Monstrosity', '', 'Aeorian Hunters', 'neutral evil',
+            "Explorer's Guide to Wildemount:", 'egtw.aeorian-hunter', '171', '15', '4'],
+        ['Aeorian Nullifier', '12', 'Large', 'Monstrosity', '', 'Aeorian Hunters', 'neutral evil',
+            "Explorer's Guide to Wildemount:", 'egtw.aeorian-nullifier', '180', '17', '2']
     ]
     response = client.get("/api/monsters")
     received = response.get_json()["data"]
@@ -403,6 +427,24 @@ def test_monster_list_returns_good_all_constraint_list(client):
             assert ':'.join(source.split[":"][:-1]) in parameters['sources']
 
 
+def test_monster_list_returns_good_no_legendary_list(client):
+    parameters = {"allowLegendary": "false"}
+    response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
+    received = len(response.get_json()["data"])
+    expected = 2373
+
+    assert expected == received
+
+
+def test_monster_list_returns_good_no_named_list(client):
+    parameters = {"allowNamed": "false"}
+    response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
+    received = len(response.get_json()["data"])
+    expected = 2359
+
+    assert expected == received
+
+
 def test_exp_calc_gives_json_with_proper_mimetype(client):
     response = client.get("/api/expthresholds?party=" + str([[1, 1]]))
     assert response.status_code == 200
@@ -451,19 +493,7 @@ def test_check_source_returns_good_data(client):
     assert expected == received
 
 
-def test_monster_list_returns_good_no_legendary_list(client):
-    parameters = {"allowLegendary": "false"}
-    response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
-    received = len(response.get_json()["data"])
-    expected = 2373
-
-    assert expected == received
-
-
-def test_monster_list_returns_good_no_named_list(client):
-    parameters = {"allowNamed": "false"}
-    response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
-    received = len(response.get_json()["data"])
-    expected = 2359
-
-    assert expected == received
+def test_encounter_generator_gives_json_with_proper_mimetype(client):
+    response = client.get("/api/encountergenerator")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
