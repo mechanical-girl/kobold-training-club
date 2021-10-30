@@ -202,9 +202,9 @@ def generate(params: Dict) -> List[Tuple[int, str]]:
         if lower_xp < main.cr_calc(encounter_monster_crs, encounter_quantities) < upper_xp:
             break
 
-    for i in range(len(encounter_quantities)):
-        print(f"{encounter_quantities[i]}x {encounter_monsters[i]}")
-    print()
+    # for i in range(len(encounter_quantities)):
+    #    print(f"{encounter_quantities[i]}x {encounter_monsters[i]}")
+    # print()
 
     encounter = []
 
