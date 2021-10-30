@@ -45,7 +45,7 @@ gos.monster_one,Monster One, 1, Medium,,,,,,,,,,,,Ghosts of Saltmarsh: 123,"""
     c.execute(
         '''SELECT name, sources FROM monsters WHERE name = "Monster One"''')
     src = c.fetchall()[0]
-    print(src)
+    # print(src)
 
     assert src[0] == "Monster One"
     assert src[1] == "Ghosts of Saltmarsh: 123, Mythic Odysseys of Theros: 123"
@@ -82,7 +82,7 @@ kuk.monster_three,Monster Three, 1, Medium,,,,,,,,,,,,Mythic Odysseys of Theros:
     c.execute(
         '''SELECT name, sources FROM monsters WHERE name LIKE "%Monster Three%"''')
     monster_list = c.fetchall()
-    print(monster_list)
+    # print(monster_list)
 
     assert ("Monster Three (KUK)",
             "Klarota's Underdark Kingdom: 456") in monster_list
