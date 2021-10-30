@@ -109,6 +109,7 @@ $(function () {
                 sourcesManager.getUnofficialSources();
             }
             window.monsterParameters[selector] = data
+            console.log(window.monsterParameters)
         }));
     };
 
@@ -159,7 +160,8 @@ $(function () {
 
     }))
 
-    $.when(listPopulatorPromises).done(function (listPopulatorPromises) {
+    $.when(listPopulatorPromises).done(function () {
+        console.log(window.monsterParameters)
         createMonsterTable()
         // Populate the character selectors
         var party = JSON.parse(window.localStorage.getItem("party"));

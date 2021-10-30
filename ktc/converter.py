@@ -6,7 +6,7 @@ import os
 import re
 import sqlite3
 from io import StringIO
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Tuple
 
 dir_path = os.path.join(os.path.dirname(__file__), os.pardir, "data/")
 db_location = os.path.abspath(os.path.join(dir_path, "monsters.db"))
@@ -24,10 +24,10 @@ def check_if_key_processed(key: str) -> str:
     if key == "":
         return ""
     with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
-        c = conn.cursor()
-        c.execute(
+        cursor = conn.cursor()
+        cursor.execute(
             '''SELECT name FROM sources WHERE url = ?''', (key,))
-        results = [result[0] for result in c.fetchall()]
+        results = [result[0] for result in cursor.fetchall()]
         return ", ".join(results)
 
 
@@ -47,8 +47,8 @@ def split_source_from_index(source: str) -> Tuple[str, str]:
 
 def write_to_db(query: str, values: List[List[Any]], db_location=db_location):
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
-        c = conn.cursor()
-        c.executemany(query, values)
+        cursor = conn.cursor()
+        cursor.executemany(query, values)
         conn.commit()
 
 
@@ -65,6 +65,7 @@ def amalgamate_sources(sources_list: List[List[str]]) -> List[str]:
     return master
 
 
+# TODO: split this up, I guess?
 def ingest_data(csv_string: str, db_location: str, source=""):
     source_url = str(source)
     official_sources = ['basicrulesv1', "player'shandbook", 'monstermanual', 'thewildbeyondthewitchlight', "vanrichten'sguidetoravenloft", 'strixhaven:acurriculumofchaos', "fizban'streasuryofdragons", 'candlekeepmysteries', "tasha'scauldronofeverything", 'strangerthingsanddungeons&dragons', 'beasts&behemoths', 'icewinddale:rimeofthefrostmaiden', 'mythicodysseysoftheros', "explorer'sguidetowildmount", 'dungeons&dragonsvsrickandmorty', 'eberron:risingfromthelastwar', 'infernalmachinerebuild', 'tyrranyofdragons', 'locathahrising', "baldur'sgate:descentintoavernus",
@@ -77,15 +78,15 @@ def ingest_data(csv_string: str, db_location: str, source=""):
     with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
         f = StringIO(csv_string)
         csv_reader = csv.DictReader(f, delimiter=',')
-        c = conn.cursor()
+        cursor = conn.cursor()
         sources_in_url: List[str] = []
 
         if already_processed := check_if_key_processed(source_url):
             return already_processed
 
-        c.execute(
+        cursor.execute(
             '''SELECT name FROM sources WHERE official = 1''')
-        sources_official = [source[0] for source in c.fetchall()]
+        sources_official = [source[0] for source in cursor.fetchall()]
 
         for row in csv_reader:
             monster_is_official = False
@@ -120,10 +121,10 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             monster_name = row['name']
             sources_of_nametwins = []
 
-            c.execute('SELECT sources FROM monsters WHERE name = ?',
-                      (monster_name,))
+            cursor.execute('SELECT sources FROM monsters WHERE name = ?',
+                           (monster_name,))
 
-            existing_monsters_with_name_string = c.fetchall()
+            existing_monsters_with_name_string = cursor.fetchall()
             for string in existing_monsters_with_name_string:
                 sources_of_nametwins += string[0].split(', ')
 
@@ -131,9 +132,9 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             unofficial_nametwins = []
             for source in sources_of_nametwins:
                 name, _ = split_source_from_index(source)
-                c.execute(
+                cursor.execute(
                     '''SELECT official FROM sources WHERE name = ?''', (name,))
-                if c.fetchall()[0][0]:
+                if cursor.fetchall()[0][0]:
                     official_nametwins.append(source)
                 else:
                     unofficial_nametwins.append(source)
@@ -149,14 +150,14 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                                                   for word in name.split()])
                         new_name = f"{row['name']} ({source_acronym})"
                         updates.append((new_name, monster_name, un_source))
-                    c.executemany(
+                    cursor.executemany(
                         '''UPDATE monsters SET name = ? WHERE name = ? AND sources = ?''', (updates))
 
                 else:
                     updates = []
                     if list(filter(lambda x: x in sources, unofficial_nametwins)) != []:
                         # print(amalgamate_sources([sources, unofficial_nametwins]))
-                        # c.execute('''UPDATE monsters SET sources = ? WHERE name = ? AND sources = ?''', (", ".join(amalgamate_sources([sources, unofficial_nametwins])), monster_name, un_source,))
+                        # cursor.execute('''UPDATE monsters SET sources = ? WHERE name = ? AND sources = ?''', (", ".join(amalgamate_sources([sources, unofficial_nametwins])), monster_name, un_source,))
                         continue
                     for un_source in unofficial_nametwins:
                         name, _ = split_source_from_index(un_source)
@@ -168,7 +169,7 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                     source_acronym = ''.join([word[0]
                                               for word in name.split()])
                     monster_name = f"{row['name']} ({source_acronym})"
-                    c.executemany(
+                    cursor.executemany(
                         '''UPDATE OR IGNORE monsters SET name = ? WHERE name = ? AND sources = ?''', (updates))
 
             # Standardise the way sources are saved and confirm officiality - or lack thereof - of source
@@ -188,8 +189,8 @@ def ingest_data(csv_string: str, db_location: str, source=""):
                 storing_sources.append([source_name, source_is_official, hash_source_name(
                     source_name), source_url, hash_source_name(f"{source_name}{source_url}")])
 
-            c.executemany('''INSERT OR REPLACE INTO sources VALUES (?, ?, ?, ?, ?)''',
-                          storing_sources)
+            cursor.executemany('''INSERT OR REPLACE INTO sources VALUES (?, ?, ?, ?, ?)''',
+                               storing_sources)
 
             hash_string = ','.join(source_hashes)
             if corrected_sources == 0:
@@ -222,20 +223,30 @@ def ingest_data(csv_string: str, db_location: str, source=""):
             except KeyError:
                 monster_section = ""
 
+            try:
+                is_legendary = 1 if row['legendary'] == "legendary" else 0
+            except KeyError:
+                is_legendary = 0
+
+            try:
+                is_named = 1 if row['named'] == "named" else 0
+            except KeyError:
+                is_named = 0
+
             values: List[Any] = []
             try:
                 values = [row['fid'], monster_name, row['cr'], row['size'], row["type"], monster_tags, monster_section, alignment,
-                          environments, row['ac'], row['hp'], row['init'], row['lair'], row['legendary'], row['named'], ', '.join(corrected_sources), hash_string]
+                          environments, row['ac'], row['hp'], row['init'], row['lair'], is_legendary, is_named, ', '.join(corrected_sources), hash_string]
             except KeyError:
                 values = [row['fid'], monster_name, row['cr'], row['size'], row["type"], monster_tags, monster_section, alignment,
-                          environments, row['ac'], row['hp'], row['init'], row['lair?'], row['legendary?'], row['unique?'], ', '.join(corrected_sources), hash_string]
+                          environments, row['ac'], row['hp'], row['init'], row['lair?'], is_legendary, is_named, ', '.join(corrected_sources), hash_string]
 
             for i in range(len(values)):
                 if type(values[i]) == str:
                     values[i] = values[i].replace("'           '", "")
                     values[i] = values[i].strip()
 
-            c.execute(
+            cursor.execute(
                 '''INSERT OR REPLACE INTO monsters VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', values)
 
         conn.commit()
@@ -253,12 +264,13 @@ def load_csv_from_file(filename: str) -> str:
 
 
 def configure_db(db_location: str):
+    """Creates a DB in the specified location, overwriting existing"""
     conn = sqlite3.connect(db_location)
-    c = conn.cursor()
+    cursor = conn.cursor()
 
-    c.execute('''DROP TABLE IF EXISTS monsters''')
-    c.execute('''DROP TABLE IF EXISTS sources''')
-    c.execute('''CREATE TABLE monsters (
+    cursor.execute('''DROP TABLE IF EXISTS monsters''')
+    cursor.execute('''DROP TABLE IF EXISTS sources''')
+    cursor.execute('''CREATE TABLE monsters (
                 fid text,
                 name text UNIQUE,
                 cr text,
@@ -276,14 +288,14 @@ def configure_db(db_location: str):
                 named int,
                 sources text,
                 sourcehashes text)'''
-              )
-    c.execute('''CREATE TABLE sources (
+                   )
+    cursor.execute('''CREATE TABLE sources (
         name text,
         official int,
         hash text,
         url text,
         sourceurlhash text UNIQUE)'''
-              )
+                   )
 
     conn.commit()
     return conn
@@ -291,20 +303,20 @@ def configure_db(db_location: str):
 
 if __name__ == "__main__":
     with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
-        c = conn.cursor()
-        c.execute('''SELECT name FROM sqlite_master WHERE type="table"''')
-        if len(c.fetchall()) > 0:
+        cursor = conn.cursor()
+        cursor.execute('''SELECT name FROM sqlite_master WHERE type="table"''')
+        if len(cursor.fetchall()) > 0:
 
-            c.execute('''SELECT * FROM monsters''')
-            results = c.fetchall()
+            cursor.execute('''SELECT * FROM monsters''')
+            results = cursor.fetchall()
             with open(f"{dir_path}/master.csv", 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(["fid", "name", "cr", "size", "type", "tags", "section", "alignment", "environment",
                                 "ac", "hp", "init", "lair", "legendary", "named", "sources", "sourcehashes"])
                 writer.writerows(results)
 
-            c.execute('''SELECT * FROM sources''')
-            results = c.fetchall()
+            cursor.execute('''SELECT * FROM sources''')
+            results = cursor.fetchall()
             with open(f"{dir_path}/master_sources.csv", 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(
