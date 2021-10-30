@@ -2,7 +2,7 @@
 
 var AssociatedId = function (clicked_button) {
     if (clicked_button != undefined) {
-        attachedParamChooser = $(clicked_button).parent().children("ul")[0];
+        let attachedParamChooser = $(clicked_button).parent().children("ul")[0];
         if (attachedParamChooser == undefined) {
             attachedParamChooser = $(clicked_button).parent().children("#minCr")[0];
         }
@@ -12,7 +12,7 @@ var AssociatedId = function (clicked_button) {
 
 var GetUpdatedValues = function (updatedList) {
     if (updatedList != undefined) {
-        parent_list = $("#" + updatedList);
+        let parent_list = $("#" + updatedList);
         var selected_elements = []
         for (var i = 0; i < parent_list.find("input").length; i++) {
             var this_box = parent_list.find("input")[i];
@@ -39,8 +39,8 @@ var getUpdatedChallengeRatings = function () {
     var maxValue = $("#maxCr option:selected").attr("value");
     var allowLegendary = $("#allowLegendary").prop("checked");
     var allowNamed = $("#allowNamed").prop("checked");
-    minValueComp = floatify(minValue)
-    maxValueComp = floatify(maxValue)
+    let minValueComp = floatify(minValue)
+    let maxValueComp = floatify(maxValue)
     var alerts = $("#challengeRatingSelectorDiv .alert")
     alerts.remove();
     if (maxValueComp < minValueComp) {
@@ -63,7 +63,7 @@ var sortTable = function (clicked_button) {
         monsterParameters["allowLegendary"] = values[2]
         monsterParameters["allowNamed"] = values[3]
     } else {
-        listUpdatedName = listUpdated.split("_")[0];
+        let listUpdatedName = listUpdated.split("_")[0];
         window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
     }
     window.monsterDataTable.ajax.reload();
@@ -71,8 +71,8 @@ var sortTable = function (clicked_button) {
 }
 
 var toggleAll = function (clicked_button) {
-    var listUpdated = AssociatedId(clicked_button);
-    command = $(clicked_button).text()
+    let listUpdated = AssociatedId(clicked_button);
+    let command = $(clicked_button).text()
     if (command == "Deselect All") {
         $('#' + listUpdated).find(":input").prop("checked", false)
         $(clicked_button).text("Select All");

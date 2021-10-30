@@ -7,7 +7,7 @@ var listElements = function (data, prefix = "") {
         var stored = window.localStorage.getItem(prefix + "_selector")
         prefix = prefix + "_";
     }
-    listText = "";
+    let listText = "";
     for (let i = 0; i < data.length; i++) {
         var checked = " checked";
         if (stored != null && stored.indexOf(data[i]) == -1) {
@@ -100,7 +100,7 @@ const addMonsterByName = function(monsterName) {
     }
 
     // add monster to list with count 1
-    level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + escapeText(monsterName) + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
+    let level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + escapeText(monsterName) + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
 
     $("#monsterList").append(level_holder);
 
@@ -112,7 +112,7 @@ var importEncounter = function () {
     var monsterListDiv = $("#monsterList");
     if (monsters != null) {
         for (var i = 0; i < monsters.length; i++) {
-            level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsters[i][0] + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>' + monsters[i][1] + '</span>x ' + monsters[i][0] + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
+            let level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsters[i][0] + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>' + monsters[i][1] + '</span>x ' + monsters[i][0] + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
             monsterListDiv.append(level_holder);
         }
     }
@@ -316,7 +316,6 @@ const encounterManager = require('./encounter-manager.js');
 const sourcesManager = require('./sources-manager.js');
 const improvedInitiativeService = require('./improved-initiative-service.js');
 window.monsterParameters = {};
-window.monsterDataTable;
 window.partyThresholds = []
 window.encounterDifficulty = 0
 var customSourceNames = [];
@@ -404,8 +403,8 @@ $(function () {
     }
 
     // Populate the first five accordions
-    var listPopulatorPromises = []
-    selectors = ["sources", "environments", "sizes", "types", "alignments"]
+    let listPopulatorPromises = []
+    let selectors = ["sources", "environments", "sizes", "types", "alignments"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i];
         listPopulatorPromises.push($.getJSON("/api/" + selector, function (data) {
@@ -415,8 +414,7 @@ $(function () {
                 // Populate unofficial sources
                 sourcesManager.getUnofficialSources();
             }
-            window.monsterParameters[selector] = data
-            console.log(window.monsterParameters)
+            window.monsterParameters[selector] = data;
         }));
     };
 
@@ -459,8 +457,7 @@ $(function () {
 
         updaterButton.sortTable($("#challengeRatingSelectorDiv .updater_button"));
 
-
-        table = $("#monsterTable").DataTable();
+        let table = $("#monsterTable").DataTable();
         table.on('draw', function () {
             encounterManager.colourAllCells();
         })
@@ -542,11 +539,11 @@ $(function () {
 
         $(document).on("input", "#sourceKeyInput", function () {
             $('#sourceKeyManagementDiv .alert').remove();
-            key = $("#sourceKeyInput").val()
+            let key = $("#sourceKeyInput").val()
             if (key == "") { return }
             $('#sourceKeyManagementDiv .alert').remove();
             $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Requesting the sheet now...</div >')
-            var checkIfSheetProcessed = $.ajax({ type: "POST", url: "/api/checksource", data: { key: JSON.stringify(key) } });
+            let checkIfSheetProcessed = $.ajax({ type: "POST", url: "/api/checksource", data: { key: JSON.stringify(key) } });
             checkIfSheetProcessed.done(function (data) {
                 if (data == "") {
                     var customSourceSheetRequest = $.get('https://docs.google.com/spreadsheet/pub?key=' + key + '&output=csv');
@@ -590,30 +587,30 @@ $(function () {
 
 const encounterManager = require("./encounter-manager");
 
-var createCharLevelCombo = function (char, level) {
-    var char = (char != undefined) ? char : 1;
-    var level = (char != undefined) ? level : 1;
-    var characterListDiv = $("#characterList");
-    var optionID = $("#characterList div").length;
+var createCharLevelCombo = function (charArg, levelArg) {
+    let char = (charArg != undefined) ? charArg : 1;
+    let level = (charArg != undefined) ? levelArg : 1;
+    let characterListDiv = $("#characterList");
+    let optionID = $("#characterList div").length;
 
-    var char_options = ""
-    var level_options = ""
-    for (var i = 1; i <= 20; i++) {
-        var selected = (char == i) ? " selected=\"selected\"" : ""
+    let char_options = ""
+    let level_options = ""
+    for (let i = 1; i <= 20; i++) {
+        let selected = (char == i) ? " selected=\"selected\"" : ""
         char_options += '<option value="' + i + '"' + selected + '>' + i + '</option>'
     }
-    for (var i = 1; i <= 20; i++) {
-        var selected = (level == i) ? " selected=\"selected\"" : ""
+    for (let i = 1; i <= 20; i++) {
+        let selected = (level == i) ? " selected=\"selected\"" : ""
         level_options += '<option value="' + i + '"' + selected + '>' + i + '</option>'
     }
-    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + char_options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + level_options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
+    let level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + char_options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + level_options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
     characterListDiv.append(level_holder);
 }
 
 var handleClick = function (clicked_button) {
     if (clicked_button == window.document || clicked_button == undefined) { return }
 
-    var button_classes = clicked_button.className.split(/\s+/);
+    let button_classes = clicked_button.className.split(/\s+/);
 
     if (button_classes.indexOf("party-update") == -1) {
         return
@@ -631,7 +628,7 @@ var handleClick = function (clicked_button) {
 var getParty = function() {
     var party = [];
     var comboSelectorDivs = $("div .charLevelComboSelector");
-    for (var i = 0; i <= comboSelectorDivs.length; i++) {
+    for (var i = 0; i < comboSelectorDivs.length; i++) {
         let selectors = $(comboSelectorDivs[i]).children("select")
         if (selectors.length > 0) {
             party[party.length] = new Array(parseInt($(selectors[0]).val()), parseInt($(selectors[1]).val()))
@@ -690,7 +687,7 @@ var searchSources = function () {
 
 var getUnofficialSources = function () {
     $.getJSON('/api/unofficialsources').done(function (response) {
-        unofficialSourceNames = response;
+        let unofficialSourceNames = response;
         $("#customSourcesUsed").empty;
         $("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"));
     })
@@ -710,7 +707,7 @@ module.exports = { searchSources: searchSources, moveSourceCheckbox: moveSourceC
 
 var AssociatedId = function (clicked_button) {
     if (clicked_button != undefined) {
-        attachedParamChooser = $(clicked_button).parent().children("ul")[0];
+        let attachedParamChooser = $(clicked_button).parent().children("ul")[0];
         if (attachedParamChooser == undefined) {
             attachedParamChooser = $(clicked_button).parent().children("#minCr")[0];
         }
@@ -720,7 +717,7 @@ var AssociatedId = function (clicked_button) {
 
 var GetUpdatedValues = function (updatedList) {
     if (updatedList != undefined) {
-        parent_list = $("#" + updatedList);
+        let parent_list = $("#" + updatedList);
         var selected_elements = []
         for (var i = 0; i < parent_list.find("input").length; i++) {
             var this_box = parent_list.find("input")[i];
@@ -747,8 +744,8 @@ var getUpdatedChallengeRatings = function () {
     var maxValue = $("#maxCr option:selected").attr("value");
     var allowLegendary = $("#allowLegendary").prop("checked");
     var allowNamed = $("#allowNamed").prop("checked");
-    minValueComp = floatify(minValue)
-    maxValueComp = floatify(maxValue)
+    let minValueComp = floatify(minValue)
+    let maxValueComp = floatify(maxValue)
     var alerts = $("#challengeRatingSelectorDiv .alert")
     alerts.remove();
     if (maxValueComp < minValueComp) {
@@ -771,7 +768,7 @@ var sortTable = function (clicked_button) {
         monsterParameters["allowLegendary"] = values[2]
         monsterParameters["allowNamed"] = values[3]
     } else {
-        listUpdatedName = listUpdated.split("_")[0];
+        let listUpdatedName = listUpdated.split("_")[0];
         window.monsterParameters[listUpdatedName] = GetUpdatedValues(listUpdated);
     }
     window.monsterDataTable.ajax.reload();
@@ -779,8 +776,8 @@ var sortTable = function (clicked_button) {
 }
 
 var toggleAll = function (clicked_button) {
-    var listUpdated = AssociatedId(clicked_button);
-    command = $(clicked_button).text()
+    let listUpdated = AssociatedId(clicked_button);
+    let command = $(clicked_button).text()
     if (command == "Deselect All") {
         $('#' + listUpdated).find(":input").prop("checked", false)
         $(clicked_button).text("Select All");

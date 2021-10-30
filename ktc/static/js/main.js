@@ -8,7 +8,6 @@ const encounterManager = require('./encounter-manager.js');
 const sourcesManager = require('./sources-manager.js');
 const improvedInitiativeService = require('./improved-initiative-service.js');
 window.monsterParameters = {};
-window.monsterDataTable;
 window.partyThresholds = []
 window.encounterDifficulty = 0
 var customSourceNames = [];
@@ -96,8 +95,8 @@ $(function () {
     }
 
     // Populate the first five accordions
-    var listPopulatorPromises = []
-    selectors = ["sources", "environments", "sizes", "types", "alignments"]
+    let listPopulatorPromises = []
+    let selectors = ["sources", "environments", "sizes", "types", "alignments"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i];
         listPopulatorPromises.push($.getJSON("/api/" + selector, function (data) {
@@ -107,8 +106,7 @@ $(function () {
                 // Populate unofficial sources
                 sourcesManager.getUnofficialSources();
             }
-            window.monsterParameters[selector] = data
-            console.log(window.monsterParameters)
+            window.monsterParameters[selector] = data;
         }));
     };
 
@@ -151,8 +149,7 @@ $(function () {
 
         updaterButton.sortTable($("#challengeRatingSelectorDiv .updater_button"));
 
-
-        table = $("#monsterTable").DataTable();
+        let table = $("#monsterTable").DataTable();
         table.on('draw', function () {
             encounterManager.colourAllCells();
         })
@@ -234,11 +231,11 @@ $(function () {
 
         $(document).on("input", "#sourceKeyInput", function () {
             $('#sourceKeyManagementDiv .alert').remove();
-            key = $("#sourceKeyInput").val()
+            let key = $("#sourceKeyInput").val()
             if (key == "") { return }
             $('#sourceKeyManagementDiv .alert').remove();
             $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Requesting the sheet now...</div >')
-            var checkIfSheetProcessed = $.ajax({ type: "POST", url: "/api/checksource", data: { key: JSON.stringify(key) } });
+            let checkIfSheetProcessed = $.ajax({ type: "POST", url: "/api/checksource", data: { key: JSON.stringify(key) } });
             checkIfSheetProcessed.done(function (data) {
                 if (data == "") {
                     var customSourceSheetRequest = $.get('https://docs.google.com/spreadsheet/pub?key=' + key + '&output=csv');

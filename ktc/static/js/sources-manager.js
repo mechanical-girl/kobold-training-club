@@ -17,7 +17,7 @@ var searchSources = function () {
 
 var getUnofficialSources = function () {
     $.getJSON('/api/unofficialsources').done(function (response) {
-        unofficialSourceNames = response;
+        let unofficialSourceNames = response;
         $("#customSourcesUsed").empty;
         $("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"));
     })
