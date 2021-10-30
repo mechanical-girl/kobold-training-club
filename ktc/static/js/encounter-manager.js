@@ -1,5 +1,5 @@
 // encounter-manager.js
-var escapeText = function (text) {
+const escapeText = function (text) {
     return text.replace(/&/g, '&amp;')
         .replace(/>/g, '&gt;')
         .replace(/</g, '&lt;')
@@ -7,7 +7,7 @@ var escapeText = function (text) {
         .replace(/'/g, '&apos;');
 }
 
-var cr_xp_mapping = {
+const cr_xp_mapping = {
     "0": 10,
     "1/8": 25,
     "1/4": 50,
@@ -45,7 +45,7 @@ var cr_xp_mapping = {
 }
 
 
-var highlight_colours = ["#fff", "#dff0d8", "#f6ce95", "#eba5a3", "#888"]
+const highlight_colours = ["#fff", "#dff0d8", "#f6ce95", "#eba5a3", "#888"]
 
 
 $(function () {
@@ -56,12 +56,11 @@ $(function () {
     $(".exp-list.daily").css("background-color", highlight_colours[4])
 });
 
-var difficulties = ["easy", "medium", "hard", "deadly", "daily"]
+const difficulties = ["easy", "medium", "hard", "deadly", "daily"]
 
-var addMonster = function (cell) {
-    var monsterListDiv = $("#monsterList");
-    var row = $(cell).parent()
-    var monsterName = $(row).children("td:first-child").text()
+const addMonster = function (cell) {
+    let row = $(cell).parent()
+    let monsterName = $(row).children("td:first-child").text()
 
     addMonsterByName(monsterName);
 }
@@ -77,7 +76,7 @@ const addMonsterByName = function(monsterName) {
     }
 
     // add monster to list with count 1
-    level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + escapeText(monsterName) + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
+    let level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + escapeText(monsterName) + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>1</span>x ' + monsterName + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
 
     $("#monsterList").append(level_holder);
 
@@ -89,7 +88,7 @@ var importEncounter = function () {
     var monsterListDiv = $("#monsterList");
     if (monsters != null) {
         for (var i = 0; i < monsters.length; i++) {
-            level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsters[i][0] + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>' + monsters[i][1] + '</span>x ' + monsters[i][0] + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
+            let level_holder = '<div class="monsterSelector d-flex align-items-center" id="' + monsters[i][0] + '"><i class="bi bi-dash-square-fill encounter-update" style="size: 125%; margin-right : 5px;"></i><span>' + monsters[i][1] + '</span>x ' + monsters[i][0] + '<i class="bi bi-plus-square-fill encounter-update" style="size: 125%; margin-left: 5px;"></i></div>';
             monsterListDiv.append(level_holder);
         }
     }
@@ -147,7 +146,7 @@ var updateEncounterDifficulty = function () {
     for (var i = 0; i < $(monsterListDiv).children('div').length; i++) {
         var thisMonsterDiv = $(monsterListDiv).children('div')[i];
         let monsterName = $(monsterListDiv).children('div')[i].id;
-        let thisSpan = $($(monsterListDiv).children('div')[i]).children('span')[0]
+        let thisSpan = $(thisMonsterDiv).children('span')[0]
         let noOfMonsters = parseInt($(thisSpan).text())
         monstersInEncounter[monstersInEncounter.length] = new Array(monsterName, noOfMonsters)
     }

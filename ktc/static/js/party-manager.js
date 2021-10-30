@@ -2,30 +2,30 @@
 
 const encounterManager = require("./encounter-manager");
 
-var createCharLevelCombo = function (char, level) {
-    var char = (char != undefined) ? char : 1;
-    var level = (char != undefined) ? level : 1;
-    var characterListDiv = $("#characterList");
-    var optionID = $("#characterList div").length;
+var createCharLevelCombo = function (charArg, levelArg) {
+    let char = (charArg != undefined) ? charArg : 1;
+    let level = (charArg != undefined) ? levelArg : 1;
+    let characterListDiv = $("#characterList");
+    let optionID = $("#characterList div").length;
 
-    var char_options = ""
-    var level_options = ""
-    for (var i = 1; i <= 20; i++) {
-        var selected = (char == i) ? " selected=\"selected\"" : ""
+    let char_options = ""
+    let level_options = ""
+    for (let i = 1; i <= 20; i++) {
+        let selected = (char == i) ? " selected=\"selected\"" : ""
         char_options += '<option value="' + i + '"' + selected + '>' + i + '</option>'
     }
-    for (var i = 1; i <= 20; i++) {
-        var selected = (level == i) ? " selected=\"selected\"" : ""
+    for (let i = 1; i <= 20; i++) {
+        let selected = (level == i) ? " selected=\"selected\"" : ""
         level_options += '<option value="' + i + '"' + selected + '>' + i + '</option>'
     }
-    level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + char_options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + level_options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
+    let level_holder = '<div class="charLevelComboSelector d-flex align-items-center" id="' + optionID + '"><i class="bi bi-dash-square-fill party-update" style="size: 125%; margin-right : 5px;"></i><select class="charLevelComboSelector" id="characterNumber' + optionID + '">' + char_options + '</select> characters at level <select class="charLevelComboSelector" id="levelNumber' + optionID + '">' + level_options + '</select><i class="bi bi-plus-square-fill party-update" style="size: 125%; margin-left: 5px;"></i></div>';
     characterListDiv.append(level_holder);
 }
 
 var handleClick = function (clicked_button) {
     if (clicked_button == window.document || clicked_button == undefined) { return }
 
-    var button_classes = clicked_button.className.split(/\s+/);
+    let button_classes = clicked_button.className.split(/\s+/);
 
     if (button_classes.indexOf("party-update") == -1) {
         return
@@ -43,7 +43,7 @@ var handleClick = function (clicked_button) {
 var getParty = function() {
     var party = [];
     var comboSelectorDivs = $("div .charLevelComboSelector");
-    for (var i = 0; i <= comboSelectorDivs.length; i++) {
+    for (var i = 0; i < comboSelectorDivs.length; i++) {
         let selectors = $(comboSelectorDivs[i]).children("select")
         if (selectors.length > 0) {
             party[party.length] = new Array(parseInt($(selectors[0]).val()), parseInt($(selectors[1]).val()))

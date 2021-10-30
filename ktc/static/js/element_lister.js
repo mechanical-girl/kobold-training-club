@@ -6,7 +6,7 @@ var listElements = function (data, prefix = "") {
         var stored = window.localStorage.getItem(prefix + "_selector")
         prefix = prefix + "_";
     }
-    listText = "";
+    let listText = "";
     for (let i = 0; i < data.length; i++) {
         var checked = " checked";
         if (stored != null && stored.indexOf(data[i]) == -1) {
