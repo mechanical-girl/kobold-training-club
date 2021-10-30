@@ -23,7 +23,7 @@ module.exports = listElements
 
 },{}],2:[function(require,module,exports){
 // encounter-manager.js
-var escapeText = function (text) {
+const escapeText = function (text) {
     return text.replace(/&/g, '&amp;')
         .replace(/>/g, '&gt;')
         .replace(/</g, '&lt;')
@@ -31,7 +31,7 @@ var escapeText = function (text) {
         .replace(/'/g, '&apos;');
 }
 
-var cr_xp_mapping = {
+const cr_xp_mapping = {
     "0": 10,
     "1/8": 25,
     "1/4": 50,
@@ -69,7 +69,7 @@ var cr_xp_mapping = {
 }
 
 
-var highlight_colours = ["#fff", "#dff0d8", "#f6ce95", "#eba5a3", "#888"]
+const highlight_colours = ["#fff", "#dff0d8", "#f6ce95", "#eba5a3", "#888"]
 
 
 $(function () {
@@ -80,12 +80,11 @@ $(function () {
     $(".exp-list.daily").css("background-color", highlight_colours[4])
 });
 
-var difficulties = ["easy", "medium", "hard", "deadly", "daily"]
+const difficulties = ["easy", "medium", "hard", "deadly", "daily"]
 
-var addMonster = function (cell) {
-    var monsterListDiv = $("#monsterList");
-    var row = $(cell).parent()
-    var monsterName = $(row).children("td:first-child").text()
+const addMonster = function (cell) {
+    let row = $(cell).parent()
+    let monsterName = $(row).children("td:first-child").text()
 
     addMonsterByName(monsterName);
 }
@@ -171,7 +170,7 @@ var updateEncounterDifficulty = function () {
     for (var i = 0; i < $(monsterListDiv).children('div').length; i++) {
         var thisMonsterDiv = $(monsterListDiv).children('div')[i];
         let monsterName = $(monsterListDiv).children('div')[i].id;
-        let thisSpan = $($(monsterListDiv).children('div')[i]).children('span')[0]
+        let thisSpan = $(thisMonsterDiv).children('span')[0]
         let noOfMonsters = parseInt($(thisSpan).text())
         monstersInEncounter[monstersInEncounter.length] = new Array(monsterName, noOfMonsters)
     }
@@ -322,7 +321,6 @@ window.partyThresholds = []
 window.encounterDifficulty = 0
 var customSourceNames = [];
 var unofficialSourceNames = []
-const storage = window.localStorage;
 
 var getMonsterParameters = function () {
     return {
@@ -418,6 +416,7 @@ $(function () {
                 sourcesManager.getUnofficialSources();
             }
             window.monsterParameters[selector] = data
+            console.log(window.monsterParameters)
         }));
     };
 
@@ -468,7 +467,8 @@ $(function () {
 
     }))
 
-    $.when(listPopulatorPromises).done(function (listPopulatorPromises) {
+    $.when(listPopulatorPromises).done(function () {
+        console.log(window.monsterParameters)
         createMonsterTable()
         // Populate the character selectors
         var party = JSON.parse(window.localStorage.getItem("party"));
@@ -904,8 +904,8 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 
-}).call(this)}).call(this,{"isBuffer":require("../../../../../../../opt/homebrew/lib/node_modules/watchify/node_modules/is-buffer/index.js")})
-},{"../../../../../../../opt/homebrew/lib/node_modules/watchify/node_modules/is-buffer/index.js":62}],9:[function(require,module,exports){
+}).call(this)}).call(this,{"isBuffer":require("../../../../../../../opt/homebrew/lib/node_modules/browserify/node_modules/is-buffer/index.js")})
+},{"../../../../../../../opt/homebrew/lib/node_modules/browserify/node_modules/is-buffer/index.js":62}],9:[function(require,module,exports){
 'use strict';
 
 /* eslint no-invalid-this: 1 */
@@ -2564,7 +2564,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":18,"./internal/streams/BufferList":23,"./internal/streams/destroy":24,"./internal/streams/stream":25,"_process":66,"core-util-is":8,"events":50,"inherits":12,"isarray":15,"process-nextick-args":17,"safe-buffer":26,"string_decoder/":27,"util":44}],21:[function(require,module,exports){
+},{"./_stream_duplex":18,"./internal/streams/BufferList":23,"./internal/streams/destroy":24,"./internal/streams/stream":25,"_process":66,"core-util-is":8,"events":50,"inherits":12,"isarray":15,"process-nextick-args":17,"safe-buffer":26,"string_decoder/":27,"util":45}],21:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -3549,7 +3549,7 @@ if (util && util.inspect && util.inspect.custom) {
     return this.constructor.name + ' ' + obj;
   };
 }
-},{"safe-buffer":26,"util":44}],24:[function(require,module,exports){
+},{"safe-buffer":26,"util":45}],24:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -4386,7 +4386,7 @@ module.exports = function resolve(x, options, callback) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./caller":32,"./node-modules-paths":36,"./normalize-options":37,"_process":66,"fs":45,"is-core-module":14,"path":65}],32:[function(require,module,exports){
+},{"./caller":32,"./node-modules-paths":36,"./normalize-options":37,"_process":66,"fs":42,"is-core-module":14,"path":65}],32:[function(require,module,exports){
 module.exports = function () {
     // see https://code.google.com/p/v8/wiki/JavaScriptStackTraceApi
     var origPrepareStackTrace = Error.prepareStackTrace;
@@ -4804,7 +4804,7 @@ module.exports = function resolveSync(x, options) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./caller":32,"./node-modules-paths":36,"./normalize-options":37,"_process":66,"fs":45,"is-core-module":14,"path":65}],39:[function(require,module,exports){
+},{"./caller":32,"./node-modules-paths":36,"./normalize-options":37,"_process":66,"fs":42,"is-core-module":14,"path":65}],39:[function(require,module,exports){
 (function (process){(function (){
 var Transform = require('readable-stream').Transform
   , inherits  = require('util').inherits
@@ -4997,6 +4997,8 @@ function extend() {
 }
 
 },{}],42:[function(require,module,exports){
+
+},{}],43:[function(require,module,exports){
 (function (global){(function (){
 'use strict';
 
@@ -5025,7 +5027,7 @@ module.exports = function availableTypedArrays() {
 };
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -5177,11 +5179,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],44:[function(require,module,exports){
-
 },{}],45:[function(require,module,exports){
-arguments[4][44][0].apply(exports,arguments)
-},{"dup":44}],46:[function(require,module,exports){
+arguments[4][42][0].apply(exports,arguments)
+},{"dup":42}],46:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -6962,7 +6962,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":43,"buffer":46,"ieee754":59}],47:[function(require,module,exports){
+},{"base64-js":44,"buffer":46,"ieee754":59}],47:[function(require,module,exports){
 'use strict';
 
 var GetIntrinsic = require('get-intrinsic');
@@ -8224,7 +8224,7 @@ module.exports = function isTypedArray(value) {
 };
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"available-typed-arrays":42,"call-bind/callBound":47,"es-abstract/helpers/getOwnPropertyDescriptor":49,"foreach":51,"has-tostringtag/shams":57}],65:[function(require,module,exports){
+},{"available-typed-arrays":43,"call-bind/callBound":47,"es-abstract/helpers/getOwnPropertyDescriptor":49,"foreach":51,"has-tostringtag/shams":57}],65:[function(require,module,exports){
 (function (process){(function (){
 // 'path' module extracted from Node.js v8.11.1 (only the posix part)
 // transplited with Babel
@@ -10142,4 +10142,4 @@ module.exports = function whichTypedArray(value) {
 };
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"available-typed-arrays":42,"call-bind/callBound":47,"es-abstract/helpers/getOwnPropertyDescriptor":49,"foreach":51,"has-tostringtag/shams":57,"is-typed-array":64}]},{},[1,2,3,4,5,6,7]);
+},{"available-typed-arrays":43,"call-bind/callBound":47,"es-abstract/helpers/getOwnPropertyDescriptor":49,"foreach":51,"has-tostringtag/shams":57,"is-typed-array":64}]},{},[1,2,3,4,5,6,7]);

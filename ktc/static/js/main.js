@@ -13,7 +13,6 @@ window.partyThresholds = []
 window.encounterDifficulty = 0
 var customSourceNames = [];
 var unofficialSourceNames = []
-const storage = window.localStorage;
 
 var getMonsterParameters = function () {
     return {

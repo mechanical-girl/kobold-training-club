@@ -136,7 +136,7 @@ def generate_encounter():
     """Wrapper for the encounter generator function"""
     try:
         params = json.loads(request.values["params"])
-    except:
+    except KeyError:
         params = {}
 
     result = random_encounter_generator.generate(params)
