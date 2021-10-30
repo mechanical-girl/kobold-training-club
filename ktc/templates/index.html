@@ -159,7 +159,7 @@
 
                                     </ul>
                                     <button class="updater_button">Update</button>
-                                    <button class="toggle_all_button">Deselect All</button>
+                                    <button class="toggle_all_button">Select All</button>
                                     <input type="text" id="customSourceSearcher" placeholder="Search by name...">
                                     <ul id="customSourceFinder">
 
@@ -252,9 +252,22 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-5" id="encounter-col">
                         <h4>Your Encounter <span id="encounterDifficulty"></span></h4>
                         <div class="row" id="monsterList">
+                        </div>
+                        <div class="dropdown"><div class="btn-group">
+                            <button type="button" class="btn btn-primary btn-sm" id="generate-encounter-button" >Hard Encounter</button>
+                            <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item random-encounter-difficulty" id="easy" href="#">Easy Encounter</a></li>
+                                <li><a class="dropdown-item random-encounter-difficulty" id="medium"  href="#">Medium Encounter</a></li>
+                                <li><a class="dropdown-item random-encounter-difficulty active" id="hard" aria-current="true" href="#">Hard Encounter</a></li>
+                                <li><a class="dropdown-item random-encounter-difficulty" id="deadly" href="#">Deadly Encounter</a></li>
+                            </ul>
                         </div>
                     </div>
 

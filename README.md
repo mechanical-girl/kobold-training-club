@@ -3,6 +3,8 @@
 [![codecov](https://codecov.io/gh/struandw/kobold-training-club/branch/master/graph/badge.svg?token=YHPHF6CDMG)](https://codecov.io/gh/struandw/kobold-training-club)
 [![Build Status](https://app.travis-ci.com/struandw/kobold-training-club.svg?branch=master)](https://app.travis-ci.com/github/struandw/kobold-training-club)
 ![ktc.svg](ktc.svg)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/struandw/kobold-training-club.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/struandw/kobold-training-club/context:javascript)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/struandw/kobold-training-club.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/struandw/kobold-training-club/context:python)
 
 ## Quickstart Guide
 ### Required Software

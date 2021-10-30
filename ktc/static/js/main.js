@@ -20,7 +20,6 @@ var getMonsterParameters = function () {
         params: JSON.stringify(window.monsterParameters)
     };
 }
-
 var createMonsterTable = function () {
     // Populate the monster table
 
@@ -87,9 +86,8 @@ var createMonsterTable = function () {
     $.fn.dataTableExt.oSort["name-desc"] = function (a, b) { return b.localeCompare(a) }
     $.fn.dataTableExt.oSort["name-asc"] = function (a, b) { return a.localeCompare(b) }
     window.monsterDataTable.columns.adjust().draw();
+    //$("input").each($(this).attr({"autocomplete": "off", "autocorrect": "off", "autocapitalize": "off", "spellcheck": "false", color: "pink"}));
 }
-
-
 $(function () {
     // Show any alerts if neede
     let versionNumber = $("#version-number").text().slice(1);
@@ -102,7 +100,7 @@ $(function () {
     var listPopulatorPromises = []
     selectors = ["sources", "environments", "sizes", "types", "alignments"]
     for (let i = 0; i < selectors.length; i++) {
-        let selector = selectors[i]
+        let selector = selectors[i];
         listPopulatorPromises.push($.getJSON("/api/" + selector, function (data) {
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
@@ -111,6 +109,7 @@ $(function () {
                 sourcesManager.getUnofficialSources();
             }
             window.monsterParameters[selector] = data
+            console.log(window.monsterParameters)
         }));
     };
 
@@ -161,10 +160,9 @@ $(function () {
 
     }))
 
-    $.when(listPopulatorPromises).done(function (listPopulatorPromises) {
+    $.when(listPopulatorPromises).done(function () {
+        console.log(window.monsterParameters)
         createMonsterTable()
-
-
         // Populate the character selectors
         var party = JSON.parse(window.localStorage.getItem("party"));
         if (party != null) {
@@ -175,17 +173,14 @@ $(function () {
             partyManager.createCharLevelCombo();
         }
         partyManager.updateThresholds();
-
         encounterManager.importEncounter();
 
         $(document).on("click", "#updatesNotesModal .close", function () {
             $("#updatesNotesModal").modal('hide');
         })
-
         $(document).on("click", ".party-update", function () {
             partyManager.handleClick(this)
         });
-
         // Handle Improved Initiative button clicks
         $(document).on("click", "#run_in_ii_button", function () {
             var monsters = JSON.parse(window.localStorage.getItem("monsters"));
@@ -195,33 +190,44 @@ $(function () {
 
             improvedInitiativeService.openImprovedInitiative({ Combatants: combatants });
         })
-
         // Handle sort updates
         $(document).on("click", ".updater_button", function () {
             updaterButton.sortTable(this);
         })
-
         $(".toggle_all_button").on("click", function () {
             updaterButton.toggleAll(this);
         })
-
         $(document).on("click", "#customSourceFinder .unofficial-source", function () {
             sourcesManager.moveSourceCheckbox(this);
         })
-
         // Handle monster adds
         $(document).on("click", "#monsterTable > tbody > tr > .not-a-link", function () {
             encounterManager.addMonster(this);
         })
-
         $(document).on("click", ".encounter-update", function () {
             encounterManager.updateMonsterCount(this);
         })
-
         $(document).on("change", "select", function () {
             partyManager.updateThresholds();
         })
 
+        // Handle random encounter generation
+        $(document).on("click", "#generate-encounter-button", function() {
+            console.log("Generating encounter...");
+            let encounterParameters = window.monsterParameters;
+            encounterParameters["party"] = partyManager.getParty()
+            encounterParameters["difficulty"] = $("#generate-encounter-button").text().split(' ')[0].toLowerCase()
+            console.log(encounterParameters)
+            encounterManager.generateEncounter(encounterParameters);
+        })
+
+        // Handle random encounter difficulty selection
+        $(document).on("click", ".random-encounter-difficulty", function() {
+            let selectedId = $(this).attr('id');
+            let buttonLabel = selectedId.charAt(0).toUpperCase() + selectedId.slice(1) + " Encounter";
+            $("#generate-encounter-button").text(buttonLabel);
+
+        })
 
         $(document).on("input", "#customSourceSearcher", function () {
             sourcesManager.searchSources(unofficialSourceNames);
@@ -253,7 +259,7 @@ $(function () {
                         })
                         customSheetProcessRequest.fail(function () {
                             $('#sourceKeyManagementDiv .alert').remove();
-                            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" id="processing-custom-source-alert role="alert">Processing on this sheet failed. Please check that it\'s valid. If you\'re sure it is, please open an issue on Github.</div >')
+                            $('#sourceKeyManagementDiv').prepend('<div class="alert alert-danger" id="processing-custom-source-alert" role="alert">Processing on this sheet failed. Please check that it\'s valid. If you\'re sure it is, please open an issue on Github.</div >')
                         })
                     })
                     customSourceSheetRequest.fail(function (jqXHR, textStatus, errorThrown) {
@@ -268,5 +274,6 @@ $(function () {
             })
 
         })
+
     })
 })

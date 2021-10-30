@@ -211,12 +211,18 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         challenge_rating_maximum = None
 
     try:
-        allow_legendary = parameters["allowLegendary"]
+        if parameters["allowLegendary"] and parameters["allowLegendary"] == "false":
+            allow_legendary = False
+        else:
+            allow_legendary = True
     except (KeyError, IndexError):
         allow_legendary = True
 
     try:
-        allow_named = parameters["allowNamed"]
+        if parameters["allowNamed"] and parameters["allowNamed"] == "false":
+            allow_named = False
+        else:
+            allow_named = True
     except (KeyError, IndexError):
         allow_named = True
 
@@ -335,10 +341,10 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         query_arguments += possible_challenge_ratings[mindex:maxdex]
 
     if allow_legendary is not True:
-        where_requirements += "legendary = '' AND "
+        where_requirements += "legendary = 0 AND "
 
     if allow_named is not True:
-        where_requirements += "named = '' AND "
+        where_requirements += "named = 0 AND "
 
     # If there are requirements, we add a WHERE to the start
     if where_requirements != "":
@@ -352,7 +358,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         cursor = conn.cursor()
-        conn.set_trace_callback(print)
+        # conn.set_trace_callback(print)
 
         if query_arguments == []:
             cursor.execute(query_string)
@@ -407,6 +413,7 @@ def get_encounter_xp(monsters: List[Tuple[str, int]]) -> int:
         int: The total adjusted XP for this encounter
     """
     # TODO: refactor once corresponding main function is refactored
+
     crs = []
     quantities = []
     for monster_pair in monsters:
@@ -419,13 +426,17 @@ def get_encounter_xp(monsters: List[Tuple[str, int]]) -> int:
     return adj_xp_total
 
 
-def ingest_custom_csv_string(csv_string, ingest_db_location, url=""):
-    """Simply a wrapper around the converter function"""
-    return converter.ingest_data(csv_string, ingest_db_location, url)
+def ingest_custom_csv_string(csv_string, db_location, url=""):
+    """Simply a wrapper for the converter function"""
+    return converter.ingest_data(csv_string, db_location, url)
 
 
 def get_unofficial_sources() -> List[str]:
-    """Returns a deduplicated list of all unofficial sources in the database"""
+    """Returns a deduplicated list of unofficial sources
+
+    Returns:
+        List[str]: a deduplicated list of unofficial sources
+    """
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         cursor = conn.cursor()
 

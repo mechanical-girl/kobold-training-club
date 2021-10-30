@@ -30,7 +30,8 @@
   },
   "devDependencies": {
     "browserify-shim": "^3.8.14",
-    "jasmine": "^3.8.0"
+    "jasmine": "^3.8.0",
+    "typescript": "^4.4.4"
   },
   "repository": {
     "type": "git",
