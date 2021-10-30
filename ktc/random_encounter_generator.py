@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pprint
 import random
 from fractions import Fraction
 from typing import Dict, List, Tuple

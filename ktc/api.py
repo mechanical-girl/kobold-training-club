@@ -3,7 +3,6 @@
 """The API module contains most of the important functions for KTC and wrappers for the rest"""
 
 import contextlib
-import pprint
 import sqlite3
 from fractions import Fraction
 from typing import Dict, List, Tuple
@@ -163,8 +162,6 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     if parameters == {}:
         parameters['sources'] = [
             f"source_{source}" for source in get_list_of_sources()]
-    else:
-        pprint.pprint(parameters)
 
     try:
         environment_constraints = [
@@ -215,7 +212,6 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     try:
         if parameters["allowLegendary"] and parameters["allowLegendary"] == "false":
-            print("foo")
             allow_legendary = False
         else:
             allow_legendary = True
@@ -225,7 +221,6 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     try:
         if parameters["allowNamed"] and parameters["allowNamed"] == "false":
             allow_named = False
-            print("bar")
         else:
             allow_named = True
     except (KeyError, IndexError):
@@ -363,7 +358,7 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
 
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         cursor = conn.cursor()
-        conn.set_trace_callback(print)
+        # conn.set_trace_callback(print)
 
         if query_arguments == []:
             cursor.execute(query_string)
