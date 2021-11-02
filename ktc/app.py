@@ -87,6 +87,7 @@ def get_monsters():
     """Gets a list of monsters matching the passed parameters and returns them"""
     try:
         monster_parameters_string = request.values["params"]
+        print(monster_parameters_string)
         monster_parameters = json.loads(
             monster_parameters_string)
     except KeyError:
