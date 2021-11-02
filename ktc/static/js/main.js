@@ -13,6 +13,25 @@ window.encounterDifficulty = 0
 var customSourceNames = [];
 var unofficialSourceNames = []
 
+function addZero(x,n) {
+  while (x.toString().length < n) {
+    x = "0" + x;
+  }
+  return x;
+}
+
+const debugLog = function(str) {
+    const d = new Date();
+    let h = addZero(d.getHours(), 2);
+    let m = addZero(d.getMinutes(), 2);
+    let s = addZero(d.getSeconds(), 2);
+    let ms = addZero(d.getMilliseconds(), 3);
+    let time = h + ":" + m + ":" + s + ":" + ms;
+
+    console.log("[" + time + "] " + str)
+
+}
+
 var getMonsterParameters = function () {
     return {
         params: JSON.stringify(window.monsterParameters)
@@ -87,19 +106,23 @@ var createMonsterTable = function () {
     //$("input").each($(this).attr({"autocomplete": "off", "autocorrect": "off", "autocapitalize": "off", "spellcheck": "false", color: "pink"}));
 }
 $(function () {
-    // Show any alerts if neede
+    // Show any alerts if needed
+    debugLog("Checking version...");
     let versionNumber = $("#version-number").text().slice(1);
     if (window.localStorage.getItem('lastVersion') != versionNumber && $("#patchNotesModal .modal-body").text().length > 20) {
         window.localStorage.setItem('lastVersion', versionNumber)
         $('#patchNotesModal').modal('show')
     }
+    debugLog("Version check done.")
 
     // Populate the first five accordions
     let listPopulatorPromises = []
     let selectors = ["sources", "environments", "sizes", "types", "alignments"]
     for (let i = 0; i < selectors.length; i++) {
         let selector = selectors[i];
+        debugLog("Requesting " + selector + "...")
         listPopulatorPromises.push($.getJSON("/api/" + selector, function (data) {
+            debugLog(selector + " data received")
             var parent = $("#" + selector + "_selector");
             parent.append(listElements(data, selector));
             if (selector == "sources") {
@@ -107,12 +130,16 @@ $(function () {
                 sourcesManager.getUnofficialSources();
             }
             window.monsterParameters[selector] = data;
+            debugLog(selector + " added to page, done.")
         }));
+        debugLog("Request sent.")
     };
 
 
     // Populate the last accordion
+    debugLog("Requesting CRs...")
     listPopulatorPromises.push($.getJSON("/api/crs", function (data) {
+        debugLog("Processing CRs...")
         var min = $("#challengeRatingMinimum");
         var max = $("#challengeRatingMaximum");
         let min_cr_stored = JSON.parse(window.localStorage.getItem("minCr"))
@@ -153,13 +180,16 @@ $(function () {
         table.on('draw', function () {
             encounterManager.colourAllCells();
         })
-
+        debugLog("CRs added to page, done.")
     }))
+    debugLog("Request sent.")
 
     $.when(listPopulatorPromises).done(function () {
-        console.log(window.monsterParameters)
+        debugLog("All fields filled, creating monster table...")
         createMonsterTable()
+        debugLog("Monster table done.")
         // Populate the character selectors
+        debugLog("Populating character selectors...")
         var party = JSON.parse(window.localStorage.getItem("party"));
         if (party != null) {
             for (var i = 0; i < party.length; i++) {
@@ -168,8 +198,14 @@ $(function () {
         } else {
             partyManager.createCharLevelCombo();
         }
+        debugLog("Character selectors done.")
+        debugLog("Getting updated XP thresholds...")
         partyManager.updateThresholds();
+        debugLog("XP thresholds done.")
+
+        debugLog("Getting locally stored encounter...")
         encounterManager.importEncounter();
+        debugLog("Local encounter done.")
 
         $(document).on("click", "#updatesNotesModal .close", function () {
             $("#updatesNotesModal").modal('hide');
