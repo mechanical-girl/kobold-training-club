@@ -129,6 +129,8 @@ def test_cr_list_gives_correct_list(client):
         "25",
         "26",
         "27",
+        "28",
+        "29",
         "30",
     ]
     response = client.get("/api/crs")
@@ -270,6 +272,7 @@ def test_cr_list_gives_correct_list(client):
         "26",
         "27",
         "28",
+        "29",
         "30",
     ]
     response = client.get("/api/crs")
@@ -355,9 +358,11 @@ def test_monster_list_returns_good_single_constraint_list(client):
 def test_monster_list_returns_good_multiple_constraint_list(client):
     expected = ['Aboleth', 'Adept', 'Arachnia, Giant Water Spider', 'Barbarian Warrior', 'Boalisk', 'Bone Golem', 'Caryatid Column', 'Chuul', 'Coffer Corpse', 'Crabman', 'Crocodile', 'Crushing Wave Priest', 'Crushing Wave Reaver', 'Dagon', 'Dark Tide Knight', 'Dark Triton', 'Deep Scion', 'Dolphin', 'Elite Bullywug', 'Elite Hobgoblin', 'Evil Priest', 'Eye of the Deep', 'Fanged Sea Serpent', 'Fathomer', 'Fledgling Mage', 'Four-Armed Gargoyle', 'Giant Armadillo', 'Giant Clam', 'Giant Crab', 'Giant Electric Catfish', 'Giant Frog', 'Giant Moray Eel', 'Giant Octopus', 'Giant Pike', 'Giant Sea Horse', 'Giant Seahorse', 'Giant Toad', 'Giant Water Beetle', 'Giant Water Spider', 'Gray Nisp', 'Green Guardian Gargoyle', 'Gulper Eel',
                 'Hippocampus', 'Hunter Shark', 'Kelpie (FEF)', 'Kraken Priest', 'Kuo-toa', 'Kuo-toa Archpriest', 'Kuo-toa Whip', 'Lithonnite', 'Living Stone Statue', 'Living Wax Statue', 'Mad Hermit', 'Marevak, Advisor to the Castellan', 'Margoyle', 'Marid', 'Marine Basilisk', 'Merfolk', 'Merfolk Hydromancer', 'Merrow', 'Monstrous Crayfish', 'Morkoth', 'Mummy of the Deep', 'Ogre Skeleton', 'One-Eyed Shiver', 'Orc Chief', 'Plesiosaurus', 'Reef Shark', 'Sahuagin', 'Sahuagin Baron', 'Sahuagin Priestess', 'Sea Hag', 'Sea Hag (coven)', 'Sea Spawn', 'Spitting Sea Serpent', 'Strangle Weed', 'Swarm of Quippers', 'Thalasskoptis', 'Thoul', 'Tortoise', 'Troglodyte Shaman', 'Troglodyte Spore Servant', 'Wastrilith', 'Water Elemental', 'Water Elemental Myrmidon', 'Wizard Golem', 'Young Aboleth', 'Zombie']
-    parameters = '{"sizes": ["sizes_Medium", "sizes_Large"], "environments": ["environments_aquatic"]}'
-    response = client.get("/api/monsters?params=" +
-                          json.dumps(json.loads(parameters)))
+    param_dict = {"sizes": ["sizes_Medium", "sizes_Large"], "environments": ["environments_aquatic"], "sources": ["_Baldur's Gate: Descent into Avernus", "_Basic Rules v1", "_Curse of Strahd", "_Eberron: Rising from the Last War", "_Explorer's Guide to Wildemount", "_Ghosts of Saltmarsh", "_Hoard of the Dragon Queen", "_Icewind Dale: Rime of the Frost Maiden", "_Into The Borderlands", "_Monster Manual", "_Mordenkainen's Tome of Foes", "_Mythic Odysseys of Theros", "_Out of the Abyss", "_Player's Handbook", "_Princes of the Apocalypse",
+                                                                                                                  "_Rise of Tiamat", "_Storm King's Thunder", "_Tales from the Yawning Portal", "_Volo's Guide to Monsters", "_Waterdeep: Dragon Heist", "_Waterdeep: Dungeon of the Mad Mage", "_Lost Mines of Phandelver", "_Fifth Edition Foes", "_Monster-A-Day", "_Princes of the Apocalypse Online Supplement v1.0", "_HotDQ supplement", "_Monster Module", "_Nerzugal's Extended Bestiary", "_Primeval Thule Campaign Setting", "_Primeval Thule Gamemaster's Companion", "_Tome of Beasts", "_Tome of Beasts II", ], }
+
+    param_str = json.dumps(param_dict)
+    response = client.get("/api/monsters?params=" + param_str)
     received = response.get_json()["data"]
 
     for i, monster in enumerate(received):
@@ -431,7 +436,7 @@ def test_monster_list_returns_good_no_legendary_list(client):
     parameters = {"allowLegendary": "false"}
     response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
     received = len(response.get_json()["data"])
-    expected = 2576
+    expected = 1138
 
     assert expected == received
 
@@ -440,7 +445,7 @@ def test_monster_list_returns_good_no_named_list(client):
     parameters = {"allowNamed": "false"}
     response = client.get(f"/api/monsters?params={json.dumps(parameters)}")
     received = len(response.get_json()["data"])
-    expected = 2576
+    expected = 1248
 
     assert expected == received
 

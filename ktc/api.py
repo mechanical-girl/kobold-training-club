@@ -98,6 +98,10 @@ def get_list_of_monster_types() -> List[str]:
 
 def get_list_of_challenge_ratings() -> List[str]:
     """Returns a unique list of challenge ratings from the monsters table"""
+    return ['0', '1/8', '1/4', '1/2', '1', '2', '3', '4', '5', '6', '7', '8',
+            '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19',
+            '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30']
+
     with contextlib.closing(sqlite3.connect(db_location)) as conn:
         cursor = conn.cursor()
 
@@ -146,7 +150,14 @@ def get_list_of_sources() -> List[str]:
 # TODO Split paraneter sanitisation and query construction into separate functions
 
 
-def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
+def parse_params(params: Dict, p_key: str) -> List:
+    try:
+        return [param.split("_")[1] for param in params[p_key]]
+    except (KeyError, IndexError):
+        return []
+
+
+def get_list_of_monsters(r_params: Dict) -> Dict[str, List[List[str]]]:
     """Query the database for monsters matching the parameters passed and return a list
 
     Args:
@@ -159,114 +170,52 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     # Here we go through the parameters and split each into an individual variable
     # This improves readability and allows for the creation of empty lists if
     # no constraints are given
-    if parameters == {}:
-        parameters['sources'] = [
+
+    params = {}
+    if r_params == {}:
+        params['sources'] = [
             f"source_{source}" for source in get_list_of_sources()]
 
-    try:
-        environment_constraints = [
-            param.split("_")[1] for param in parameters["environments"]
-        ]
-    except (KeyError, IndexError):
-        environment_constraints = []
+    params['env'] = parse_params(r_params, 'environments')
+    params['size'] = parse_params(r_params, 'sizes')
+    params['source'] = parse_params(r_params, 'sources')
+    params['source'] += parse_params(r_params, 'customSourcesUsed')
+    params['type'] = parse_params(r_params, 'types')
+    params['align'] = parse_params(r_params, 'alignments')
+    params['cr_min'] = parse_params(r_params, 'minimumChallengeRating')
+    params['cr_max'] = parse_params(r_params, 'maximumChallengeRating')
+
+    if params['source'] == []:
+        params['source'] = get_list_of_sources()
+
+    # TODO: Refactor to store CRs as floats and convert to fractions
+    possible_challenge_ratings = get_list_of_challenge_ratings()
+    print(possible_challenge_ratings)
+    if params['cr_min'] == []:
+        params['cr_min'] = possible_challenge_ratings[0]
+    if params['cr_max'] == []:
+        params['cr_max'] = possible_challenge_ratings[-1]
 
     try:
-        size_constraints = [param.split("_")[1]
-                            for param in parameters["sizes"]]
-    except (KeyError, IndexError):
-        size_constraints = []
-
-    try:
-        source_constraints = [param.split("_")[1]
-                              for param in parameters["sources"]]
-    except (KeyError, IndexError):
-        source_constraints = []
-
-    try:
-        source_constraints += [param.split("_")[1]
-                               for param in parameters["customSourcesUsed"]]
-    except (KeyError, IndexError):
-        pass
-
-    try:
-        type_constraints = [param.split("_")[1]
-                            for param in parameters["types"]]
-    except (KeyError, IndexError):
-        type_constraints = []
-
-    try:
-        alignment_constraints = [
-            param.split("_")[1] for param in parameters["alignments"]
-        ]
-    except (KeyError, IndexError):
-        alignment_constraints = []
-
-    try:
-        challenge_rating_minimum = parameters["minimumChallengeRating"]
-    except (KeyError, IndexError):
-        challenge_rating_minimum = None
-    try:
-        challenge_rating_maximum = parameters["maximumChallengeRating"]
-    except (KeyError, IndexError):
-        challenge_rating_maximum = None
-
-    try:
-        if parameters["allowLegendary"] and parameters["allowLegendary"] == "false":
-            allow_legendary = False
+        if r_params["allowLegendary"] and r_params["allowLegendary"] == "false":
+            params['legend'] = False
         else:
-            allow_legendary = True
+            params['legend'] = True
     except (KeyError, IndexError):
-        allow_legendary = True
+        params['legend'] = True
 
     try:
-        if parameters["allowNamed"] and parameters["allowNamed"] == "false":
-            allow_named = False
+        if r_params["allowNamed"] and r_params["allowNamed"] == "false":
+            params['named'] = False
         else:
-            allow_named = True
+            params['named'] = True
     except (KeyError, IndexError):
-        allow_named = True
+        params['named'] = True
 
     # Oh, this is clumsy, I hate this
     where_requirements = ""
     query_arguments = []
     query_from = "monsters"
-    # TODO: Refactor to store CRs as floats and convert to fractions
-    possible_challenge_ratings = [
-        "0",
-        "1/8",
-        "1/4",
-        "1/2",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15",
-        "16",
-        "17",
-        "18",
-        "19",
-        "20",
-        "21",
-        "22",
-        "23",
-        "24",
-        "25",
-        "26",
-        "27",
-        "28",
-        "29",
-        "30",
-    ]
 
     # SO
     # If we have size constraints, we construct a string of placeholders,
@@ -274,26 +223,26 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     # and then append the constraints to the query_arguments list
 
     # Create a custom select with "environment like x or..." for every environment in constraints
-    if environment_constraints != []:
+    if params['env'] != []:
         query_from = f"(SELECT * FROM {query_from} WHERE "
-        for i, constraint in enumerate(environment_constraints):
+        for i, constraint in enumerate(params['env']):
             query_from += "environment LIKE ? OR "
-            environment_constraints[i] = f"%{constraint}%"
+            params['env'][i] = f"%{constraint}%"
         query_from = query_from[:-4]
         query_from += ")"
-        query_arguments += environment_constraints
+        query_arguments += params['env']
 
     # Create a custom select with "sourcehashes like x or", then get the source
     # hash for every specified source
     #
     # You need to do this because of wildcards surrounding the source name
     # Which makes me wonder if you need to be using those wildcards at all...
-    if source_constraints != []:
+    if params['source'] != []:
         query_from = f"(SELECT * FROM {query_from} WHERE "
         constraint_hashes = []
         with contextlib.closing(sqlite3.connect(db_location, uri=True)) as conn:
             cursor = conn.cursor()
-            for constraint in source_constraints:
+            for constraint in params['source']:
                 cursor.execute(
                     '''SELECT hash FROM sources WHERE name = ?''', (constraint,))
                 constraint_hashes.append(f"%{cursor.fetchone()[0]}%")
@@ -302,34 +251,34 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         query_from += ")"
         query_arguments += constraint_hashes
 
-    if alignment_constraints != []:
+    if params['align'] != []:
         query_from = f"(SELECT * FROM {query_from} WHERE "
-        for i, constraint in enumerate(alignment_constraints):
+        for i, constraint in enumerate(params['align']):
             query_from += "alignment LIKE ? OR "
-            alignment_constraints[i] = f"%{constraint}%"
+            params['align'][i] = f"%{constraint}%"
         query_from = query_from[:-4]
         query_from += ")"
-        query_arguments += alignment_constraints
+        query_arguments += params['align']
 
-    if size_constraints != []:
-        size_query_placeholders = f"({', '.join(['?']*len(size_constraints))})"
+    if params['size'] != []:
+        size_query_placeholders = f"({', '.join(['?']*len(params['size']))})"
         where_requirements += f"size IN {size_query_placeholders} AND "
-        query_arguments += size_constraints
+        query_arguments += params['size']
 
-    if type_constraints != []:
-        type_query_placeholders = f"({', '.join(['?']*len(type_constraints))})"
+    if params['type'] != []:
+        type_query_placeholders = f"({', '.join(['?']*len(params['type']))})"
         where_requirements += f"type IN {type_query_placeholders} AND "
-        query_arguments += type_constraints
+        query_arguments += params['type']
 
-    if challenge_rating_minimum is not None or challenge_rating_maximum is not None:
-        if challenge_rating_minimum is None:
+    if params['cr_min'] is not None or params['cr_max'] is not None:
+        if params['cr_min'] is None:
             min_cr = possible_challenge_ratings[0]
         else:
-            min_cr = challenge_rating_minimum
-        if challenge_rating_maximum is None:
+            min_cr = params['cr_min']
+        if params['cr_max'] is None:
             max_cr = possible_challenge_ratings[-1]
         else:
-            max_cr = challenge_rating_maximum
+            max_cr = params['cr_max']
 
         mindex = possible_challenge_ratings.index(min_cr)
         maxdex = possible_challenge_ratings.index(max_cr)+1
@@ -340,10 +289,10 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         where_requirements += f"cr IN {challenge_rating_placeholders} AND "
         query_arguments += possible_challenge_ratings[mindex:maxdex]
 
-    if allow_legendary is not True:
+    if params['legend'] is not True:
         where_requirements += "legendary = 0 AND "
 
-    if allow_named is not True:
+    if params['named'] is not True:
         where_requirements += "named = 0 AND "
 
     # If there are requirements, we add a WHERE to the start
