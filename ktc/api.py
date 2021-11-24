@@ -159,10 +159,6 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     # Here we go through the parameters and split each into an individual variable
     # This improves readability and allows for the creation of empty lists if
     # no constraints are given
-    if parameters == {}:
-        parameters['sources'] = [
-            f"source_{source}" for source in get_list_of_sources()]
-
     try:
         environment_constraints = [
             param.split("_")[1] for param in parameters["environments"]
@@ -180,7 +176,9 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
         source_constraints = [param.split("_")[1]
                               for param in parameters["sources"]]
     except (KeyError, IndexError):
-        source_constraints = []
+        source_constraints = get_list_of_sources()
+
+    print(get_list_of_sources()+get_unofficial_sources())
 
     try:
         source_constraints += [param.split("_")[1]

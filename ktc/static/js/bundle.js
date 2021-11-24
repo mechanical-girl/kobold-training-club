@@ -492,6 +492,7 @@ $(function () {
             encounterManager.colourAllCells();
         })
         debugLog("CRs added to page, done.")
+        debugLog(getMonsterParameters()["params"]);
     }))
     debugLog("Request sent.")
 
@@ -729,7 +730,6 @@ var getUnofficialSources = function () {
     $.getJSON('/api/unofficialsources').done(function (response) {
         let unofficialSourceNames = response;
         $("#customSourcesUsed").empty;
-        //$("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"));
         window.unofficialSourceNames = unofficialSourceNames;
     })
 }
