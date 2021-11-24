@@ -11,7 +11,7 @@ window.monsterParameters = {};
 window.partyThresholds = []
 window.encounterDifficulty = 0
 var customSourceNames = [];
-var unofficialSourceNames = []
+window.unofficialSourceNames = []
 
 function addZero(x,n) {
   while (x.toString().length < n) {
@@ -262,7 +262,7 @@ $(function () {
         })
 
         $(document).on("input", "#customSourceSearcher", function () {
-            sourcesManager.searchSources(unofficialSourceNames);
+            sourcesManager.searchSources(window.unofficialSourceNames);
         })
 
         $(document).on("input", "#sourceKeyInput", function () {
@@ -287,7 +287,7 @@ $(function () {
                             customSourceNames[customSourceNames.length] = results["name"];
                             $('#sourceKeyManagementDiv .alert').remove();
                             $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Source ' + results['name'] + ' processed! Search for it in the box above.</div >')
-                            $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
+                            $.getJSON('/api/unofficialsources').done(function (response) { window.unofficialSourceNames = response; })
                         })
                         customSheetProcessRequest.fail(function () {
                             $('#sourceKeyManagementDiv .alert').remove();
