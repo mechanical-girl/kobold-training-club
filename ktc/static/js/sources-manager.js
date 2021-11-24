@@ -20,7 +20,6 @@ var getUnofficialSources = function () {
     $.getJSON('/api/unofficialsources').done(function (response) {
         let unofficialSourceNames = response;
         $("#customSourcesUsed").empty;
-        //$("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"));
         window.unofficialSourceNames = unofficialSourceNames;
     })
 }
