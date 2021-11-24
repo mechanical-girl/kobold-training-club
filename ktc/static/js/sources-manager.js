@@ -7,6 +7,7 @@ var searchSources = function () {
     if (searchTerm != undefined) {
         $("#customSourceFinder").empty();
         searchTerm = searchTerm.toLowerCase();
+        console.log(window.unofficialSourceNames)
         for (var i = 0; i < window.unofficialSourceNames.length; i++) {
             if (window.unofficialSourceNames[i].toLowerCase().indexOf(searchTerm) != -1) {
                 $("#customSourceFinder").append('<li><label><input type="checkbox" class="unofficial-source" id="sources_' + window.unofficialSourceNames[i] + '">' + window.unofficialSourceNames[i] + '</label></li>');
@@ -19,7 +20,8 @@ var getUnofficialSources = function () {
     $.getJSON('/api/unofficialsources').done(function (response) {
         let unofficialSourceNames = response;
         $("#customSourcesUsed").empty;
-        $("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"));
+        //$("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"));
+        window.unofficialSourceNames = unofficialSourceNames;
     })
 }
 

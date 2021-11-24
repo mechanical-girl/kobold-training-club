@@ -322,7 +322,7 @@ window.monsterParameters = {};
 window.partyThresholds = []
 window.encounterDifficulty = 0
 var customSourceNames = [];
-var unofficialSourceNames = []
+window.unofficialSourceNames = []
 
 function addZero(x,n) {
   while (x.toString().length < n) {
@@ -573,7 +573,7 @@ $(function () {
         })
 
         $(document).on("input", "#customSourceSearcher", function () {
-            sourcesManager.searchSources(unofficialSourceNames);
+            sourcesManager.searchSources(window.unofficialSourceNames);
         })
 
         $(document).on("input", "#sourceKeyInput", function () {
@@ -598,7 +598,7 @@ $(function () {
                             customSourceNames[customSourceNames.length] = results["name"];
                             $('#sourceKeyManagementDiv .alert').remove();
                             $('#sourceKeyManagementDiv').prepend('<div class="alert alert-primary" id="processing-custom-source-alert role="alert">Source ' + results['name'] + ' processed! Search for it in the box above.</div >')
-                            $.getJSON('/api/unofficialsources').done(function (response) { unofficialSourceNames = response; })
+                            $.getJSON('/api/unofficialsources').done(function (response) { window.unofficialSourceNames = response; })
                         })
                         customSheetProcessRequest.fail(function () {
                             $('#sourceKeyManagementDiv .alert').remove();
@@ -716,6 +716,7 @@ var searchSources = function () {
     if (searchTerm != undefined) {
         $("#customSourceFinder").empty();
         searchTerm = searchTerm.toLowerCase();
+        console.log(window.unofficialSourceNames)
         for (var i = 0; i < window.unofficialSourceNames.length; i++) {
             if (window.unofficialSourceNames[i].toLowerCase().indexOf(searchTerm) != -1) {
                 $("#customSourceFinder").append('<li><label><input type="checkbox" class="unofficial-source" id="sources_' + window.unofficialSourceNames[i] + '">' + window.unofficialSourceNames[i] + '</label></li>');
@@ -728,7 +729,8 @@ var getUnofficialSources = function () {
     $.getJSON('/api/unofficialsources').done(function (response) {
         let unofficialSourceNames = response;
         $("#customSourcesUsed").empty;
-        $("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"));
+        //$("#customSourcesUsed").append(listElements(unofficialSourceNames, "sources"));
+        window.unofficialSourceNames = unofficialSourceNames;
     })
 }
 
