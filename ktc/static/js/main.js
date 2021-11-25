@@ -7,6 +7,7 @@ const partyManager = require('./party-manager.js');
 const encounterManager = require('./encounter-manager.js');
 const sourcesManager = require('./sources-manager.js');
 const improvedInitiativeService = require('./improved-initiative-service.js');
+const { PRIORITY_NORMAL } = require('constants');
 window.monsterParameters = {};
 window.partyThresholds = []
 window.encounterDifficulty = 0
@@ -33,7 +34,7 @@ const debugLog = function(str) {
 }
 
 var getMonsterParameters = function () {
-    return {
+        return {
         params: JSON.stringify(window.monsterParameters)
     };
 }
@@ -246,11 +247,9 @@ $(function () {
 
         // Handle random encounter generation
         $(document).on("click", "#generate-encounter-button", function() {
-            console.log("Generating encounter...");
             let encounterParameters = window.monsterParameters;
             encounterParameters["party"] = partyManager.getParty()
             encounterParameters["difficulty"] = $("#generate-encounter-button").text().split(' ')[0].toLowerCase()
-            console.log(encounterParameters)
             encounterManager.generateEncounter(encounterParameters);
         })
 
@@ -265,7 +264,6 @@ $(function () {
         $(document).on("input", "#customSourceSearcher", function () {
             sourcesManager.searchSources(window.unofficialSourceNames);
         })
-
         $(document).on("input", "#sourceKeyInput", function () {
             $('#sourceKeyManagementDiv .alert').remove();
             let key = $("#sourceKeyInput").val()
