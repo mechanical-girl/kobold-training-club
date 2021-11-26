@@ -178,13 +178,13 @@ def get_list_of_monsters(parameters: Dict) -> Dict[str, List[List[str]]]:
     except (KeyError, IndexError):
         source_constraints = get_list_of_sources()
 
-    print(get_list_of_sources()+get_unofficial_sources())
-
     try:
         source_constraints += [param.split("_")[1]
                                for param in parameters["customSourcesUsed"]]
     except (KeyError, IndexError):
         pass
+
+    print(source_constraints)
 
     try:
         type_constraints = [param.split("_")[1]
