@@ -13,9 +13,9 @@ var listElements = function (data, prefix = "") {
         var checked = "";
         if (stored != null && stored.indexOf(data[i]) != -1) {
             checked = " checked"
-            listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\"" + checked + ">" + data[i] + "</label></li>");
-            storeMe.push(data[i]);
         }
+        listText += ("<li><label><input type='checkbox' id=\"" + prefix + data[i] + "\"" + checked + ">" + data[i] + "</label></li>");
+        storeMe.push(data[i]);
     };
     window.localStorage.setItem(prefix + "_selector", storeMe.join(","));
     console.log("storeMe")
