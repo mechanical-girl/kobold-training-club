@@ -22,5 +22,4 @@ var listElements = function (data, prefix = "") {
     return listText;
 };
 
-
 module.exports = listElements

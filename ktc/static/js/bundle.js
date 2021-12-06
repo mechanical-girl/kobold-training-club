@@ -23,7 +23,6 @@ var listElements = function (data, prefix = "") {
     return listText;
 };
 
-
 module.exports = listElements
 
 },{}],2:[function(require,module,exports){
